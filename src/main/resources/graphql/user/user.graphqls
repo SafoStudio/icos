@@ -1,0 +1,44 @@
+extend type Query {
+    users: [User]
+    userById(id: ID!): User
+    userProfile(userId: ID!): UserProfile
+}
+
+extend type Mutation {
+    createUser(input: UserInput!): User
+    updateProfile(userId: ID!, input: ProfileInput!): UserProfile
+}
+
+type User {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    profile: UserProfile
+    createdAt: String
+    updatedAt: String
+}
+
+type UserProfile {
+    id: ID!
+    phoneNumber: String
+    address: String
+    bio: String
+    birthDate: String
+    createdAt: String
+    updatedAt: String
+}
+
+input UserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+}
+
+input ProfileInput {
+    phoneNumber: String
+    address: String
+    bio: String
+    birthDate: String
+}
