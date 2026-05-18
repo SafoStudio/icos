@@ -1,44 +1,33 @@
-extend type Query {
-    users: [User]
-    userById(id: ID!): User
-    userProfile(userId: ID!): UserProfile
-}
-
-extend type Mutation {
-    createUser(input: UserInput!): User
-    updateProfile(userId: ID!, input: ProfileInput!): UserProfile
-}
-
 type User {
     id: ID!
     firstName: String!
     lastName: String!
     email: String!
-    profile: UserProfile
-    createdAt: String
-    updatedAt: String
+    status: UserStatus!
+    companyId: ID!
+    createdBy: ID!
+    createdAt: String!
+    updatedAt: String!
 }
 
-type UserProfile {
-    id: ID!
-    phoneNumber: String
-    address: String
-    bio: String
-    birthDate: String
-    createdAt: String
-    updatedAt: String
+enum UserStatus {
+    INVITED
+    ACTIVE
+    SUSPENDED
+    DELETED
 }
 
-input UserInput {
-    firstName: String!
-    lastName: String!
-    email: String!
-    password: String!
+type Query {
+    getUserById(id: ID!): User
+    getUserByEmail(email: String!, companyId: ID!): User
+    getUsersByCompanyId(companyId: ID!): [User!]
 }
 
-input ProfileInput {
-    phoneNumber: String
-    address: String
-    bio: String
-    birthDate: String
+type Mutation {
+    createUser(firstName: String!, lastName: String!, email: String!, companyId: ID!, createdBy: ID!): User!
+    updateUser(id: ID!, firstName: String, lastName: String, email: String, updatedBy: ID!): User!
+    activateUser(id: ID!): Boolean!
+    suspendUser(id: ID!): Boolean!
+    terminateUser(id: ID!): Boolean!
+    deleteUser(id: ID!): Boolean!
 }
