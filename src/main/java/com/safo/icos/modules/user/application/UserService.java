@@ -1,22 +1,24 @@
 package com.safo.icos.modules.user.application;
 
+import com.safo.icos.common.dto.MembershipDto;
+import com.safo.icos.common.dto.UserDto;
+import com.safo.icos.common.port.user.UserCreateData;
+import com.safo.icos.modules.user.application.dto.UserResponseDto;
+import com.safo.icos.modules.user.domain.model.Email;
+import com.safo.icos.modules.user.domain.model.Membership;
+import com.safo.icos.modules.user.domain.model.User;
+import com.safo.icos.modules.user.domain.model.UserStatus;
+import com.safo.icos.modules.user.domain.repository.MembershipRepository;
+import com.safo.icos.modules.user.domain.repository.UserRepository;
+import com.safo.icos.modules.user.infrastructure.repository.RoleJpaRepository;
+import com.safo.icos.modules.user.infrastructure.repository.RoleJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import com.safo.icos.modules.user.domain.exception.UserNotFoundException;
-import com.safo.icos.modules.user.domain.model.Email;
-import com.safo.icos.modules.user.domain.model.User;
-import com.safo.icos.modules.user.domain.model.UserId;
-import com.safo.icos.modules.user.domain.model.UserName;
-import com.safo.icos.modules.user.domain.repository.UserRepository;
-import com.safo.icos.modules.user.domain.service.UserDomainService;
-import com.safo.icos.modules.user.application.dto.UserCreateDto;
-import com.safo.icos.modules.user.application.dto.UserResponseDto;
-import com.safo.icos.modules.user.application.dto.UserUpdateDto;
-import com.safo.icos.modules.user.infrastructure.mapper.UserMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -24,91 +26,113 @@ import com.safo.icos.modules.user.infrastructure.mapper.UserMapper;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserDomainService userDomainService;
-    private final UserMapper userMapper;
+    private final MembershipRepository membershipRepository;
+    private final RoleJpaRepository roleJpaRepository;
 
-    public UserResponseDto createUser(UserCreateDto dto, UUID createdBy) {
-        UserName name = UserName.of(dto.getFirstName(), dto.getLastName());
-        Email email = Email.of(dto.getEmail());
+    public UserDto createUserFromAuth(UserCreateData data) {
+        Email email = Email.of(data.getEmail());
 
-        User user = userDomainService.createUser(name, email, dto.getCompanyId(), createdBy);
-        User savedUser = userRepository.save(user);
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
 
-        return toResponseDto(savedUser);
+        User user = User.create(
+                data.getFirstName(),
+                data.getLastName(),
+                email,
+                data.getCreatedBy()
+        );
+
+        User saved = userRepository.save(user);
+        return toUserDto(saved);
     }
 
-    @Transactional(readOnly = true)
+    public Optional<UserDto> findByEmail(String email) {
+        return userRepository.findByEmail(Email.of(email)).map(this::toUserDto);
+    }
+
+    public Optional<UserDto> findById(UUID userId) {
+        return userRepository.findById(userId).map(this::toUserDto);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(Email.of(email));
+    }
+
+    public void updateUserStatus(UUID userId, String status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        switch (status.toUpperCase()) {
+            case "ACTIVE": user.activate(); break;
+            case "SUSPENDED": user.suspend(); break;
+            case "TERMINATED": user.terminate(); break;
+            default: throw new IllegalArgumentException("Invalid status");
+        }
+
+        userRepository.save(user);
+    }
+
+    public Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId) {
+        return membershipRepository.findActiveByUserIdAndCompanyId(userId, companyId)
+                .map(this::toMembershipDto);
+    }
+
+    public Optional<MembershipDto> findMembershipById(UUID membershipId) {
+        return membershipRepository.findById(membershipId)
+                .map(this::toMembershipDto);
+    }
+
+    public MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId) {
+        Membership membership = Membership.create(userId, companyId, role, departmentId);
+        Membership saved = membershipRepository.save(membership);
+        return toMembershipDto(saved);
+    }
+
+    private UserDto toUserDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail().getValue())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .status(user.getStatus().name())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+
+    private MembershipDto toMembershipDto(Membership membership) {
+        return MembershipDto.builder()
+                .id(membership.getId())
+                .userId(membership.getUserId())
+                .companyId(membership.getCompanyId())
+                .role(membership.getRole())
+                .departmentId(membership.getDepartmentId())
+                .active(membership.isActive())
+                .build();
+    }
+
     public UserResponseDto getUserById(UUID userId) {
-        User user = userRepository.findById(UserId.fromUUID(userId))
-                .orElseThrow(() -> new UserNotFoundException(UserId.fromUUID(userId)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return toResponseDto(user);
     }
 
-    @Transactional(readOnly = true)
-    public UserResponseDto getUserByEmailAndCompanyId(String email, UUID companyId) {
-        Email emailValue = Email.of(email);
-        User user = userRepository.findByEmailAndCompanyId(emailValue, companyId)
-                .orElseThrow(() -> new UserNotFoundException(email));
-        return toResponseDto(user);
-    }
-
-    @Transactional(readOnly = true)
     public List<UserResponseDto> getUsersByCompanyId(UUID companyId) {
-        return userRepository.findByCompanyId(companyId).stream()
-                .map(this::toResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    public UserResponseDto updateUser(UUID userId, UserUpdateDto dto, UUID updatedBy) {
-        User user = userRepository.findById(UserId.fromUUID(userId))
-                .orElseThrow(() -> new UserNotFoundException(UserId.fromUUID(userId)));
-
-        if (dto.getFirstName() != null || dto.getLastName() != null) {
-            String firstName = dto.getFirstName() != null ? dto.getFirstName() : user.getName().getFirstName();
-            String lastName = dto.getLastName() != null ? dto.getLastName() : user.getName().getLastName();
-            user.changeName(UserName.of(firstName, lastName));
-        }
-
-        if (dto.getEmail() != null) {
-            Email newEmail = Email.of(dto.getEmail());
-            if (!newEmail.equals(user.getEmail())) {
-                user = userDomainService.updateUserEmail(user.getId(), newEmail, user.getCompanyId());
-            }
-        }
-
-        User savedUser = userRepository.save(user);
-        return toResponseDto(savedUser);
-    }
-
-    public void activateUser(UUID userId) {
-        User user = userDomainService.activateUser(UserId.fromUUID(userId));
-        userRepository.save(user);
-    }
-
-    public void suspendUser(UUID userId) {
-        User user = userDomainService.suspendUser(UserId.fromUUID(userId));
-        userRepository.save(user);
-    }
-
-    public void terminateUser(UUID userId) {
-        User user = userDomainService.terminateUser(UserId.fromUUID(userId));
-        userRepository.save(user);
+        return List.of();
     }
 
     public void deleteUser(UUID userId) {
-        User user = userRepository.findById(UserId.fromUUID(userId))
-                .orElseThrow(() -> new UserNotFoundException(UserId.fromUUID(userId)));
-        userRepository.delete(user);
+        userRepository.deleteById(userId);
     }
 
     private UserResponseDto toResponseDto(User user) {
         return UserResponseDto.builder()
-                .id(user.getId().getValue())
-                .firstName(user.getName().getFirstName())
-                .lastName(user.getName().getLastName())
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .email(user.getEmail().getValue())
                 .status(user.getStatus())
-                .companyId(user.getCompanyId())
                 .createdBy(user.getCreatedBy())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

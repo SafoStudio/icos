@@ -1,0 +1,36 @@
+extend type Query {
+    user(id: ID!): User!
+    usersByCompany(companyId: ID!): [User!]!
+}
+
+extend type Mutation {
+    createUser(input: UserCreateInput!): User!
+    updateUser(id: ID!, input: UserUpdateInput!): User!
+    deleteUser(id: ID!): Boolean!
+    activateUser(id: ID!): Boolean!
+    suspendUser(id: ID!): Boolean!
+}
+
+type User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    status: String!
+    companyId: ID!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+input UserCreateInput {
+    email: String!
+    firstName: String!
+    lastName: String!
+    companyId: ID!
+}
+
+input UserUpdateInput {
+    firstName: String
+    lastName: String
+    email: String
+}

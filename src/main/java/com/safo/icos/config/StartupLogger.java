@@ -22,12 +22,14 @@ public class StartupLogger {
     @EventListener(ApplicationReadyEvent.class)
     public void logStartup() {
         String baseUrl = "http://localhost:" + port;
-        log.info("\n----------------------------------------------------------\n" +
-                "\tApplication is running! Access URLs:\n" +
-                "\tLocal: \t\t{}\n" +
-                "\tGraphQL: \t{}{}\n" +
-                "\tGraphiQL: \t{}{}\n" +
-                "----------------------------------------------------------",
-                baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath);
+        log.info("""
+                ----------------------------------------------------------
+                \tApplication is running! Access URLs:
+                \tLocal: \t\t%s
+                \tGraphQL: \t%s%s
+                \tGraphiQL: \t%s%s
+                \tpgAdmin: \thttp://localhost:5050
+                ----------------------------------------------------------
+                """.formatted(baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath));
     }
 }

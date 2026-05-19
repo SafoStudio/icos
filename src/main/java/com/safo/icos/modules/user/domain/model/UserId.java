@@ -9,7 +9,14 @@ public class UserId {
     private final UUID value;
 
     private UserId(UUID value) {
+        if (value == null) {
+            throw new IllegalArgumentException("UserId cannot be null");
+        }
         this.value = value;
+    }
+
+    public static UserId fromUUID(UUID uuid) {
+        return new UserId(uuid);
     }
 
     public static UserId generate() {
@@ -20,15 +27,11 @@ public class UserId {
         return new UserId(UUID.fromString(value));
     }
 
-    public static UserId fromUUID(UUID value) {
-        return new UserId(value);
-    }
-
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        UserId userId = (UserId) object;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserId userId = (UserId) o;
         return Objects.equals(value, userId.value);
     }
 

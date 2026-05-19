@@ -1,38 +1,37 @@
 package com.safo.icos.modules.user.infrastructure.mapper;
 
-import com.safo.icos.modules.user.infrastructure.repository.UserJpaEntity;
-import org.springframework.stereotype.Component;
 import com.safo.icos.modules.user.domain.model.Email;
 import com.safo.icos.modules.user.domain.model.User;
-import com.safo.icos.modules.user.domain.model.UserId;
-import com.safo.icos.modules.user.domain.model.UserName;
+import com.safo.icos.modules.user.domain.model.UserStatus;
+import com.safo.icos.modules.user.infrastructure.repository.UserJpaEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
-    public UserJpaEntity toJpaEntity(User user) {
+    public UserJpaEntity toJpaEntity(User domain) {
         return UserJpaEntity.builder()
-                .id(user.getId().getValue())
-                .firstName(user.getName().getFirstName())
-                .lastName(user.getName().getLastName())
-                .email(user.getEmail().getValue())
-                .status(user.getStatus())
-                .companyId(user.getCompanyId())
-                .createdBy(user.getCreatedBy())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
+                .id(domain.getId())
+                .firstName(domain.getFirstName())
+                .lastName(domain.getLastName())
+                .email(domain.getEmail().getValue())
+                .status(domain.getStatus().name())
+                .createdBy(domain.getCreatedBy())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
                 .build();
     }
 
     public User toDomain(UserJpaEntity entity) {
-        return User.reconstitute(
-                UserId.fromUUID(entity.getId()),
-                UserName.of(entity.getFirstName(), entity.getLastName()),
-                Email.of(entity.getEmail()),
-                entity.getStatus(),
-                entity.getCompanyId(),
-                entity.getCreatedBy(),
-                entity.getCreatedAt()
-        );
+        return User.builder()
+                .id(entity.getId())
+                .firstName(entity.getFirstName())
+                .lastName(entity.getLastName())
+                .email(new Email(entity.getEmail()))
+                .status(UserStatus.valueOf(entity.getStatus()))
+                .createdBy(entity.getCreatedBy())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
     }
 }

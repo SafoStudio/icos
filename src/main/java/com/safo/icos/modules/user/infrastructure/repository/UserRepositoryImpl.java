@@ -1,65 +1,75 @@
 package com.safo.icos.modules.user.infrastructure.repository;
 
-import com.safo.icos.modules.user.infrastructure.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import com.safo.icos.modules.user.domain.model.Email;
 import com.safo.icos.modules.user.domain.model.User;
-import com.safo.icos.modules.user.domain.model.UserId;
 import com.safo.icos.modules.user.domain.model.UserStatus;
 import com.safo.icos.modules.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository jpaRepository;
-    private final UserMapper mapper;
 
     @Override
-    public Optional<User> findById(UserId id) {
-        return jpaRepository.findById(id.getValue())
-                .map(mapper::toDomain);
+    public Optional<User> findById(UUID id) {
+        return jpaRepository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Optional<User> findByEmailAndCompanyId(Email email, UUID companyId) {
-        return jpaRepository.findByEmailAndCompanyId(email.getValue(), companyId)
-                .map(mapper::toDomain);
+    public Optional<User> findByEmail(Email email) {
+        return jpaRepository.findByEmail(email.getValue()).map(this::toDomain);
     }
 
     @Override
-    public List<User> findByCompanyId(UUID companyId) {
-        return jpaRepository.findByCompanyId(companyId).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<User> findByCompanyIdAndStatus(UUID companyId, UserStatus status) {
-        return jpaRepository.findByCompanyIdAndStatus(companyId, status).stream()
-                .map(mapper::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean existsByEmailAndCompanyId(Email email, UUID companyId) {
-        return jpaRepository.existsByEmailAndCompanyId(email.getValue(), companyId);
+    public boolean existsByEmail(Email email) {
+        return jpaRepository.existsByEmail(email.getValue());
     }
 
     @Override
     public User save(User user) {
-        UserJpaEntity entity = mapper.toJpaEntity(user);
-        UserJpaEntity savedEntity = jpaRepository.save(entity);
-        return mapper.toDomain(savedEntity);
+        UserJpaEntity entity = toJpaEntity(user);
+        UserJpaEntity saved = jpaRepository.save(entity);
+        return toDomain(saved);
     }
 
     @Override
     public void delete(User user) {
-        jpaRepository.deleteById(user.getId().getValue());
+        jpaRepository.deleteById(user.getId());
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
+    private UserJpaEntity toJpaEntity(User domain) {
+        return UserJpaEntity.builder()
+                .id(domain.getId())
+                .firstName(domain.getFirstName())
+                .lastName(domain.getLastName())
+                .email(domain.getEmail().getValue())
+                .status(domain.getStatus().name())
+                .createdBy(domain.getCreatedBy())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
+                .build();
+    }
+
+    private User toDomain(UserJpaEntity entity) {
+        return User.builder()
+                .id(entity.getId())
+                .firstName(entity.getFirstName())
+                .lastName(entity.getLastName())
+                .email(new Email(entity.getEmail()))
+                .status(UserStatus.valueOf(entity.getStatus()))
+                .createdBy(entity.getCreatedBy())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
     }
 }

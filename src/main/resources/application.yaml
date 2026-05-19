@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   application:
     name: icos
   datasource:
@@ -8,12 +11,34 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
   graphql:
     graphiql:
       enabled: true
+      path: /graphiql
+    schema:
+      locations: classpath:graphql/
+      printer:
+        enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-signing-must-be-changed-in-production}
+    access-token-ttl: ${JWT_EXPIRATION:900000}
+    refresh-token-ttl: ${JWT_REFRESH_EXPIRATION:604800000}
+  auth:
+    refresh-token-ttl: 30d
+    bcrypt-strength: 12
+
+logging:
+  level:
+    com.safo.icos: DEBUG
+    org.springframework.security: DEBUG

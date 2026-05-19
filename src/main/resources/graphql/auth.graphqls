@@ -1,0 +1,36 @@
+extend type Mutation {
+    register(
+        email: String!
+        password: String!
+        firstName: String!
+        lastName: String!
+        companyId: ID!
+        role: String
+    ): AuthResponse!
+
+    login(
+        email: String!
+        password: String!
+        companyId: ID!
+    ): AuthResponse!
+
+    refresh(refreshToken: String!): RefreshResponse!
+    logout(refreshToken: String!): Boolean!
+}
+
+extend type Query {
+    me: User!
+}
+
+type AuthResponse {
+    accessToken: String!
+    refreshToken: String!
+    tokenType: String!
+    expiresIn: Int!
+    user: User!
+}
+
+type RefreshResponse {
+    accessToken: String!
+    expiresIn: Int!
+}
