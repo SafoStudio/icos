@@ -10,8 +10,8 @@ import com.safo.icos.modules.user.domain.model.User;
 import com.safo.icos.modules.user.domain.model.UserStatus;
 import com.safo.icos.modules.user.domain.repository.MembershipRepository;
 import com.safo.icos.modules.user.domain.repository.UserRepository;
-import com.safo.icos.modules.user.infrastructure.repository.RoleJpaRepository;
-import com.safo.icos.modules.user.infrastructure.repository.RoleJpaEntity;
+import com.safo.icos.modules.user.infrastructure.repository.*;
+import com.safo.icos.security.permission.RequirePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final MembershipRepository membershipRepository;
     private final RoleJpaRepository roleJpaRepository;
+    private final UserProfileJpaRepository profileRepository;
 
     public UserDto createUserFromAuth(UserCreateData data) {
         Email email = Email.of(data.getEmail());
@@ -137,5 +138,17 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
+    }
+
+    @RequirePermission("profile:edit")
+    public void updateProfile(UUID userId, String phoneNumber, String address, String bio) {
+        UserProfileJpaEntity profile = profileRepository.findById(userId)
+                .orElse(UserProfileJpaEntity.builder().userId(userId).build());
+
+        profile.setPhoneNumber(phoneNumber);
+        profile.setAddress(address);
+        profile.setBio(bio);
+
+        profileRepository.save(profile);
     }
 }

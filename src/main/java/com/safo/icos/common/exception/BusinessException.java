@@ -1,5 +1,8 @@
 package com.safo.icos.common.exception;
 
+import lombok.Getter;
+
+@Getter
 public class BusinessException extends RuntimeException {
     private final String errorCode;
 
@@ -8,7 +11,4 @@ public class BusinessException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    public String getErrorCode() {
-        return errorCode;
-    }
 }

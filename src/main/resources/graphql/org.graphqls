@@ -1,0 +1,31 @@
+type Company {
+    id: ID!
+    name: String!
+    taxId: String
+}
+
+type Department {
+    id: ID!
+    companyId: ID!
+    name: String!
+    managerId: ID
+}
+
+type Position {
+    id: ID!
+    companyId: ID!
+    name: String!
+    description: String
+}
+
+extend type Query {
+    company(id: ID!): Company
+    departments(companyId: ID!): [Department!]!
+    positions(companyId: ID!): [Position!]!
+}
+
+extend type Mutation {
+    createCompany(name: String!, taxId: String): Company
+    createDepartment(companyId: ID!, name: String!, managerId: ID): Department
+    createPosition(companyId: ID!, name: String!, description: String): Position
+}
