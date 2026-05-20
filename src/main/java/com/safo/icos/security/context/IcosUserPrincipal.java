@@ -2,6 +2,7 @@ package com.safo.icos.security.context;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
@@ -20,7 +21,7 @@ public class IcosUserPrincipal implements UserDetails {
     private final Collection<? extends GrantedAuthority> authorities;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
@@ -30,7 +31,7 @@ public class IcosUserPrincipal implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return email;
     }
 

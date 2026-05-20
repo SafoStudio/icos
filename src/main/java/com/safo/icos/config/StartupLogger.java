@@ -24,12 +24,12 @@ public class StartupLogger {
         String baseUrl = "http://localhost:" + port;
         log.info("""
                 ----------------------------------------------------------
-                \tApplication is running! Access URLs:
-                \tLocal: \t\t%s
-                \tGraphQL: \t%s%s
-                \tGraphiQL: \t%s%s
-                \tpgAdmin: \thttp://localhost:5050
+                \t Application is running! Access URLs:
+                \t Local:    \t\t{}
+                \t GraphQL:  \t{}{}
+                \t GraphiQL: \t{}{}
+                \t pgAdmin:  \thttp://localhost:5050
                 ----------------------------------------------------------
-                """.formatted(baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath));
+                """, baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath);
     }
 }

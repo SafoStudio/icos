@@ -27,12 +27,10 @@ public class SecurityAspect {
     @Around("@annotation(requirePermission)")
     public Object handlePermission(ProceedingJoinPoint joinPoint, RequirePermission requirePermission) throws Throwable {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal)) {
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal userPrincipal)) {
             throw new SecurityException("No authenticated user found");
         }
-        
-        IcosUserPrincipal userPrincipal = (IcosUserPrincipal) authentication.getPrincipal();
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Resource resourceAnno = signature.getMethod().getAnnotation(Resource.class);
@@ -43,20 +41,27 @@ public class SecurityAspect {
             UUID id = findIdArgument(joinPoint, signature, resourceAnno.idSource());
 
             Repositories repositories = new Repositories(applicationContext);
-            Object oldEntity = repositories.getRepositoryFor(resourceAnno.type())
-                    .flatMap(repo -> ((JpaRepository<Object, UUID>) repo).findById(id))
-                    .orElseThrow(() -> new EntityNotFoundException("Resource not found with ID: " + id));
+
+            Object oldEntity = findEntityById(repositories, resourceAnno.type(), id);
 
             Object dto = findDtoArgument(joinPoint);
-
             finalResource = new CompositeResource<>(oldEntity, dto, id);
         } else {
             finalResource = findDtoArgument(joinPoint);
         }
 
         permissionsService.assertCan(userPrincipal, requirePermission.value(), finalResource);
-
         return joinPoint.proceed();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object findEntityById(Repositories repositories, Class<?> entityType, UUID id) {
+        return repositories.getRepositoryFor(entityType)
+                .map(repo -> {
+                    JpaRepository<Object, UUID> jpaRepository = (JpaRepository<Object, UUID>) repo;
+                    return jpaRepository.findById(id).orElse(null);
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Resource not found with ID: " + id));
     }
 
     private UUID findIdArgument(ProceedingJoinPoint joinPoint, MethodSignature signature, String idSourceName) {
@@ -64,14 +69,14 @@ public class SecurityAspect {
         Object[] args = joinPoint.getArgs();
 
         for (int i = 0; i < parameterNames.length; i++) {
-            if (parameterNames[i].equals(idSourceName) && args[i] instanceof UUID) {
-                return (UUID) args[i];
+            if (parameterNames[i].equals(idSourceName) && args[i] instanceof UUID uuid) {
+                return uuid;
             }
         }
 
         return Arrays.stream(args)
-                .filter(arg -> arg instanceof UUID)
-                .map(arg -> (UUID) arg)
+                .filter(UUID.class::isInstance)
+                .map(UUID.class::cast)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find ID argument: " + idSourceName));
     }

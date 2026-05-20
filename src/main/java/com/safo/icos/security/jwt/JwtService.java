@@ -32,8 +32,8 @@ public class JwtService implements AuthTokenProvider {
     }
 
     @Override
-    public AuthTokenDto generateTokens(UUID userId, String email, String firstName, String lastName, UUID tenantId) {
-        String accessToken = generateAccessToken(userId, email, firstName, lastName, tenantId);
+    public AuthTokenDto generateTokens(UUID userId, UUID tenantId) {
+        String accessToken = generateAccessToken(userId, tenantId);
         String refreshToken = generateRefreshToken(userId);
 
         return AuthTokenDto.builder()
@@ -44,15 +44,12 @@ public class JwtService implements AuthTokenProvider {
                 .build();
     }
 
-    private String generateAccessToken(UUID userId, String email, String firstName, String lastName, UUID tenantId) {
+    private String generateAccessToken(UUID userId, UUID tenantId) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(accessTokenTtlSeconds);
 
         return Jwts.builder()
                 .subject(userId.toString())
-                .claim("email", email)
-                .claim("firstName", firstName)
-                .claim("lastName", lastName)
                 .claim("tenantId", tenantId.toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))

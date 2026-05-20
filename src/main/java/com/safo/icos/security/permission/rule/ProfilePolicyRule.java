@@ -4,6 +4,8 @@ import com.safo.icos.security.context.IcosUserPrincipal;
 import com.safo.icos.security.permission.PolicyResult;
 import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -21,14 +23,13 @@ public class ProfilePolicyRule implements PolicyRule {
         }
 
         // 1. Check if editing own profile
-        if (user.getUserId().equals(targetUserId)) {
-            if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("profile:edit.self"))) {
-                return PolicyResult.allow("User can edit their own profile");
-            }
+        if (user.getUserId().equals(targetUserId)
+                && user.getAuthorities().stream().anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.self"))) {
+            return PolicyResult.allow("User can edit their own profile");
         }
 
         // 2. Check if user has permission to edit all profiles (Admin/Owner/HR)
-        if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("profile:edit.all"))) {
+        if (user.getAuthorities().stream().anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.all"))) {
             return PolicyResult.allow("User has permission to edit all profiles");
         }
 

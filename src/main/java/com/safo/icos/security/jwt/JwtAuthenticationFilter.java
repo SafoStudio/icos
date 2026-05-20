@@ -16,8 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -51,6 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         TenantContext.setTenantId(tenantIdStr);
 
                         userProvider.findPrincipal(userId, tenantId).ifPresent(principalData -> {
+                            List<SimpleGrantedAuthority> authorities = principalData.getPermissions().stream()
+                                    .map(SimpleGrantedAuthority::new)
+                                    .toList();
+
                             IcosUserPrincipal principal = IcosUserPrincipal.builder()
                                     .userId(principalData.getUserId())
                                     .email(principalData.getEmail())
@@ -59,9 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     .roleName(principalData.getRoleName())
                                     .departmentId(principalData.getDepartmentId())
                                     .departmentName(principalData.getDepartmentName())
-                                    .authorities(principalData.getPermissions().stream()
-                                            .map(SimpleGrantedAuthority::new)
-                                            .collect(Collectors.toList()))
+                                    .authorities(authorities)
                                     .build();
 
                             UsernamePasswordAuthenticationToken authentication =

@@ -5,6 +5,9 @@ import java.util.Base64;
 import java.util.Objects;
 
 public record TokenValue(String value) {
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     public TokenValue {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Token value cannot be empty");
@@ -13,7 +16,7 @@ public record TokenValue(String value) {
 
     public static TokenValue generate() {
         byte[] randomBytes = new byte[32];
-        new SecureRandom().nextBytes(randomBytes);
+        SECURE_RANDOM.nextBytes(randomBytes);
         return new TokenValue(Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes));
     }
 

@@ -16,6 +16,7 @@ import com.safo.icos.modules.auth.application.dto.RegisterRequestDto;
 import com.safo.icos.modules.auth.domain.exception.InvalidCredentialsException;
 import com.safo.icos.modules.auth.domain.exception.UserAlreadyExistsException;
 import com.safo.icos.modules.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.auth.domain.model.TokenValue;
 import com.safo.icos.modules.auth.domain.repository.RefreshTokenRepository;
 import com.safo.icos.modules.auth.domain.service.AuthDomainService;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaEntity;
@@ -79,9 +80,6 @@ public class AuthService {
 
         AuthTokenDto tokens = authTokenProvider.generateTokens(
                 user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
                 membership.getCompanyId()
         );
 
@@ -119,9 +117,6 @@ public class AuthService {
 
         AuthTokenDto tokens = authTokenProvider.generateTokens(
                 user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
                 membership.getCompanyId()
         );
 
@@ -137,7 +132,7 @@ public class AuthService {
     public RefreshResponseDto refresh(String refreshTokenValue, String deviceInfo) {
         log.debug("Refreshing token");
 
-        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(refreshTokenValue)
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(new TokenValue(refreshTokenValue))
                 .orElseThrow(() -> new BusinessException("Invalid refresh token", ErrorCode.TOKEN_NOT_FOUND));
 
         authDomainService.validateRefreshToken(refreshToken);
@@ -161,9 +156,6 @@ public class AuthService {
         // Generate new JWT
         AuthTokenDto tokens = authTokenProvider.generateTokens(
                 user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
                 membership.getCompanyId()
         );
 
@@ -175,7 +167,7 @@ public class AuthService {
     }
 
     public void logout(String refreshTokenValue) {
-        refreshTokenRepository.findByTokenHash(refreshTokenValue)
+        refreshTokenRepository.findByTokenHash(new TokenValue(refreshTokenValue))
                 .ifPresent(token -> {
                     RefreshToken revoked = token.revoke();
                     refreshTokenRepository.save(revoked);

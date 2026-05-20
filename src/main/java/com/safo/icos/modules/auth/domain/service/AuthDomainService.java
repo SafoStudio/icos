@@ -4,31 +4,22 @@ import com.safo.icos.modules.auth.domain.exception.TokenExpiredException;
 import com.safo.icos.modules.auth.domain.exception.TokenNotFoundException;
 import com.safo.icos.modules.auth.domain.exception.TokenRevokedException;
 import com.safo.icos.modules.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.auth.domain.model.TokenValue;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthDomainService {
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-
-    public String generateTokenHash() {
-        byte[] bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
     public RefreshToken createRefreshToken(UUID membershipId, String deviceInfo, Duration ttl) {
-        String tokenHash = generateTokenHash();
+        TokenValue token = TokenValue.generate();
         Instant expiresAt = Instant.now().plus(ttl);
 
-        return RefreshToken.create(membershipId, tokenHash, deviceInfo, expiresAt);
+        return RefreshToken.create(membershipId, token, deviceInfo, expiresAt);
     }
 
     public void validateRefreshToken(RefreshToken token) {

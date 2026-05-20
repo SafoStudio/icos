@@ -8,7 +8,7 @@ import java.util.UUID;
 public class RefreshTokenId {
     private final UUID value;
 
-    private RefreshTokenId(UUID value) {
+    public RefreshTokenId(UUID value) {
         if (value == null) {
             throw new IllegalArgumentException("RefreshTokenId cannot be null");
         }
