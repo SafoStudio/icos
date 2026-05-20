@@ -16,10 +16,10 @@ type User {
     email: String!
     firstName: String!
     lastName: String!
-    status: String!
     companyId: ID!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    role: String!
+    departmentId: ID
+    permissions: [String!]!
 }
 
 input UserCreateInput {

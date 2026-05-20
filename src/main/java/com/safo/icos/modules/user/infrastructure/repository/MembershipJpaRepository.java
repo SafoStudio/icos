@@ -11,5 +11,7 @@ public interface MembershipJpaRepository extends JpaRepository<MembershipJpaEnti
     @Query("SELECT m FROM MembershipJpaEntity m WHERE m.userId = :userId AND m.companyId = :companyId AND m.active = true")
     Optional<MembershipJpaEntity> findActiveByUserIdAndCompanyId(UUID userId, UUID companyId);
 
+    Optional<MembershipJpaEntity> findFirstByUserIdAndActiveTrue(UUID userId);
+
     List<MembershipJpaEntity> findByUserId(UUID userId);
 }

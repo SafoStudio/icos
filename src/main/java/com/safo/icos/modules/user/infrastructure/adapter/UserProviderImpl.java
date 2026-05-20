@@ -54,6 +54,11 @@ public class UserProviderImpl implements UserProvider {
     }
 
     @Override
+    public Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId) {
+        return userService.findFirstActiveMembershipByUserId(userId);
+    }
+
+    @Override
     public MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId) {
         return userService.createMembership(userId, companyId, role, departmentId);
     }

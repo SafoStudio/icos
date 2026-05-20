@@ -79,6 +79,11 @@ public class UserService {
                 .map(this::toMembershipDto);
     }
 
+    public Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId) {
+        return membershipRepository.findFirstByUserIdAndActiveTrue(userId)
+                .map(this::toMembershipDto);
+    }
+
     public Optional<MembershipDto> findMembershipById(UUID membershipId) {
         return membershipRepository.findById(membershipId)
                 .map(this::toMembershipDto);
@@ -108,6 +113,9 @@ public class UserService {
                 .userId(membership.getUserId())
                 .companyId(membership.getCompanyId())
                 .role(membership.getRole())
+                .roleId(roleJpaRepository.findByName(membership.getRole())
+                        .map(RoleJpaEntity::getId)
+                        .orElse(null))
                 .departmentId(membership.getDepartmentId())
                 .active(membership.isActive())
                 .build();

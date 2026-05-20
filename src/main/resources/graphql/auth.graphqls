@@ -4,14 +4,12 @@ extend type Mutation {
         password: String!
         firstName: String!
         lastName: String!
-        companyId: ID!
-        role: String
+        companyName: String!
     ): AuthResponse!
 
     login(
         email: String!
         password: String!
-        companyId: ID!
     ): AuthResponse!
 
     refresh(refreshToken: String!): RefreshResponse!
@@ -24,7 +22,6 @@ extend type Query {
 
 type AuthResponse {
     accessToken: String!
-    refreshToken: String!
     tokenType: String!
     expiresIn: Int!
     user: User!

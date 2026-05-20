@@ -7,13 +7,21 @@ import com.safo.icos.modules.auth.application.dto.AuthResponseDto;
 import com.safo.icos.modules.auth.application.dto.LoginRequestDto;
 import com.safo.icos.modules.auth.application.dto.RefreshResponseDto;
 import com.safo.icos.modules.auth.application.dto.RegisterRequestDto;
+import com.safo.icos.modules.auth.presentation.dto.AuthResponseView;
+import com.safo.icos.modules.auth.presentation.dto.RefreshResponseView;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import java.time.Duration;
 import java.util.UUID;
 
 @Slf4j
@@ -24,14 +32,32 @@ public class AuthGraphQLResolver {
     private final AuthService authService;
     private final UserProvider userProvider;
 
+    private HttpServletResponse getResponse() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getResponse() : null;
+    }
+
+    private void setRefreshTokenCookie(String token) {
+        HttpServletResponse response = getResponse();
+        if (response != null) {
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Strict")
+                    .path("/")
+                    .maxAge(Duration.ofDays(30))
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        }
+    }
+
     @MutationMapping
-    public AuthResponseDto register(
+    public AuthResponseView register(
             @Argument String email,
             @Argument String password,
             @Argument String firstName,
             @Argument String lastName,
-            @Argument String companyId,
-            @Argument String role,
+            @Argument String companyName,
             @ContextValue(name = "deviceInfo", required = false) String deviceInfo
     ) {
         var request = RegisterRequestDto.builder()
@@ -39,43 +65,69 @@ public class AuthGraphQLResolver {
                 .password(password)
                 .firstName(firstName)
                 .lastName(lastName)
-                .companyId(companyId)
-                .role(role)
+                .companyName(companyName)
                 .build();
 
         String device = deviceInfo != null ? deviceInfo : "graphql-client";
-        return authService.register(request, device);
+        AuthResponseDto result = authService.register(request, device);
+        setRefreshTokenCookie(result.getRefreshToken());
+        return AuthResponseView.builder()
+                .accessToken(result.getAccessToken())
+                .tokenType(result.getTokenType())
+                .expiresIn(result.getExpiresIn())
+                .user(result.getUser())
+                .build();
     }
 
     @MutationMapping
-    public AuthResponseDto login(
+    public AuthResponseView login(
             @Argument String email,
             @Argument String password,
-            @Argument String companyId,
             @ContextValue(name = "deviceInfo", required = false) String deviceInfo
     ) {
         var request = LoginRequestDto.builder()
                 .email(email)
                 .password(password)
-                .companyId(companyId)
                 .build();
 
         String device = deviceInfo != null ? deviceInfo : "graphql-client";
-        return authService.login(request, device);
+        AuthResponseDto result = authService.login(request, device);
+        setRefreshTokenCookie(result.getRefreshToken());
+        return AuthResponseView.builder()
+                .accessToken(result.getAccessToken())
+                .tokenType(result.getTokenType())
+                .expiresIn(result.getExpiresIn())
+                .user(result.getUser())
+                .build();
     }
 
     @MutationMapping
-    public RefreshResponseDto refresh(
+    public RefreshResponseView refresh(
             @Argument String refreshToken,
             @ContextValue(name = "deviceInfo", required = false) String deviceInfo
     ) {
         String device = deviceInfo != null ? deviceInfo : "graphql-client";
-        return authService.refresh(refreshToken, device);
+        RefreshResponseDto result = authService.refresh(refreshToken, device);
+        setRefreshTokenCookie(result.getRefreshToken());
+        return RefreshResponseView.builder()
+                .accessToken(result.getAccessToken())
+                .expiresIn(result.getExpiresIn())
+                .build();
     }
 
     @MutationMapping
-    public boolean logout(@Argument String refreshToken) {
-        authService.logout(refreshToken);
+    public boolean logout() {
+        HttpServletResponse response = getResponse();
+        if (response != null) {
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Strict")
+                    .path("/")
+                    .maxAge(0)
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        }
         return true;
     }
 

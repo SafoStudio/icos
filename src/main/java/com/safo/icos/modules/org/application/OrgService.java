@@ -22,6 +22,11 @@ public class OrgService {
     // --- Company ---
     @RequirePermission("org:manage")
     public CompanyDto createCompany(String name, String taxId) {
+        return createCompanyInternal(name, taxId);
+    }
+
+    @Transactional
+    public CompanyDto createCompanyInternal(String name, String taxId) {
         Company company = Company.create(name, taxId);
         Company saved = companyRepository.save(company);
         return toDto(saved);

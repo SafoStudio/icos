@@ -1,4 +1,3 @@
-// modules/auth/application/AuthService.java
 package com.safo.icos.modules.auth.application;
 
 import com.safo.icos.common.constant.ErrorCode;
@@ -21,6 +20,10 @@ import com.safo.icos.modules.auth.domain.repository.RefreshTokenRepository;
 import com.safo.icos.modules.auth.domain.service.AuthDomainService;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaEntity;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaRepository;
+import com.safo.icos.modules.org.application.OrgService;
+import com.safo.icos.modules.org.application.dto.CompanyDto;
+import com.safo.icos.modules.user.infrastructure.repository.PermissionJpaEntity;
+import com.safo.icos.modules.user.infrastructure.repository.RoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,8 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -43,6 +45,8 @@ public class AuthService {
     private final AuthDomainService authDomainService;
     private final PasswordEncoder passwordEncoder;
     private final AuthCredentialsJpaRepository credentialsRepository;
+    private final OrgService orgService;
+    private final RoleJpaRepository roleJpaRepository;
 
     @Value("${app.auth.refresh-token-ttl:30d}")
     private Duration refreshTokenTtl;
@@ -70,9 +74,27 @@ public class AuthService {
                 .build();
         credentialsRepository.save(credentials);
 
-        UUID companyId = UUID.fromString(request.getCompanyId());
-        String role = request.getRole() != null ? request.getRole() : "OWNER";
-        MembershipDto membership = userProvider.createMembership(user.getId(), companyId, role, null);
+        // Create company and membership
+        CompanyDto company = orgService.createCompanyInternal(request.getCompanyName(), null);
+        MembershipDto membership = userProvider.createMembership(user.getId(), company.getId(), "OWNER", null);
+
+        UserDto userWithCompany = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .companyId(membership.getCompanyId().toString())
+                .role(membership.getRole())
+                .departmentId(membership.getDepartmentId())
+                .permissions(roleJpaRepository.findById(membership.getRoleId())
+                        .map(role -> role.getPermissions().stream()
+                                .map(PermissionJpaEntity::getName)
+                                .toList())
+                        .orElse(List.of()))
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
 
         RefreshToken refreshToken = authDomainService.createRefreshToken(
                 membership.getId(), deviceInfo, refreshTokenTtl);
@@ -88,7 +110,7 @@ public class AuthService {
                 .refreshToken(tokens.getRefreshToken())
                 .tokenType(tokens.getTokenType())
                 .expiresIn(tokens.getExpiresIn())
-                .user(user)
+                .user(userWithCompany)
                 .build();
     }
 
@@ -105,10 +127,9 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        UUID companyId = UUID.fromString(request.getCompanyId());
-        MembershipDto membership = userProvider.findActiveMembership(user.getId(), companyId)
+        MembershipDto membership = userProvider.findFirstActiveMembershipByUserId(user.getId())
                 .orElseThrow(() -> new BusinessException(
-                        "User is not active in this company",
+                        "User does not have an active membership",
                         ErrorCode.USER_NOT_ACTIVE));
 
         RefreshToken refreshToken = authDomainService.createRefreshToken(
@@ -120,12 +141,30 @@ public class AuthService {
                 membership.getCompanyId()
         );
 
+UserDto userWithCompany = UserDto.builder()
+        .id(user.getId())
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .companyId(membership.getCompanyId().toString())
+        .role(membership.getRole())
+        .departmentId(membership.getDepartmentId())
+        .permissions(roleJpaRepository.findById(membership.getRoleId())
+                .map(role -> role.getPermissions().stream()
+                        .map(PermissionJpaEntity::getName)
+                        .toList())
+                .orElse(List.of()))
+        .status(user.getStatus())
+        .createdAt(user.getCreatedAt())
+        .updatedAt(user.getUpdatedAt())
+        .build();
+
         return AuthResponseDto.builder()
                 .accessToken(tokens.getAccessToken())
                 .refreshToken(tokens.getRefreshToken())
                 .tokenType(tokens.getTokenType())
                 .expiresIn(tokens.getExpiresIn())
-                .user(user)
+                .user(userWithCompany)
                 .build();
     }
 

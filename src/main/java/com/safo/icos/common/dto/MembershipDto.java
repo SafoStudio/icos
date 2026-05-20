@@ -11,6 +11,7 @@ public class MembershipDto {
     private final UUID userId;
     private final UUID companyId;
     private final String role;
+    private final UUID roleId;
     private final UUID departmentId;
     private final boolean active;
 }

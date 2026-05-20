@@ -12,6 +12,7 @@ public interface UserProvider {
     boolean existsByEmail(String email);
     void updateUserStatus(UUID userId, String status);
     Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId);
+    Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId);
     MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId);
     Optional<MembershipDto> findMembershipById(UUID membershipId);
 

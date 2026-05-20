@@ -10,6 +10,5 @@ public class RegisterRequestDto {
     private final String password;
     private final String firstName;
     private final String lastName;
-    private final String companyId;
-    private final String role;
+    private final String companyName;
 }
