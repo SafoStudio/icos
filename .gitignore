@@ -34,3 +34,5 @@ build/
 
 # Security
 .env
+m.sh
+r.sh

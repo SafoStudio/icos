@@ -3,6 +3,9 @@ package com.safo.icos.modules.org.application;
 import com.safo.icos.modules.org.application.dto.PositionDto;
 import com.safo.icos.modules.org.domain.model.Position;
 import com.safo.icos.modules.org.domain.repository.PositionRepository;
+import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.common.exception.BusinessException;
+import com.safo.icos.security.context.TenantContext;
 import com.safo.icos.security.permission.RequirePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +21,14 @@ import java.util.stream.Collectors;
 public class PositionService {
     private final PositionRepository positionRepository;
 
-    @RequirePermission("pos:manage")
-    public PositionDto createPosition(UUID companyId, String name, String description) {
+    @RequirePermission("position:manage")
+    public PositionDto createPosition(String name, String description) {
+        UUID companyId = UUID.fromString(TenantContext.getTenantId());
+        
+        if (positionRepository.existsByCompanyIdAndName(companyId, name)) {
+            throw new BusinessException("Position already exists", ErrorCode.POSITION_ALREADY_EXISTS);
+        }
+        
         Position position = Position.create(companyId, name, description);
         Position saved = positionRepository.save(position);
         return toDto(saved);

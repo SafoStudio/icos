@@ -8,4 +8,5 @@ import java.util.UUID;
 @Repository
 public interface PositionJpaRepository extends JpaRepository<PositionJpaEntity, UUID> {
     List<PositionJpaEntity> findByCompanyId(UUID companyId);
+    boolean existsByCompanyIdAndName(UUID companyId, String name);
 }

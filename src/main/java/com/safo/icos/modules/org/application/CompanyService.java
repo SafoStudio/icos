@@ -16,7 +16,7 @@ import java.util.UUID;
 public class CompanyService {
     private final CompanyRepository companyRepository;
 
-    @RequirePermission("org:manage")
+    @RequirePermission("company:manage")
     public CompanyDto createCompany(String name, String taxId) {
         return createCompanyInternal(name, taxId);
     }

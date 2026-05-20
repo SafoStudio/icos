@@ -1,0 +1,2 @@
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE positions ADD COLUMN IF NOT EXISTS description TEXT;

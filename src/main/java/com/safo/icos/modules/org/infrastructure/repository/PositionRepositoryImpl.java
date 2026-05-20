@@ -29,6 +29,11 @@ public class PositionRepositoryImpl implements PositionRepository {
     }
 
     @Override
+    public boolean existsByCompanyIdAndName(UUID companyId, String name) {
+        return jpaRepository.existsByCompanyIdAndName(companyId, name);
+    }
+
+    @Override
     public Position save(Position position) {
         PositionJpaEntity entity = mapper.toJpa(position);
         PositionJpaEntity saved = jpaRepository.save(entity);

@@ -11,15 +11,17 @@ public class Department {
     private final UUID id;
     private final UUID companyId;
     private final String name;
+    private final String description;
     private final UUID managerId;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public static Department create(UUID companyId, String name, UUID managerId) {
+    public static Department create(UUID companyId, String name, String description, UUID managerId) {
         return Department.builder()
                 .id(UUID.randomUUID())
                 .companyId(companyId)
                 .name(name)
+                .description(description)
                 .managerId(managerId)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())

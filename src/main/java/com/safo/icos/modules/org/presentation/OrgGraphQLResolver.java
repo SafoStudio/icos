@@ -41,16 +41,16 @@ public class OrgGraphQLResolver {
     }
 
     @MutationMapping
-    public DepartmentDto createDepartment(@Argument String companyId, @Argument String name, @Argument String managerId) {
+    public DepartmentDto createDepartment(@Argument String name, @Argument String description, @Argument String managerId) {
         return departmentService.createDepartment(
-                UUID.fromString(companyId),
                 name,
+                description,
                 managerId != null ? UUID.fromString(managerId) : null
         );
     }
 
     @MutationMapping
-    public PositionDto createPosition(@Argument String companyId, @Argument String name, @Argument String description) {
-        return positionService.createPosition(UUID.fromString(companyId), name, description);
+    public PositionDto createPosition(@Argument String name, @Argument String description) {
+        return positionService.createPosition(name, description);
     }
 }

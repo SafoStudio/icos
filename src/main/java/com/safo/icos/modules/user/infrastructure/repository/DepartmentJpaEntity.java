@@ -24,6 +24,9 @@ public class DepartmentJpaEntity {
     @Column(name = "manager_id")
     private UUID managerId;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

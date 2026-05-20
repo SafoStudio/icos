@@ -8,6 +8,7 @@ type Department {
     id: ID!
     companyId: ID!
     name: String!
+    description: String
     managerId: ID
 }
 
@@ -26,6 +27,6 @@ extend type Query {
 
 extend type Mutation {
     createCompany(name: String!, taxId: String): Company
-    createDepartment(companyId: ID!, name: String!, managerId: ID): Department
-    createPosition(companyId: ID!, name: String!, description: String): Position
+    createDepartment(name: String!, description: String, managerId: ID): Department
+    createPosition(name: String!, description: String): Position
 }

@@ -9,29 +9,17 @@ import org.springframework.stereotype.Component;
 public class DepartmentPolicyRule implements PolicyRule {
     @Override
     public boolean supports(String action) {
-        return action.startsWith("users:") || action.startsWith("departments:");
+        return action.startsWith("user:") || action.startsWith("department:") || action.startsWith("position:");
     }
 
     @Override
     public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
         if ("OWNER".equals(user.getRoleName())) {
-            return PolicyResult.allow("Owner has full access within company");
+            return PolicyResult.allow("Owner has full access");
         }
 
-        if ("HEAD".equals(user.getRoleName())) {
-            if (isHrDepartment(user.getDepartmentName())) {
-                return PolicyResult.allow("HR Head has cross-department access");
-            }
-
-            // Regular Head can only see their own department (placeholder for further logic)
-            return PolicyResult.abstain(); 
-        }
-
+        // Add additional rules for HEAD, etc.
         return PolicyResult.abstain();
-    }
-
-    private boolean isHrDepartment(String deptName) {
-        return deptName != null && (deptName.equalsIgnoreCase("HR") || deptName.toUpperCase().contains("HR"));
     }
 
     @Override

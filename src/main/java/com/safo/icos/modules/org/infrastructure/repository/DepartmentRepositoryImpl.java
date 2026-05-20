@@ -25,12 +25,14 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
 
     @Override
     public List<Department> findByCompanyId(UUID companyId) {
-        // Since we don't have a direct method in DepartmentJpaRepository yet, we filter for now
-        // or we could add it to DepartmentJpaRepository.
-        return jpaRepository.findAll().stream()
-                .filter(d -> d.getCompanyId().equals(companyId))
+        return jpaRepository.findByCompanyId(companyId).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsByCompanyIdAndName(UUID companyId, String name) {
+        return jpaRepository.existsByCompanyIdAndName(companyId, name);
     }
 
     @Override
