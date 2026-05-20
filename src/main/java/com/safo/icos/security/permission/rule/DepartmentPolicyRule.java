@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 public class DepartmentPolicyRule implements PolicyRule {
     @Override
     public boolean supports(String action) {
-        return action.startsWith("user:") || action.startsWith("department:") || action.startsWith("position:");
+        return action.startsWith("department:");
     }
 
     @Override
     public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
         if ("OWNER".equals(user.getRoleName())) {
-            return PolicyResult.allow("Owner has full access");
+            return PolicyResult.allow("Owner has full access to departments");
         }
 
-        // Add additional rules for HEAD, etc.
         return PolicyResult.abstain();
     }
 
