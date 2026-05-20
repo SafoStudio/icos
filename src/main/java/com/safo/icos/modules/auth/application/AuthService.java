@@ -20,7 +20,7 @@ import com.safo.icos.modules.auth.domain.repository.RefreshTokenRepository;
 import com.safo.icos.modules.auth.domain.service.AuthDomainService;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaEntity;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaRepository;
-import com.safo.icos.modules.org.application.OrgService;
+import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.user.infrastructure.repository.PermissionJpaEntity;
 import com.safo.icos.modules.user.infrastructure.repository.RoleJpaRepository;
@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -45,7 +47,7 @@ public class AuthService {
     private final AuthDomainService authDomainService;
     private final PasswordEncoder passwordEncoder;
     private final AuthCredentialsJpaRepository credentialsRepository;
-    private final OrgService orgService;
+    private final CompanyService companyService;
     private final RoleJpaRepository roleJpaRepository;
 
     @Value("${app.auth.refresh-token-ttl:30d}")
@@ -75,9 +77,9 @@ public class AuthService {
         credentialsRepository.save(credentials);
 
         // Create company and membership
-        CompanyDto company = orgService.createCompanyInternal(request.getCompanyName(), null);
+        CompanyDto company = companyService.createCompanyInternal(request.getCompanyName(), null);
         MembershipDto membership = userProvider.createMembership(user.getId(), company.getId(), "OWNER", null);
-
+        
         UserDto userWithCompany = UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -140,24 +142,24 @@ public class AuthService {
                 user.getId(),
                 membership.getCompanyId()
         );
-
-UserDto userWithCompany = UserDto.builder()
-        .id(user.getId())
-        .email(user.getEmail())
-        .firstName(user.getFirstName())
-        .lastName(user.getLastName())
-        .companyId(membership.getCompanyId().toString())
-        .role(membership.getRole())
-        .departmentId(membership.getDepartmentId())
-        .permissions(roleJpaRepository.findById(membership.getRoleId())
-                .map(role -> role.getPermissions().stream()
-                        .map(PermissionJpaEntity::getName)
-                        .toList())
-                .orElse(List.of()))
-        .status(user.getStatus())
-        .createdAt(user.getCreatedAt())
-        .updatedAt(user.getUpdatedAt())
-        .build();
+        
+        UserDto userWithCompany = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .companyId(membership.getCompanyId().toString())
+                .role(membership.getRole())
+                .departmentId(membership.getDepartmentId())
+                .permissions(roleJpaRepository.findById(membership.getRoleId())
+                        .map(role -> role.getPermissions().stream()
+                                .map(PermissionJpaEntity::getName)
+                                .toList())
+                        .orElse(List.of()))
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
 
         return AuthResponseDto.builder()
                 .accessToken(tokens.getAccessToken())
