@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,20 +23,34 @@ public class DepartmentService {
     private final DepartmentRepository departmentRepository;
 
     @RequirePermission("department:manage")
-    public DepartmentDto createDepartment(String name, String description, UUID managerId) {
+    public DepartmentDto updateDepartment(UUID id, String name, String description) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Department not found", ErrorCode.DEPT_NOT_FOUND));
+        
+        department.update(name, description);
+        Department saved = departmentRepository.save(department);
+        return toDto(saved);
+    }
+
+    @RequirePermission("department:manage")
+    public DepartmentDto createDepartment(String name, String description) {
         UUID companyId = UUID.fromString(TenantContext.getTenantId());
         
         if (departmentRepository.existsByCompanyIdAndName(companyId, name)) {
             throw new BusinessException("Department already exists", ErrorCode.DEPT_ALREADY_EXISTS);
         }
         
-        Department department = Department.create(companyId, name, description, managerId);
+        Department department = Department.create(companyId, name, description);
         Department saved = departmentRepository.save(department);
         return toDto(saved);
     }
 
     public List<DepartmentDto> getDepartmentsByCompany(UUID companyId) {
-        return departmentRepository.findByCompanyId(companyId).stream()
+        List<Department> departments = departmentRepository.findByCompanyId(companyId);
+        if (departments == null) {
+            return Collections.emptyList();
+        }
+        return departments.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -46,7 +61,6 @@ public class DepartmentService {
                 .companyId(domain.getCompanyId())
                 .name(domain.getName())
                 .description(domain.getDescription())
-                .managerId(domain.getManagerId())
                 .build();
     }
 }

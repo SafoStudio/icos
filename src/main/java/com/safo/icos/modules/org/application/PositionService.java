@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,8 +35,22 @@ public class PositionService {
         return toDto(saved);
     }
 
+    @RequirePermission("position:manage")
+    public PositionDto updatePosition(UUID id, String name, String description) {
+        Position position = positionRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Position not found", ErrorCode.POSITION_NOT_FOUND));
+        
+        position.update(name, description);
+        Position saved = positionRepository.save(position);
+        return toDto(saved);
+    }
+
     public List<PositionDto> getPositionsByCompany(UUID companyId) {
-        return positionRepository.findByCompanyId(companyId).stream()
+        List<Position> positions = positionRepository.findByCompanyId(companyId);
+        if (positions == null) {
+            return Collections.emptyList();
+        }
+        return positions.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }

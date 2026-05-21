@@ -10,3 +10,17 @@ type Mutation {
     # All Mutations from other files will be merged here.
     # Empty type - it will be expanded in other files.
 }
+
+enum InviteStatus {
+    PENDING
+    ACCEPTED
+    EXPIRED
+    CANCELED
+}
+
+enum RoleName {
+    ADMIN
+    OWNER
+    HEAD
+    SPECIALIST
+}

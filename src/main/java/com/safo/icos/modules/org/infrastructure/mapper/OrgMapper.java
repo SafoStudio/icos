@@ -39,7 +39,6 @@ public class OrgMapper {
                 .companyId(entity.getCompanyId())
                 .name(entity.getName())
                 .description(entity.getDescription())
-                .managerId(entity.getManagerId())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -51,7 +50,6 @@ public class OrgMapper {
                 .companyId(domain.getCompanyId())
                 .name(domain.getName())
                 .description(domain.getDescription())
-                .managerId(domain.getManagerId())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
                 .build();

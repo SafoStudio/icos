@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface InviteJpaRepository extends JpaRepository<InviteJpaEntity, UUID> {
     Optional<InviteJpaEntity> findByToken(String token);
+    boolean existsByEmail(String email);
 }

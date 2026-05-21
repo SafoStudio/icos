@@ -10,21 +10,25 @@ import java.util.UUID;
 public class Department {
     private final UUID id;
     private final UUID companyId;
-    private final String name;
-    private final String description;
-    private final UUID managerId;
+    private String name;
+    private String description;
     private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
-    public static Department create(UUID companyId, String name, String description, UUID managerId) {
+    public static Department create(UUID companyId, String name, String description) {
         return Department.builder()
                 .id(UUID.randomUUID())
                 .companyId(companyId)
                 .name(name)
                 .description(description)
-                .managerId(managerId)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void update(String name, String description) {
+        if (name != null) this.name = name;
+        if (description != null) this.description = description;
+        this.updatedAt = LocalDateTime.now();
     }
 }

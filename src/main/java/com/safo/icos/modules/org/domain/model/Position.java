@@ -10,10 +10,10 @@ import java.util.UUID;
 public class Position {
     private final UUID id;
     private final UUID companyId;
-    private final String name;
-    private final String description;
+    private String name;
+    private String description;
     private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     public static Position create(UUID companyId, String name, String description) {
         return Position.builder()
@@ -24,5 +24,11 @@ public class Position {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void update(String name, String description) {
+        if (name != null) this.name = name;
+        if (description != null) this.description = description;
+        this.updatedAt = LocalDateTime.now();
     }
 }

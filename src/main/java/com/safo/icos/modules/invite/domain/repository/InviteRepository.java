@@ -9,4 +9,5 @@ public interface InviteRepository {
     Invite save(Invite invite);
     Optional<Invite> findById(UUID id);
     Optional<Invite> findByToken(String token);
+    boolean existsByEmail(String email);
 }

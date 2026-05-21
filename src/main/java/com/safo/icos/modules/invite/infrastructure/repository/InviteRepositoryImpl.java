@@ -31,4 +31,9 @@ public class InviteRepositoryImpl implements InviteRepository {
     public Optional<Invite> findByToken(String token) {
         return jpaRepository.findByToken(token).map(mapper::toDomain);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return jpaRepository.existsByEmail(email);
+    }
 }

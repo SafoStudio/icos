@@ -11,5 +11,4 @@ public class DepartmentDto {
     private final UUID companyId;
     private final String name;
     private final String description;
-    private final UUID managerId;
 }

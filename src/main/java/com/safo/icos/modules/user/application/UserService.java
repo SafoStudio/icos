@@ -89,8 +89,8 @@ public class UserService {
                 .map(this::toMembershipDto);
     }
 
-    public MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId) {
-        Membership membership = Membership.create(userId, companyId, role, departmentId);
+    public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId) {
+        Membership membership = Membership.create(userId, companyId, roleId, departmentId, managerId);
         Membership saved = membershipRepository.save(membership);
         return toMembershipDto(saved);
     }
@@ -108,14 +108,16 @@ public class UserService {
     }
 
     private MembershipDto toMembershipDto(Membership membership) {
+        String roleName = roleJpaRepository.findById(membership.getRoleId())
+                .map(RoleJpaEntity::getName)
+                .orElse("UNKNOWN");
+
         return MembershipDto.builder()
                 .id(membership.getId())
                 .userId(membership.getUserId())
                 .companyId(membership.getCompanyId())
-                .role(membership.getRole())
-                .roleId(roleJpaRepository.findByName(membership.getRole())
-                        .map(RoleJpaEntity::getId)
-                        .orElse(null))
+                .role(roleName)
+                .roleId(membership.getRoleId())
                 .departmentId(membership.getDepartmentId())
                 .active(membership.isActive())
                 .build();

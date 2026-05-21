@@ -25,6 +25,7 @@ import com.safo.icos.modules.invite.domain.model.Invite;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.user.infrastructure.repository.PermissionJpaEntity;
+import com.safo.icos.modules.user.infrastructure.repository.RoleJpaEntity;
 import com.safo.icos.modules.user.infrastructure.repository.RoleJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,12 @@ public class AuthService {
 
         // Create company and membership
         CompanyDto company = companyService.createCompanyInternal(request.getCompanyName(), null);
-        MembershipDto membership = userProvider.createMembership(user.getId(), company.getId(), "OWNER", null);
+        
+        UUID ownerRoleId = roleJpaRepository.findByName("OWNER")
+                .map(RoleJpaEntity::getId)
+                .orElseThrow(() -> new RuntimeException("Role OWNER not found"));
+                
+        MembershipDto membership = userProvider.createMembership(user.getId(), company.getId(), ownerRoleId, null, null);
         
         UserDto userWithCompany = UserDto.builder()
                 .id(user.getId())
@@ -241,11 +247,16 @@ public class AuthService {
         credentialsRepository.save(credentials);
 
         // Create membership from invite
+        UUID roleId = roleJpaRepository.findByName(invite.getRole().name())
+                .map(RoleJpaEntity::getId)
+                .orElseThrow(() -> new RuntimeException("Role " + invite.getRole().name() + " not found"));
+        
         MembershipDto membership = userProvider.createMembership(
                 user.getId(), 
                 invite.getCompanyId(), 
-                invite.getRole().name(), 
-                invite.getDepartmentId());
+                roleId, 
+                invite.getDepartmentId(),
+                invite.getManagerId());
 
         UserDto userWithCompany = UserDto.builder()
                 .id(user.getId())

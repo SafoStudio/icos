@@ -25,12 +25,12 @@ public class OrgGraphQLResolver {
         return companyService.getCompany(UUID.fromString(id));
     }
 
-    @QueryMapping
+    @QueryMapping(name = "departments")
     public List<DepartmentDto> getDepartmentsByCompany(@Argument String companyId) {
         return departmentService.getDepartmentsByCompany(UUID.fromString(companyId));
     }
 
-    @QueryMapping
+    @QueryMapping(name = "positions")
     public List<PositionDto> getPositionsByCompany(@Argument String companyId) {
         return positionService.getPositionsByCompany(UUID.fromString(companyId));
     }
@@ -41,16 +41,22 @@ public class OrgGraphQLResolver {
     }
 
     @MutationMapping
-    public DepartmentDto createDepartment(@Argument String name, @Argument String description, @Argument String managerId) {
-        return departmentService.createDepartment(
-                name,
-                description,
-                managerId != null ? UUID.fromString(managerId) : null
-        );
+    public DepartmentDto createDepartment(@Argument String name, @Argument String description) {
+        return departmentService.createDepartment(name, description);
+    }
+
+    @MutationMapping
+    public DepartmentDto updateDepartment(@Argument String id, @Argument String name, @Argument String description) {
+        return departmentService.updateDepartment(UUID.fromString(id), name, description);
     }
 
     @MutationMapping
     public PositionDto createPosition(@Argument String name, @Argument String description) {
         return positionService.createPosition(name, description);
+    }
+
+    @MutationMapping
+    public PositionDto updatePosition(@Argument String id, @Argument String name, @Argument String description) {
+        return positionService.updatePosition(UUID.fromString(id), name, description);
     }
 }

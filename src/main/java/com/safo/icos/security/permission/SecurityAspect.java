@@ -83,7 +83,7 @@ public class SecurityAspect {
 
     private Object findDtoArgument(ProceedingJoinPoint joinPoint) {
         return Arrays.stream(joinPoint.getArgs())
-                .filter(arg -> !(arg instanceof UUID))
+                .filter(arg -> arg != null && !(arg instanceof UUID))
                 .findFirst()
                 .orElse(null);
     }

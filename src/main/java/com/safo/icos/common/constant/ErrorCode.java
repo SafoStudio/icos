@@ -10,7 +10,9 @@ public final class ErrorCode {
     public static final String MEMBERSHIP_NOT_FOUND = "MEMBERSHIP_001";
     public static final String USER_NOT_ACTIVE = "MEMBERSHIP_002";
     public static final String DEPT_ALREADY_EXISTS = "ORG_001";
-    public static final String POSITION_ALREADY_EXISTS = "ORG_002";
+    public static final String DEPT_NOT_FOUND = "ORG_002";
+    public static final String POSITION_ALREADY_EXISTS = "ORG_003";
+    public static final String POSITION_NOT_FOUND = "ORG_004";
 
     private ErrorCode() {}
 }

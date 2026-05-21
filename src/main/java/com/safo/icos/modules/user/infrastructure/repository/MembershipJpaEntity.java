@@ -27,6 +27,9 @@ public class MembershipJpaEntity {
     @Column(name = "department_id")
     private UUID departmentId;
 
+    @Column(name = "manager_id")
+    private UUID managerId;
+
     @Column(name = "active", nullable = false)
     private boolean active;
 

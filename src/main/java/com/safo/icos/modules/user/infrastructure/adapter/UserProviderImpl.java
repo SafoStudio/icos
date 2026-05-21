@@ -59,8 +59,8 @@ public class UserProviderImpl implements UserProvider {
     }
 
     @Override
-    public MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId) {
-        return userService.createMembership(userId, companyId, role, departmentId);
+    public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId) {
+        return userService.createMembership(userId, companyId, roleId, departmentId, managerId);
     }
 
     @Override

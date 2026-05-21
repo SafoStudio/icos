@@ -1,5 +1,6 @@
 package com.safo.icos.modules.invite.application;
 
+import com.safo.icos.common.util.HashUtils;
 import com.safo.icos.modules.invite.application.dto.*;
 import com.safo.icos.modules.invite.domain.model.Invite;
 import com.safo.icos.common.enums.InviteStatus;
@@ -45,6 +46,11 @@ public class InviteService {
     @Transactional
     public InviteResponseDto createInvite(UUID companyId, InviteRequestDto dto) {
         checkInvitePermissions();
+        
+        if (repository.existsByEmail(dto.email())) {
+            throw new RuntimeException("An invitation for this email already exists");
+        }
+        
         IcosUserPrincipal principal = (IcosUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String token = generateSafeToken();
@@ -57,7 +63,7 @@ public class InviteService {
                 .departmentId(dto.departmentId())
                 .managerId(dto.managerId())
                 .invitedById(principal.getUserId())
-                .token(token)
+                .token(HashUtils.hash(token))
                 .status(InviteStatus.PENDING)
                 .expiresAt(OffsetDateTime.now().plusDays(7))
                 .createdAt(OffsetDateTime.now())
@@ -83,7 +89,7 @@ public class InviteService {
     }
 
     public InviteResponseDto getInviteByToken(String token) {
-        Invite invite = repository.findByToken(token)
+        Invite invite = repository.findByToken(HashUtils.hash(token))
                 .orElseThrow(() -> new RuntimeException("Invite not found"));
 
         if (!invite.isPending()) {
@@ -152,7 +158,7 @@ public class InviteService {
                 .departmentId(invite.getDepartmentId())
                 .managerId(invite.getManagerId())
                 .invitedById(invite.getInvitedById())
-                .token(newToken)
+                .token(HashUtils.hash(newToken))
                 .status(InviteStatus.PENDING)
                 .expiresAt(OffsetDateTime.now().plusDays(7))
                 .createdAt(invite.getCreatedAt())

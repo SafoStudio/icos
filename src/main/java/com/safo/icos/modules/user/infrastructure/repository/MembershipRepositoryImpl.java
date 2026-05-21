@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class MembershipRepositoryImpl implements MembershipRepository {
 
     private final MembershipJpaRepository jpaRepository;
-    private final RoleJpaRepository roleJpaRepository;
 
     @Override
     public Optional<Membership> findById(UUID id) {
@@ -51,16 +50,13 @@ public class MembershipRepositoryImpl implements MembershipRepository {
     }
 
     private MembershipJpaEntity toJpaEntity(Membership domain) {
-        UUID roleId = roleJpaRepository.findByName(domain.getRole())
-                .map(RoleJpaEntity::getId)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + domain.getRole()));
-
         return MembershipJpaEntity.builder()
                 .id(domain.getId())
                 .userId(domain.getUserId())
                 .companyId(domain.getCompanyId())
-                .roleId(roleId)
+                .roleId(domain.getRoleId())
                 .departmentId(domain.getDepartmentId())
+                .managerId(domain.getManagerId())
                 .active(domain.isActive())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
@@ -68,16 +64,13 @@ public class MembershipRepositoryImpl implements MembershipRepository {
     }
 
     private Membership toDomain(MembershipJpaEntity entity) {
-        String roleName = roleJpaRepository.findById(entity.getRoleId())
-                .map(RoleJpaEntity::getName)
-                .orElse("UNKNOWN");
-
         return Membership.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
                 .companyId(entity.getCompanyId())
-                .role(roleName)
+                .roleId(entity.getRoleId())
                 .departmentId(entity.getDepartmentId())
+                .managerId(entity.getManagerId())
                 .active(entity.isActive())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

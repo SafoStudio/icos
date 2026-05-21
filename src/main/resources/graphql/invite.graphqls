@@ -13,7 +13,6 @@ input InviteAcceptInput {
 
 type InviteResponse {
     id: ID!
-    token: String!
     email: String!
     role: RoleName!
     companyId: ID!

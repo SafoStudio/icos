@@ -13,7 +13,7 @@ public interface UserProvider {
     void updateUserStatus(UUID userId, String status);
     Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId);
     Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId);
-    MembershipDto createMembership(UUID userId, UUID companyId, String role, UUID departmentId);
+    MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId);
     Optional<MembershipDto> findMembershipById(UUID membershipId);
 
     /**
