@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class IcosApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(IcosApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(IcosApplication.class, args);
+  }
 
 }

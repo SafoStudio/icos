@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RegisterRequestDto {
-    private final String email;
-    private final String password;
-    private final String firstName;
-    private final String lastName;
-    private final String companyName;
+  private final String email;
+  private final String password;
+  private final String firstName;
+  private final String lastName;
+  private final String companyName;
 }

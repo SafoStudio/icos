@@ -1,43 +1,26 @@
 package com.safo.icos.modules.auth.domain.model;
 
-import lombok.Getter;
 import java.util.Objects;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
-@Getter
-public class RefreshTokenId {
-    private final UUID value;
+public record RefreshTokenId(UUID value) {
 
-    public RefreshTokenId(UUID value) {
-        if (value == null) {
-            throw new IllegalArgumentException("RefreshTokenId cannot be null");
-        }
-        this.value = value;
-    }
+  public RefreshTokenId {
+    Objects.requireNonNull(value, "RefreshTokenId cannot be null");
+  }
 
-    public static RefreshTokenId generate() {
-        return new RefreshTokenId(UUID.randomUUID());
-    }
+  public static RefreshTokenId generate() {
+    return new RefreshTokenId(UUID.randomUUID());
+  }
 
-    public static RefreshTokenId fromString(String value) {
-        return new RefreshTokenId(UUID.fromString(value));
-    }
+  public static RefreshTokenId fromString(String value) {
+    return new RefreshTokenId(UUID.fromString(value));
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RefreshTokenId that = (RefreshTokenId) o;
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public String toString() {
-        return value.toString();
-    }
+  @Override
+  @NotNull
+  public String toString() {
+    return value.toString();
+  }
 }

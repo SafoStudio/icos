@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RefreshResponseDto {
-    private final String accessToken;
-    private final String refreshToken;
-    private final int expiresIn;
+  private final String accessToken;
+  private final String refreshToken;
+  private final int expiresIn;
 }

@@ -10,26 +10,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartupLogger {
 
-    @Value("${server.port:8080}")
-    private String port;
+  @Value("${server.port:8080}")
+  private String port;
 
-    @Value("${spring.graphql.path:/graphql}")
-    private String graphqlPath;
+  @Value("${spring.graphql.path:/graphql}")
+  private String graphqlPath;
 
-    @Value("${spring.graphql.graphiql.path:/graphiql}")
-    private String graphiqlPath;
+  @Value("${spring.graphql.graphiql.path:/graphiql}")
+  private String graphiqlPath;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void logStartup() {
-        String baseUrl = "http://localhost:" + port;
-        log.info("""
-                ----------------------------------------------------------
-                \t Application is running! Access URLs:
-                \t Local:    \t\t{}
-                \t GraphQL:  \t{}{}
-                \t GraphiQL: \t{}{}
-                \t pgAdmin:  \thttp://localhost:5050
-                ----------------------------------------------------------
-                """, baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath);
-    }
+  @EventListener(ApplicationReadyEvent.class)
+  public void logStartup() {
+    String baseUrl = "http://localhost:" + port;
+    log.info("""
+            ----------------------------------------------------------
+            \t Application is running! Access URLs:
+            \t Local:    \t\t{}
+            \t GraphQL:  \t{}{}
+            \t GraphiQL: \t{}{}
+            \t pgAdmin:  \thttp://localhost:5050
+            ----------------------------------------------------------
+            """, baseUrl, baseUrl, graphqlPath, baseUrl, graphiqlPath);
+  }
 }

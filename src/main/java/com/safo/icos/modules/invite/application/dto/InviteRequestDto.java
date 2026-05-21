@@ -7,8 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record InviteRequestDto(
-    @Email @NotBlank String email,
-    @NotNull RoleName role,
-    @NotNull UUID departmentId,
-    UUID managerId
-) {}
+        @Email @NotBlank String email,
+        @NotNull RoleName role,
+        @NotNull UUID departmentId,
+        UUID managerId
+) {
+}

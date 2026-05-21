@@ -7,22 +7,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DepartmentPolicyRule implements PolicyRule {
-    @Override
-    public boolean supports(String action) {
-        return action.startsWith("department:");
+  @Override
+  public boolean supports(String action) {
+    return action.startsWith("department:");
+  }
+
+  @Override
+  public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
+    if ("OWNER".equals(user.getRoleName())) {
+      return PolicyResult.allow("Owner has full access to departments");
     }
 
-    @Override
-    public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
-        if ("OWNER".equals(user.getRoleName())) {
-            return PolicyResult.allow("Owner has full access to departments");
-        }
+    return PolicyResult.abstain();
+  }
 
-        return PolicyResult.abstain();
-    }
-
-    @Override
-    public int getOrder() {
-        return 50;
-    }
+  @Override
+  public int getOrder() {
+    return 50;
+  }
 }

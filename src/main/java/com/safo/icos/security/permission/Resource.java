@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Resource {
-    Class<?> type();
-    String idSource() default "id";
+  Class<?> type();
+
+  String idSource() default "id";
 }

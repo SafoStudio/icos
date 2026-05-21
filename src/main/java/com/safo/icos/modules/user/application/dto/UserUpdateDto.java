@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserUpdateDto {
-    private final String firstName;
-    private final String lastName;
-    private final String email;
+  private final String firstName;
+  private final String lastName;
+  private final String email;
 }

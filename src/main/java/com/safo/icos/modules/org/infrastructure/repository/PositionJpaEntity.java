@@ -1,9 +1,15 @@
 package com.safo.icos.modules.org.infrastructure.repository;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "positions")
@@ -12,21 +18,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PositionJpaEntity {
-    @Id
-    private UUID id;
+  @Id
+  private UUID id;
 
-    @Column(name = "company_id", nullable = false)
-    private UUID companyId;
+  @Column(name = "company_id", nullable = false)
+  private UUID companyId;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "description")
-    private String description;
+  @Column(name = "description")
+  private String description;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+  @Column(name = "created_at", nullable = false)
+  private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private LocalDateTime updatedAt;
 }

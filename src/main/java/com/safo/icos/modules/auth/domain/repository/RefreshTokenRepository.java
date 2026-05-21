@@ -6,9 +6,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RefreshTokenRepository {
-    RefreshToken save(RefreshToken token);
-    Optional<RefreshToken> findByTokenHash(TokenValue tokenHash);
-    Optional<RefreshToken> findById(UUID id);
-    void delete(RefreshToken token);
-    void deleteByMembershipId(UUID membershipId);
+  RefreshToken save(RefreshToken token);
+
+  Optional<RefreshToken> findByTokenHash(TokenValue tokenHash);
+
+  Optional<RefreshToken> findById(UUID id);
+
+  void delete(RefreshToken token);
+
+  void deleteByMembershipId(UUID membershipId);
 }

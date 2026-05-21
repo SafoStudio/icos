@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class RefreshResponseView {
-    private final String accessToken;
-    private final int expiresIn;
+  private final String accessToken;
+  private final int expiresIn;
 }

@@ -7,22 +7,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PositionPolicyRule implements PolicyRule {
-    @Override
-    public boolean supports(String action) {
-        return action.startsWith("position:");
+  @Override
+  public boolean supports(String action) {
+    return action.startsWith("position:");
+  }
+
+  @Override
+  public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
+    if ("OWNER".equals(user.getRoleName())) {
+      return PolicyResult.allow("Owner has full access to positions");
     }
 
-    @Override
-    public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
-        if ("OWNER".equals(user.getRoleName())) {
-            return PolicyResult.allow("Owner has full access to positions");
-        }
+    return PolicyResult.abstain();
+  }
 
-        return PolicyResult.abstain();
-    }
-
-    @Override
-    public int getOrder() {
-        return 50;
-    }
+  @Override
+  public int getOrder() {
+    return 50;
+  }
 }

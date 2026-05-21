@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CompanyRepository {
-    Optional<Company> findById(UUID id);
-    Company save(Company company);
+  Optional<Company> findById(UUID id);
+
+  Company save(Company company);
 }
