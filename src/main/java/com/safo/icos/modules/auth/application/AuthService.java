@@ -20,6 +20,8 @@ import com.safo.icos.modules.auth.domain.repository.RefreshTokenRepository;
 import com.safo.icos.modules.auth.domain.service.AuthDomainService;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaEntity;
 import com.safo.icos.modules.auth.infrastructure.repository.AuthCredentialsJpaRepository;
+import com.safo.icos.modules.invite.application.dto.InviteAcceptDto;
+import com.safo.icos.modules.invite.domain.model.Invite;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.user.infrastructure.repository.PermissionJpaEntity;
@@ -213,5 +215,71 @@ public class AuthService {
                     RefreshToken revoked = token.revoke();
                     refreshTokenRepository.save(revoked);
                 });
+    }
+
+    public AuthResponseDto registerFromInvite(Invite invite, InviteAcceptDto request, String deviceInfo) {
+        log.debug("Registering user from invite for email: {}", invite.getEmail());
+
+        if (userProvider.existsByEmail(invite.getEmail())) {
+            throw new UserAlreadyExistsException("User with email " + invite.getEmail() + " already exists");
+        }
+
+        UserCreateData createData = UserCreateData.builder()
+                .email(invite.getEmail())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .createdBy(invite.getInvitedById())
+                .build();
+
+        UserDto user = userProvider.createUser(createData);
+
+        // Save password
+        AuthCredentialsJpaEntity credentials = AuthCredentialsJpaEntity.builder()
+                .userId(user.getId())
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .build();
+        credentialsRepository.save(credentials);
+
+        // Create membership from invite
+        MembershipDto membership = userProvider.createMembership(
+                user.getId(), 
+                invite.getCompanyId(), 
+                invite.getRole().name(), 
+                invite.getDepartmentId());
+
+        UserDto userWithCompany = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .companyId(membership.getCompanyId().toString())
+                .role(membership.getRole())
+                .departmentId(membership.getDepartmentId())
+                .permissions(roleJpaRepository.findById(membership.getRoleId())
+                        .map(role -> role.getPermissions().stream()
+                                .map(PermissionJpaEntity::getName)
+                                .toList())
+                        .orElse(List.of()))
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+
+        RefreshToken refreshToken = authDomainService.createRefreshToken(
+                membership.getId(), deviceInfo, refreshTokenTtl);
+        refreshTokenRepository.save(refreshToken);
+
+        AuthTokenDto tokens = authTokenProvider.generateTokens(
+                user.getId(),
+                membership.getCompanyId()
+        );
+
+        return AuthResponseDto.builder()
+                .accessToken(tokens.getAccessToken())
+                .refreshToken(tokens.getRefreshToken())
+                .tokenType(tokens.getTokenType())
+                .expiresIn(tokens.getExpiresIn())
+                .user(userWithCompany)
+                .build();
     }
 }

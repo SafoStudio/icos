@@ -1,7 +1,7 @@
-package com.safo.icos.graphql.config;
+package com.safo.icos.common.graphql.config;
 
-import com.safo.icos.graphql.scalar.DateTimeScalar;
-import com.safo.icos.graphql.scalar.UuidScalar;
+import com.safo.icos.common.graphql.scalar.DateTimeScalar;
+import com.safo.icos.common.graphql.scalar.UuidScalar;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;

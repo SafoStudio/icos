@@ -1,0 +1,38 @@
+input InviteRequestInput {
+    email: String!
+    role: RoleName!
+    departmentId: ID!
+    managerId: ID
+}
+
+input InviteAcceptInput {
+    firstName: String!
+    lastName: String!
+    password: String!
+}
+
+type InviteResponse {
+    id: ID!
+    token: String!
+    email: String!
+    role: RoleName!
+    companyId: ID!
+    companyName: String!
+    departmentId: ID!
+    departmentName: String!
+    managerId: ID
+    managerName: String
+    status: InviteStatus!
+    expiresAt: String!
+}
+
+extend type Query {
+    getInviteInfo(token: String!): InviteResponse!
+}
+
+extend type Mutation {
+    createInvite(input: InviteRequestInput!): InviteResponse!
+    acceptInvite(token: String!, input: InviteAcceptInput!): AuthResponse!
+    cancelInvite(id: ID!): Boolean!
+    resendInvite(id: ID!): InviteResponse!
+}

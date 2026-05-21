@@ -1,0 +1,13 @@
+enum InviteStatus {
+    PENDING
+    ACCEPTED
+    EXPIRED
+    CANCELED
+}
+
+enum RoleName {
+    ADMIN
+    OWNER
+    HEAD
+    SPECIALIST
+}

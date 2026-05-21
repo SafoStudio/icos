@@ -32,6 +32,17 @@ spring:
       locations: classpath:graphql/
       printer:
         enabled: true
+  mail:
+    host: smtp-relay.brevo.com
+    port: 587
+    username: ${BREVO_SMTP_USERNAME}
+    password: ${BREVO_SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   jwt:
@@ -41,6 +52,10 @@ app:
   auth:
     refresh-token-ttl: 30d
     bcrypt-strength: 12
+  invitation:
+    base-url: ${INVITE_BASE_URL:http://localhost:3000/register}
+    expiration-days: 7
+    from-email: ${FROM_EMAIL:noreply@icos.com}
 
 logging:
   level:

@@ -1,4 +1,4 @@
-package com.safo.icos.graphql.scalar;
+package com.safo.icos.common.graphql.scalar;
 
 import graphql.language.StringValue;
 import graphql.language.Value;
