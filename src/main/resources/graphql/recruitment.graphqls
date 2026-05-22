@@ -2,12 +2,14 @@ extend type Query {
     vacancies(companyId: UUID!): [Vacancy!]!
     vacancy(id: UUID!): Vacancy
     application(id: UUID!): Application
+    kanbanBoard(vacancyId: UUID!): KanbanBoard!
 }
 
 extend type Mutation {
     createVacancy(input: CreateVacancyInput!): Vacancy!
     applyToVacancy(vacancyId: UUID!, candidate: CandidateInput!): Application!
     moveApplication(applicationId: UUID!, stageId: UUID!): Application!
+    hireCandidate(applicationId: UUID!, userId: UUID!): Application!
 }
 
 type Vacancy {
@@ -24,11 +26,38 @@ type Vacancy {
 
 type Application {
     id: UUID!
-    candidateId: UUID!
+    candidate: Candidate!
     vacancyId: UUID!
     currentStageId: UUID
     status: ApplicationStatus!
     createdAt: DateTime!
+}
+
+type VacancyStage {
+    id: UUID!
+    name: String!
+    type: PipelineStageType!
+    orderIndex: Int!
+}
+
+type KanbanBoard {
+    vacancyId: UUID!
+    columns: [KanbanColumn!]!
+}
+
+type KanbanColumn {
+    stage: VacancyStage!
+    applications: [Application!]!
+}
+
+type Candidate {
+    id: UUID!
+    firstName: String!
+    lastName: String!
+    email: String!
+    phone: String
+    source: String
+    resumeUrl: String
 }
 
 input CreateVacancyInput {
@@ -61,4 +90,14 @@ enum ApplicationStatus {
     HIRED
     REJECTED
     WITHDRAWN
+}
+
+enum PipelineStageType {
+    APPLIED
+    SCREENING
+    TECHNICAL
+    HR
+    OFFER
+    HIRED
+    REJECTED
 }

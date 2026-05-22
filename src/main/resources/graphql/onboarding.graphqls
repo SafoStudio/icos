@@ -1,0 +1,80 @@
+extend type Query {
+    onboardingProcess(id: UUID!): OnboardingProcess
+    myOnboardingTasks: [OnboardingTask!]!
+    onboardingTemplates(companyId: UUID!): [OnboardingTemplate!]!
+}
+
+extend type Mutation {
+    createOnboardingTemplate(input: CreateOnboardingTemplateInput!): OnboardingTemplate!
+    addTaskTemplate(input: AddTaskTemplateInput!): OnboardingTaskTemplate!
+    startOnboarding(input: StartOnboardingInput!): OnboardingProcess!
+    completeOnboardingTask(taskId: UUID!): OnboardingTask!
+}
+
+type OnboardingProcess {
+    id: UUID!
+    membershipId: UUID!
+    templateId: UUID
+    status: OnboardingProcessStatus!
+    startDate: String!
+    targetCompletionDate: String
+    tasks: [OnboardingTask!]!
+}
+
+type OnboardingTask {
+    id: UUID!
+    processId: UUID!
+    title: String!
+    description: String
+    assigneeId: UUID!
+    status: OnboardingTaskStatus!
+    dueDate: String
+    completedAt: DateTime
+}
+
+type OnboardingTemplate {
+    id: UUID!
+    companyId: UUID!
+    name: String!
+    description: String
+}
+
+type OnboardingTaskTemplate {
+    id: UUID!
+    templateId: UUID!
+    title: String!
+    description: String
+    daysFromStart: Int!
+}
+
+input CreateOnboardingTemplateInput {
+    companyId: UUID!
+    name: String!
+    description: String
+}
+
+input AddTaskTemplateInput {
+    templateId: UUID!
+    title: String!
+    description: String
+    daysFromStart: Int!
+}
+
+input StartOnboardingInput {
+    membershipId: UUID!
+    templateId: UUID!
+    startDate: String!
+}
+
+enum OnboardingProcessStatus {
+    NOT_STARTED
+    IN_PROGRESS
+    COMPLETED
+    STALLED
+}
+
+enum OnboardingTaskStatus {
+    PENDING
+    DONE
+    WAITING
+}

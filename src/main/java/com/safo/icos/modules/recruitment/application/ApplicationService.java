@@ -3,14 +3,21 @@ package com.safo.icos.modules.recruitment.application;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.common.constant.ErrorCode;
 import com.safo.icos.modules.recruitment.application.dto.ApplicationDto;
+import com.safo.icos.modules.recruitment.application.dto.KanbanBoardDto;
+import com.safo.icos.modules.recruitment.application.dto.KanbanColumnDto;
+import com.safo.icos.modules.recruitment.domain.event.CandidateHiredEvent;
 import com.safo.icos.modules.recruitment.domain.model.Application;
+import com.safo.icos.modules.recruitment.domain.model.ApplicationStatus;
+import com.safo.icos.modules.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.recruitment.domain.model.VacancyStage;
 import com.safo.icos.modules.recruitment.domain.repository.ApplicationRepository;
+import com.safo.icos.modules.recruitment.domain.repository.VacancyRepository;
 import com.safo.icos.modules.recruitment.infrastructure.repository.VacancyStageJpaRepository;
 import com.safo.icos.modules.recruitment.infrastructure.mapper.RecruitmentMapper;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ApplicationService {
     private final ApplicationRepository applicationRepository;
+    private final VacancyRepository vacancyRepository;
     private final VacancyStageJpaRepository vacancyStageJpaRepository;
     private final RecruitmentMapper mapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ApplicationDto createApplication(UUID candidateId, UUID vacancyId) {
         // Find initial stage for the vacancy
@@ -40,6 +49,29 @@ public class ApplicationService {
         return applicationRepository.findByVacancyId(vacancyId).stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    public KanbanBoardDto getKanbanBoard(UUID vacancyId) {
+        List<VacancyStage> stages = vacancyStageJpaRepository.findByVacancyIdOrderByOrderIndexAsc(vacancyId)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+
+        List<Application> applications = applicationRepository.findByVacancyId(vacancyId);
+
+        List<KanbanColumnDto> columns = stages.stream()
+                .map(stage -> KanbanColumnDto.builder()
+                        .stage(stage)
+                        .applications(applications.stream()
+                                .filter(app -> stage.getId().equals(app.getCurrentStageId()))
+                                .toList())
+                        .build())
+                .toList();
+
+        return KanbanBoardDto.builder()
+                .vacancyId(vacancyId)
+                .columns(columns)
+                .build();
     }
 
     public ApplicationDto getApplication(UUID applicationId) {
@@ -66,6 +98,36 @@ public class ApplicationService {
                 .build();
 
         applicationRepository.save(updated);
+    }
+
+    public void hireCandidate(UUID applicationId, UUID userId) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BusinessException("Application not found", ErrorCode.NOT_FOUND));
+
+        Vacancy vacancy = vacancyRepository.findById(application.getVacancyId())
+                .orElseThrow(() -> new BusinessException("Vacancy not found", ErrorCode.NOT_FOUND));
+
+        Application updated = Application.builder()
+                .id(application.getId())
+                .candidateId(application.getCandidateId())
+                .vacancyId(application.getVacancyId())
+                .currentStageId(application.getCurrentStageId())
+                .status(ApplicationStatus.HIRED)
+                .rejectionReason(application.getRejectionReason())
+                .createdAt(application.getCreatedAt())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        applicationRepository.save(updated);
+
+        // Publish event for Onboarding module
+        eventPublisher.publishEvent(new CandidateHiredEvent(
+                this,
+                application.getCandidateId(),
+                application.getVacancyId(),
+                vacancy.getCompanyId(),
+                userId
+        ));
     }
 
     private ApplicationDto toDto(Application application) {
