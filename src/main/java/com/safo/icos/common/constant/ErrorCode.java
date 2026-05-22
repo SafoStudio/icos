@@ -13,6 +13,10 @@ public final class ErrorCode {
   public static final String DEPT_NOT_FOUND = "ORG_002";
   public static final String POSITION_ALREADY_EXISTS = "ORG_003";
   public static final String POSITION_NOT_FOUND = "ORG_004";
+  public static final String NOT_FOUND = "COMMON_001";
+  public static final String VACANCY_NOT_FOUND = "REC_001";
+  public static final String CANDIDATE_NOT_FOUND = "REC_002";
+  public static final String APPLICATION_NOT_FOUND = "REC_003";
 
   private ErrorCode() {
   }

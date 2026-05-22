@@ -1,0 +1,64 @@
+extend type Query {
+    vacancies(companyId: UUID!): [Vacancy!]!
+    vacancy(id: UUID!): Vacancy
+    application(id: UUID!): Application
+}
+
+extend type Mutation {
+    createVacancy(input: CreateVacancyInput!): Vacancy!
+    applyToVacancy(vacancyId: UUID!, candidate: CandidateInput!): Application!
+    moveApplication(applicationId: UUID!, stageId: UUID!): Application!
+}
+
+type Vacancy {
+    id: UUID!
+    companyId: UUID!
+    departmentId: UUID
+    positionId: UUID
+    title: String!
+    description: String
+    requirements: String
+    status: VacancyStatus!
+    createdAt: DateTime!
+}
+
+type Application {
+    id: UUID!
+    candidateId: UUID!
+    vacancyId: UUID!
+    currentStageId: UUID
+    status: ApplicationStatus!
+    createdAt: DateTime!
+}
+
+input CreateVacancyInput {
+    companyId: UUID!
+    departmentId: UUID
+    positionId: UUID
+    title: String!
+    description: String
+    requirements: String
+}
+
+input CandidateInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    phone: String
+    source: String
+    resumeUrl: String
+}
+
+enum VacancyStatus {
+    DRAFT
+    OPEN
+    CLOSED
+    PAUSED
+}
+
+enum ApplicationStatus {
+    ACTIVE
+    HIRED
+    REJECTED
+    WITHDRAWN
+}

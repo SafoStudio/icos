@@ -7,7 +7,7 @@
     <property name="charset" value="UTF-8"/>
     <property name="severity" value="warning"/>
 
-    <!-- LineLength должен быть на уровне Checker -->
+    <!-- LineLength -->
     <module name="LineLength">
         <property name="max" value="120"/>
     </module>
