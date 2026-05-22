@@ -7,12 +7,12 @@ import com.safo.icos.modules.recruitment.application.dto.KanbanBoardDto;
 import com.safo.icos.modules.recruitment.application.dto.KanbanColumnDto;
 import com.safo.icos.modules.recruitment.domain.event.CandidateHiredEvent;
 import com.safo.icos.modules.recruitment.domain.model.Application;
-import com.safo.icos.modules.recruitment.domain.model.ApplicationStatus;
+import com.safo.icos.modules.recruitment.domain.model.enums.ApplicationStatus;
 import com.safo.icos.modules.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.recruitment.domain.model.VacancyStage;
 import com.safo.icos.modules.recruitment.domain.repository.ApplicationRepository;
 import com.safo.icos.modules.recruitment.domain.repository.VacancyRepository;
-import com.safo.icos.modules.recruitment.infrastructure.repository.VacancyStageJpaRepository;
+import com.safo.icos.modules.recruitment.infrastructure.repository.jpa.VacancyStageJpaRepository;
 import com.safo.icos.modules.recruitment.infrastructure.mapper.RecruitmentMapper;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class ApplicationService {
+    private static final String APPLICATION_NOT_FOUND_MESSAGE = "Application not found";
     private final ApplicationRepository applicationRepository;
     private final VacancyRepository vacancyRepository;
     private final VacancyStageJpaRepository vacancyStageJpaRepository;
@@ -43,12 +44,6 @@ public class ApplicationService {
         Application saved = applicationRepository.save(application);
 
         return toDto(saved);
-    }
-
-    public List<ApplicationDto> getApplicationsByVacancy(UUID vacancyId) {
-        return applicationRepository.findByVacancyId(vacancyId).stream()
-                .map(this::toDto)
-                .toList();
     }
 
     public KanbanBoardDto getKanbanBoard(UUID vacancyId) {
@@ -77,12 +72,12 @@ public class ApplicationService {
     public ApplicationDto getApplication(UUID applicationId) {
         return applicationRepository.findById(applicationId)
                 .map(this::toDto)
-                .orElseThrow(() -> new BusinessException("Application not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
     }
 
     public void moveToStage(UUID applicationId, UUID stageId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException("Application not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
 
         // Logic to validate transition could be added here or in domain service
 
@@ -102,7 +97,7 @@ public class ApplicationService {
 
     public void hireCandidate(UUID applicationId, UUID userId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException("Application not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
 
         Vacancy vacancy = vacancyRepository.findById(application.getVacancyId())
                 .orElseThrow(() -> new BusinessException("Vacancy not found", ErrorCode.NOT_FOUND));

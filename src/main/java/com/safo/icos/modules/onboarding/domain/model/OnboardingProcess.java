@@ -1,5 +1,6 @@
 package com.safo.icos.modules.onboarding.domain.model;
 
+import com.safo.icos.modules.onboarding.domain.model.enums.OnboardingProcessStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;

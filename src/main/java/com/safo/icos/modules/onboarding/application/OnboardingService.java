@@ -1,8 +1,11 @@
 package com.safo.icos.modules.onboarding.application;
 
+import com.safo.icos.common.dto.MembershipDto;
+import com.safo.icos.common.port.user.UserProvider;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.common.constant.ErrorCode;
 import com.safo.icos.modules.onboarding.domain.model.*;
+import com.safo.icos.modules.onboarding.domain.model.enums.*;
 import com.safo.icos.modules.onboarding.domain.repository.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,20 +22,21 @@ public class OnboardingService {
     private final OnboardingTaskRepository taskRepository;
     private final OnboardingTemplateRepository templateRepository;
     private final OnboardingTaskTemplateRepository taskTemplateRepository;
+    private final UserProvider userProvider;
 
     public OnboardingTemplate createTemplate(UUID companyId, String name, String description) {
         OnboardingTemplate template = OnboardingTemplate.create(companyId, name, description);
         return templateRepository.save(template);
     }
 
-    public void addTaskToTemplate(UUID templateId, String title, String description, Integer daysFromStart) {
-        OnboardingTaskTemplate taskTemplate = OnboardingTaskTemplate.create(templateId, title, description, daysFromStart);
-        taskTemplateRepository.save(taskTemplate);
-    }
-
     public OnboardingProcess startOnboarding(UUID membershipId, UUID templateId, LocalDate startDate) {
         OnboardingProcess process = OnboardingProcess.create(membershipId, templateId, startDate);
         OnboardingProcess savedProcess = processRepository.save(process);
+
+        // Get the user ID associated with this membership
+        UUID userId = userProvider.findMembershipById(membershipId)
+                .map(MembershipDto::getUserId)
+                .orElseThrow(() -> new BusinessException("Membership not found", ErrorCode.NOT_FOUND));
 
         // Instantiate tasks from template
         List<OnboardingTaskTemplate> taskTemplates = taskTemplateRepository.findByTemplateId(templateId);
@@ -41,7 +45,7 @@ public class OnboardingService {
                     savedProcess.getId(),
                     tt.getTitle(),
                     tt.getDescription(),
-                    UUID.randomUUID(), // TODO: Actual assignee logic (e.g., HR or IT user)
+                    userId, // Assign to the user being onboarded for self-service tasks
                     startDate.plusDays(tt.getDaysFromStart())
             );
             taskRepository.save(task);

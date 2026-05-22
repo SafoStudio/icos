@@ -4,10 +4,10 @@ import com.safo.icos.modules.recruitment.domain.model.Application;
 import com.safo.icos.modules.recruitment.domain.model.Candidate;
 import com.safo.icos.modules.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.recruitment.domain.model.VacancyStage;
-import com.safo.icos.modules.recruitment.infrastructure.repository.ApplicationJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.CandidateJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.VacancyJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.VacancyStageJpaEntity;
+import com.safo.icos.modules.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
+import com.safo.icos.modules.recruitment.infrastructure.repository.entity.CandidateJpaEntity;
+import com.safo.icos.modules.recruitment.infrastructure.repository.entity.VacancyJpaEntity;
+import com.safo.icos.modules.recruitment.infrastructure.repository.entity.VacancyStageJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

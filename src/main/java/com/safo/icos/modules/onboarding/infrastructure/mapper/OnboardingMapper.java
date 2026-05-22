@@ -4,10 +4,10 @@ import com.safo.icos.modules.onboarding.domain.model.OnboardingProcess;
 import com.safo.icos.modules.onboarding.domain.model.OnboardingTask;
 import com.safo.icos.modules.onboarding.domain.model.OnboardingTaskTemplate;
 import com.safo.icos.modules.onboarding.domain.model.OnboardingTemplate;
-import com.safo.icos.modules.onboarding.infrastructure.repository.OnboardingProcessJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.OnboardingTaskJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.OnboardingTaskTemplateJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.OnboardingTemplateJpaEntity;
+import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingProcessJpaEntity;
+import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTaskJpaEntity;
+import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTaskTemplateJpaEntity;
+import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTemplateJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

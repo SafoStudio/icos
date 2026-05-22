@@ -1,7 +1,10 @@
 package com.safo.icos.modules.onboarding.presentation;
 
+import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.onboarding.application.OnboardingService;
 import com.safo.icos.modules.onboarding.domain.model.*;
+import com.safo.icos.modules.onboarding.domain.model.enums.*;
 import com.safo.icos.modules.onboarding.domain.repository.OnboardingProcessRepository;
 import com.safo.icos.modules.onboarding.domain.repository.OnboardingTemplateRepository;
 import com.safo.icos.modules.onboarding.domain.repository.OnboardingTaskRepository;
@@ -35,8 +38,16 @@ public class OnboardingGraphQLResolver {
     @QueryMapping
     @RequirePermission("onboarding:task.complete")
     public List<OnboardingTask> myOnboardingTasks() {
-        IcosUserPrincipal principal = (IcosUserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        IcosUserPrincipal principal = getPrincipal();
         return taskRepository.findByAssigneeId(principal.getUserId());
+    }
+
+    private IcosUserPrincipal getPrincipal() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
+            throw new BusinessException("User not authenticated", ErrorCode.TOKEN_NOT_FOUND);
+        }
+        return principal;
     }
 
     @QueryMapping

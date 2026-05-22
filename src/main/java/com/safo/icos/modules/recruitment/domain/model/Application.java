@@ -1,5 +1,6 @@
 package com.safo.icos.modules.recruitment.domain.model;
 
+import com.safo.icos.modules.recruitment.domain.model.enums.ApplicationStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Builder;
