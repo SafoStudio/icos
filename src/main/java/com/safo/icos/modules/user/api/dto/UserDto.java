@@ -1,4 +1,4 @@
-package com.safo.icos.common.dto;
+package com.safo.icos.modules.user.api.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

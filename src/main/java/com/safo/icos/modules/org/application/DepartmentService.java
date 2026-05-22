@@ -1,6 +1,6 @@
 package com.safo.icos.modules.org.application;
 
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
 import com.safo.icos.modules.org.domain.model.Department;
@@ -24,7 +24,7 @@ public class DepartmentService {
   @RequirePermission("department:manage")
   public DepartmentDto updateDepartment(UUID id, String name, String description) {
     Department department = departmentRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("Department not found", ErrorCode.DEPT_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException("Department not found", OrgErrorCode.DEPT_NOT_FOUND));
 
     department.update(name, description);
     Department saved = departmentRepository.save(department);
@@ -36,7 +36,7 @@ public class DepartmentService {
     UUID companyId = UUID.fromString(TenantContext.getTenantId());
 
     if (departmentRepository.existsByCompanyIdAndName(companyId, name)) {
-      throw new BusinessException("Department already exists", ErrorCode.DEPT_ALREADY_EXISTS);
+      throw new BusinessException("Department already exists", OrgErrorCode.DEPT_ALREADY_EXISTS);
     }
 
     Department department = Department.create(companyId, name, description);

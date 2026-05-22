@@ -1,7 +1,9 @@
-package com.safo.icos.common.port.user;
+package com.safo.icos.modules.user.api;
 
-import com.safo.icos.common.dto.MembershipDto;
-import com.safo.icos.common.dto.UserDto;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.user.api.dto.UserCreateDto;
+import com.safo.icos.modules.user.api.dto.UserDto;
+import com.safo.icos.modules.user.api.dto.UserPrincipalDto;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,7 +12,7 @@ public interface UserProvider {
 
   Optional<UserDto> findById(UUID userId);
 
-  UserDto createUser(UserCreateData data);
+  UserDto createUser(UserCreateDto data);
 
   boolean existsByEmail(String email);
 
@@ -27,5 +29,5 @@ public interface UserProvider {
   /**
    * Finds full security context data for a user in a specific company.
    */
-  Optional<UserPrincipalData> findPrincipal(UUID userId, UUID companyId);
+  Optional<UserPrincipalDto> findPrincipal(UUID userId, UUID companyId);
 }

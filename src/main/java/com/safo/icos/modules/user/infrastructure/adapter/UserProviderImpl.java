@@ -1,9 +1,9 @@
 package com.safo.icos.modules.user.infrastructure.adapter;
 
-import com.safo.icos.common.dto.MembershipDto;
-import com.safo.icos.common.dto.UserDto;
-import com.safo.icos.common.port.user.UserCreateData;
-import com.safo.icos.common.port.user.UserProvider;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.user.api.dto.UserDto;
+import com.safo.icos.modules.user.api.dto.UserCreateDto;
+import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.modules.user.application.UserService;
 import com.safo.icos.modules.user.infrastructure.repository.DepartmentJpaEntity;
 import com.safo.icos.modules.user.infrastructure.repository.DepartmentJpaRepository;
@@ -39,7 +39,7 @@ public class UserProviderImpl implements UserProvider {
   }
 
   @Override
-  public UserDto createUser(UserCreateData data) {
+  public UserDto createUser(UserCreateDto data) {
     return userService.createUserFromAuth(data);
   }
 
@@ -74,7 +74,7 @@ public class UserProviderImpl implements UserProvider {
   }
 
   @Override
-  public Optional<com.safo.icos.common.port.user.UserPrincipalData> findPrincipal(UUID userId, UUID companyId) {
+  public Optional<com.safo.icos.modules.user.api.dto.UserPrincipalDto> findPrincipal(UUID userId, UUID companyId) {
     return userJpaRepository.findById(userId).flatMap(user ->
             membershipJpaRepository.findActiveByUserIdAndCompanyId(userId, companyId).flatMap(membership ->
                     roleJpaRepository.findById(membership.getRoleId()).map(role -> {
@@ -89,7 +89,7 @@ public class UserProviderImpl implements UserProvider {
                                 .orElse(null);
                       }
 
-                      return com.safo.icos.common.port.user.UserPrincipalData.builder()
+                      return com.safo.icos.modules.user.api.dto.UserPrincipalDto.builder()
                               .userId(user.getId())
                               .email(user.getEmail())
                               .membershipId(membership.getId())

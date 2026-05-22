@@ -1,7 +1,7 @@
 package com.safo.icos.modules.invite.domain.model;
 
-import com.safo.icos.common.enums.InviteStatus;
-import com.safo.icos.common.enums.RoleName;
+import com.safo.icos.modules.invite.domain.model.enums.InviteStatus;
+import com.safo.icos.modules.org.domain.model.enums.RoleName;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;

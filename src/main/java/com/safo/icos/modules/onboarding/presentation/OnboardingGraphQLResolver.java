@@ -1,6 +1,6 @@
 package com.safo.icos.modules.onboarding.presentation;
 
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.onboarding.application.OnboardingService;
 import com.safo.icos.modules.onboarding.domain.model.*;
@@ -45,7 +45,7 @@ public class OnboardingGraphQLResolver {
     private IcosUserPrincipal getPrincipal() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
-            throw new BusinessException("User not authenticated", ErrorCode.TOKEN_NOT_FOUND);
+            throw new BusinessException("User not authenticated", AuthErrorCode.TOKEN_NOT_FOUND);
         }
         return principal;
     }

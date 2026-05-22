@@ -1,4 +1,4 @@
-package com.safo.icos.common.enums;
+package com.safo.icos.modules.org.domain.model.enums;
 
 public enum RoleName {
   ADMIN,      // System technical admin

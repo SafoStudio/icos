@@ -1,11 +1,11 @@
 package com.safo.icos.modules.recruitment.application;
 
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.recruitment.api.constant.RecruitmentErrorCode;
 import com.safo.icos.modules.recruitment.application.dto.ApplicationDto;
 import com.safo.icos.modules.recruitment.application.dto.KanbanBoardDto;
 import com.safo.icos.modules.recruitment.application.dto.KanbanColumnDto;
-import com.safo.icos.modules.recruitment.domain.event.CandidateHiredEvent;
+import com.safo.icos.modules.recruitment.api.event.CandidateHiredEvent;
 import com.safo.icos.modules.recruitment.domain.model.Application;
 import com.safo.icos.modules.recruitment.domain.model.enums.ApplicationStatus;
 import com.safo.icos.modules.recruitment.domain.model.Vacancy;
@@ -38,7 +38,7 @@ public class ApplicationService {
                 .stream()
                 .findFirst()
                 .map(mapper::toDomain)
-                .orElseThrow(() -> new BusinessException("No stages defined for vacancy", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException("No stages defined for vacancy", RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
         Application application = Application.create(candidateId, vacancyId, initialStage.getId());
         Application saved = applicationRepository.save(application);
@@ -72,12 +72,12 @@ public class ApplicationService {
     public ApplicationDto getApplication(UUID applicationId) {
         return applicationRepository.findById(applicationId)
                 .map(this::toDto)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
     }
 
     public void moveToStage(UUID applicationId, UUID stageId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
         // Logic to validate transition could be added here or in domain service
 
@@ -97,10 +97,10 @@ public class ApplicationService {
 
     public void hireCandidate(UUID applicationId, UUID userId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
         Vacancy vacancy = vacancyRepository.findById(application.getVacancyId())
-                .orElseThrow(() -> new BusinessException("Vacancy not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException("Vacancy not found", RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
         Application updated = Application.builder()
                 .id(application.getId())

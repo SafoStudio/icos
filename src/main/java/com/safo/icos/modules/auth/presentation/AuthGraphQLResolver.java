@@ -1,7 +1,7 @@
 package com.safo.icos.modules.auth.presentation;
 
-import com.safo.icos.common.dto.UserDto;
-import com.safo.icos.common.port.user.UserProvider;
+import com.safo.icos.modules.user.api.dto.UserDto;
+import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.modules.auth.application.AuthService;
 import com.safo.icos.modules.auth.application.dto.AuthResponseDto;
 import com.safo.icos.modules.auth.application.dto.LoginRequestDto;

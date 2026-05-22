@@ -1,4 +1,4 @@
-package com.safo.icos.common.port.user;
+package com.safo.icos.modules.user.api.dto;
 
 import java.util.Set;
 import java.util.UUID;
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserPrincipalData {
+public class UserPrincipalDto {
   private final UUID userId;
   private final String email;
   private final UUID membershipId;

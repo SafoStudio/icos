@@ -1,6 +1,6 @@
 package com.safo.icos.modules.org.application;
 
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.org.application.dto.PositionDto;
 import com.safo.icos.modules.org.domain.model.Position;
@@ -26,7 +26,7 @@ public class PositionService {
     UUID companyId = UUID.fromString(TenantContext.getTenantId());
 
     if (positionRepository.existsByCompanyIdAndName(companyId, name)) {
-      throw new BusinessException("Position already exists", ErrorCode.POSITION_ALREADY_EXISTS);
+      throw new BusinessException("Position already exists", OrgErrorCode.POSITION_ALREADY_EXISTS);
     }
 
     Position position = Position.create(companyId, name, description);
@@ -37,7 +37,7 @@ public class PositionService {
   @RequirePermission("position:manage")
   public PositionDto updatePosition(UUID id, String name, String description) {
     Position position = positionRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("Position not found", ErrorCode.POSITION_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException("Position not found", OrgErrorCode.POSITION_NOT_FOUND));
 
     position.update(name, description);
     Position saved = positionRepository.save(position);

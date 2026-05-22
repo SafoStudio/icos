@@ -1,8 +1,8 @@
 package com.safo.icos.modules.user.application;
 
-import com.safo.icos.common.dto.MembershipDto;
-import com.safo.icos.common.dto.UserDto;
-import com.safo.icos.common.port.user.UserCreateData;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.user.api.dto.UserDto;
+import com.safo.icos.modules.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.user.domain.model.Email;
 import com.safo.icos.modules.user.domain.model.Membership;
@@ -31,7 +31,7 @@ public class UserService {
   private final RoleJpaRepository roleJpaRepository;
   private final UserProfileJpaRepository profileRepository;
 
-  public UserDto createUserFromAuth(UserCreateData data) {
+  public UserDto createUserFromAuth(UserCreateDto data) {
     Email email = Email.of(data.getEmail());
 
     if (userRepository.existsByEmail(email)) {

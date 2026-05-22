@@ -1,7 +1,8 @@
 package com.safo.icos.modules.invite.application;
 
-import com.safo.icos.common.constant.ErrorCode;
-import com.safo.icos.common.enums.InviteStatus;
+import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
+import com.safo.icos.modules.user.api.constant.UserErrorCode;
+import com.safo.icos.modules.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.common.exception.NotFoundException;
 import com.safo.icos.common.util.HashUtils;
@@ -40,7 +41,7 @@ public class InviteService {
   private IcosUserPrincipal getPrincipal() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
-      throw new BusinessException("User not authenticated", ErrorCode.TOKEN_NOT_FOUND);
+      throw new BusinessException("User not authenticated", AuthErrorCode.TOKEN_NOT_FOUND);
     }
     return principal;
   }
@@ -54,7 +55,7 @@ public class InviteService {
     if (!isPrivilegedRole && !isHrMember) {
       throw new BusinessException(
               "Access denied: Only ADMIN, OWNER or HR department members can manage invites",
-              ErrorCode.USER_NOT_ACTIVE
+              UserErrorCode.USER_NOT_ACTIVE
       );
     }
   }
@@ -64,7 +65,7 @@ public class InviteService {
     checkInvitePermissions();
 
     if (repository.existsByEmail(dto.email())) {
-      throw new BusinessException("An invitation for this email already exists", ErrorCode.EMAIL_ALREADY_EXISTS);
+      throw new BusinessException("An invitation for this email already exists", UserErrorCode.EMAIL_ALREADY_EXISTS);
     }
 
     IcosUserPrincipal principal = getPrincipal();
@@ -109,10 +110,10 @@ public class InviteService {
             .orElseThrow(() -> new NotFoundException(INVITE_NOT_FOUND_MSG));
 
     if (invite.isNotPending()) {
-      throw new BusinessException("Invite is no longer pending", ErrorCode.TOKEN_REVOKED);
+      throw new BusinessException("Invite is no longer pending", AuthErrorCode.TOKEN_REVOKED);
     }
     if (invite.isExpired()) {
-      throw new BusinessException("Invite has expired", ErrorCode.TOKEN_EXPIRED);
+      throw new BusinessException("Invite has expired", AuthErrorCode.TOKEN_EXPIRED);
     }
 
     CompanyDto company = companyService.getCompany(invite.getCompanyId());
@@ -161,7 +162,7 @@ public class InviteService {
             .orElseThrow(() -> new NotFoundException(INVITE_NOT_FOUND_MSG));
 
     if (invite.getStatus() == InviteStatus.ACCEPTED) {
-      throw new BusinessException("Cannot resend an already accepted invitation", ErrorCode.TOKEN_REVOKED);
+      throw new BusinessException("Cannot resend an already accepted invitation", AuthErrorCode.TOKEN_REVOKED);
     }
 
     String newToken = generateSafeToken();

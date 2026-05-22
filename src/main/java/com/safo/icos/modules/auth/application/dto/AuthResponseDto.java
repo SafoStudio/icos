@@ -1,6 +1,6 @@
 package com.safo.icos.modules.auth.application.dto;
 
-import com.safo.icos.common.dto.UserDto;
+import com.safo.icos.modules.user.api.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 

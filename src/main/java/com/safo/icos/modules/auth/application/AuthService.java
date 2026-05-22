@@ -1,13 +1,14 @@
 package com.safo.icos.modules.auth.application;
 
-import com.safo.icos.common.constant.ErrorCode;
-import com.safo.icos.common.dto.AuthTokenDto;
-import com.safo.icos.common.dto.MembershipDto;
-import com.safo.icos.common.dto.UserDto;
+import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
+import com.safo.icos.modules.user.api.constant.UserErrorCode;
+import com.safo.icos.modules.auth.api.dto.AuthTokenDto;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.user.api.dto.UserDto;
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.common.port.auth.AuthTokenProvider;
-import com.safo.icos.common.port.user.UserCreateData;
-import com.safo.icos.common.port.user.UserProvider;
+import com.safo.icos.modules.auth.api.AuthTokenProvider;
+import com.safo.icos.modules.user.api.dto.UserCreateDto;
+import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.modules.auth.application.dto.AuthResponseDto;
 import com.safo.icos.modules.auth.application.dto.LoginRequestDto;
 import com.safo.icos.modules.auth.application.dto.RefreshResponseDto;
@@ -62,7 +63,7 @@ public class AuthService {
       throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
     }
 
-    UserCreateData createData = UserCreateData.builder()
+    UserCreateDto createData = UserCreateDto.builder()
             .email(request.getEmail())
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
@@ -139,7 +140,7 @@ public class AuthService {
     MembershipDto membership = userProvider.findFirstActiveMembershipByUserId(user.getId())
             .orElseThrow(() -> new BusinessException(
                     "User does not have an active membership",
-                    ErrorCode.USER_NOT_ACTIVE));
+                    UserErrorCode.USER_NOT_ACTIVE));
 
     RefreshToken refreshToken = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);
@@ -181,7 +182,7 @@ public class AuthService {
     log.debug("Refreshing token");
 
     RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(new TokenValue(refreshTokenValue))
-            .orElseThrow(() -> new BusinessException("Invalid refresh token", ErrorCode.TOKEN_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException("Invalid refresh token", AuthErrorCode.TOKEN_NOT_FOUND));
 
     authDomainService.validateRefreshToken(refreshToken);
 
@@ -191,10 +192,10 @@ public class AuthService {
 
     // Get membership and user details
     MembershipDto membership = userProvider.findMembershipById(refreshToken.getMembershipId())
-            .orElseThrow(() -> new BusinessException("Membership not found", ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException("Membership not found", UserErrorCode.USER_NOT_FOUND));
 
     UserDto user = userProvider.findById(membership.getUserId())
-            .orElseThrow(() -> new BusinessException("User not found", ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException("User not found", UserErrorCode.USER_NOT_FOUND));
 
     // Create new refresh token
     RefreshToken newToken = authDomainService.createRefreshToken(
@@ -229,7 +230,7 @@ public class AuthService {
       throw new UserAlreadyExistsException("User with email " + invite.getEmail() + " already exists");
     }
 
-    UserCreateData createData = UserCreateData.builder()
+    UserCreateDto createData = UserCreateDto.builder()
             .email(invite.getEmail())
             .firstName(request.firstName())
             .lastName(request.lastName())

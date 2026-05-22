@@ -1,7 +1,8 @@
 package com.safo.icos.modules.recruitment.application;
 
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
+import com.safo.icos.modules.recruitment.api.constant.RecruitmentErrorCode;
 import com.safo.icos.modules.recruitment.application.dto.CreateVacancyRequest;
 import com.safo.icos.modules.recruitment.application.dto.VacancyDto;
 import com.safo.icos.modules.recruitment.domain.model.enums.PipelineStageType;
@@ -29,7 +30,7 @@ public class VacancyService {
     private IcosUserPrincipal getPrincipal() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
-            throw new BusinessException("User not authenticated", ErrorCode.TOKEN_NOT_FOUND);
+            throw new BusinessException("User not authenticated", AuthErrorCode.TOKEN_NOT_FOUND);
         }
         return principal;
     }
@@ -77,7 +78,7 @@ public class VacancyService {
     public VacancyDto getVacancy(UUID vacancyId) {
         return vacancyRepository.findById(vacancyId)
                 .map(this::toDto)
-                .orElseThrow(() -> new BusinessException("Vacancy not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException("Vacancy not found", RecruitmentErrorCode.VACANCY_NOT_FOUND));
     }
 
     private VacancyDto toDto(Vacancy vacancy) {

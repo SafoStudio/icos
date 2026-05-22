@@ -1,9 +1,9 @@
 package com.safo.icos.modules.onboarding.application;
 
-import com.safo.icos.common.dto.MembershipDto;
-import com.safo.icos.common.port.user.UserProvider;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.common.constant.ErrorCode;
+import com.safo.icos.modules.onboarding.api.constant.OnboardingErrorCode;
 import com.safo.icos.modules.onboarding.domain.model.*;
 import com.safo.icos.modules.onboarding.domain.model.enums.*;
 import com.safo.icos.modules.onboarding.domain.repository.*;
@@ -36,7 +36,7 @@ public class OnboardingService {
         // Get the user ID associated with this membership
         UUID userId = userProvider.findMembershipById(membershipId)
                 .map(MembershipDto::getUserId)
-                .orElseThrow(() -> new BusinessException("Membership not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException("Membership not found", OnboardingErrorCode.RESOURCE_NOT_FOUND));
 
         // Instantiate tasks from template
         List<OnboardingTaskTemplate> taskTemplates = taskTemplateRepository.findByTemplateId(templateId);
@@ -60,7 +60,7 @@ public class OnboardingService {
 
     public void completeTask(UUID taskId) {
         OnboardingTask task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new BusinessException("Task not found", ErrorCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException("Task not found", OnboardingErrorCode.RESOURCE_NOT_FOUND));
 
         OnboardingTask updatedTask = OnboardingTask.builder()
                 .id(task.getId())
