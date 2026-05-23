@@ -1,0 +1,69 @@
+enum EntityType {
+    USER
+    COMPANY
+    DEPARTMENT
+    POSITION
+    JOB
+}
+
+enum FieldType {
+    STRING
+    NUMBER
+    DATE
+    BOOLEAN
+    ENUM
+    ENTITY_REF
+}
+
+type CustomFieldDefinition {
+    id: UUID!
+    entityType: EntityType!
+    key: String!
+    label: String!
+    fieldType: FieldType!
+    refEntityType: String
+    required: Boolean!
+    filterable: Boolean!
+    options: [String!]
+}
+
+type CustomFieldValue {
+    id: UUID!
+    entityType: EntityType!
+    entityId: UUID!
+    definition: CustomFieldDefinition!
+    valueText: String
+    valueNumber: Float
+    valueBool: Boolean
+    valueDate: DateTime
+    valueEntityId: UUID
+    valueEntityType: String
+}
+
+input CustomFieldDefinitionInput {
+    entityType: EntityType!
+    key: String!
+    label: String!
+    fieldType: FieldType!
+    refEntityType: String
+    required: Boolean = false
+    filterable: Boolean = true
+    options: [String!]
+}
+
+input CustomFieldValueInput {
+    entityType: EntityType!
+    entityId: UUID!
+    fieldKey: String!
+    value: String
+}
+
+extend type Query {
+    customFieldDefinitions(entityType: EntityType!): [CustomFieldDefinition!]!
+    customFieldValues(entityType: EntityType!, entityId: UUID!): [CustomFieldValue!]!
+}
+
+extend type Mutation {
+    createCustomFieldDefinition(input: CustomFieldDefinitionInput!): CustomFieldDefinition!
+    setCustomFieldValue(input: CustomFieldValueInput!): CustomFieldValue!
+}
