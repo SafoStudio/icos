@@ -18,6 +18,11 @@ public interface UserProvider {
 
   void updateUserStatus(UUID userId, String status);
 
+  /**
+   * Finds the manager (HEAD role) of a specific department.
+   */
+  Optional<UserDto> findManagerByDepartmentId(UUID departmentId);
+
   Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId);
 
   Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId);
