@@ -1,5 +1,6 @@
 package com.safo.icos.common.graphql.config;
 
+import com.safo.icos.common.graphql.scalar.DateScalar;
 import com.safo.icos.common.graphql.scalar.DateTimeScalar;
 import com.safo.icos.common.graphql.scalar.UuidScalar;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ public class GraphQLConfig {
   public RuntimeWiringConfigurer runtimeWiringConfigurer() {
     return wiringBuilder -> wiringBuilder
             .scalar(DateTimeScalar.DATE_TIME)
-            .scalar(UuidScalar.UUID_SCALAR);
+            .scalar(UuidScalar.UUID_SCALAR)
+            .scalar(DateScalar.DATE);
   }
 }

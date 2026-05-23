@@ -33,8 +33,11 @@ public class UserProfileJpaEntity {
   @Column(name = "address")
   private String address;
 
-  @Column(name = "bio")
-  private String bio;
+  @Column(name = "hire_date")
+  private LocalDate hireDate;
+
+  @Column(name = "avatar_path")
+  private String avatarPath;
 
   @Column(name = "birth_date")
   private LocalDate birthDate;

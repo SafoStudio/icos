@@ -9,8 +9,8 @@ import lombok.Getter;
 @Builder
 public class User {
   private final UUID id;
-  private final String firstName;
-  private final String lastName;
+  private String firstName;
+  private String lastName;
   private final Email email;
   private final UUID createdBy;
   private final LocalDateTime createdAt;
@@ -30,6 +30,12 @@ public class User {
             .build();
   }
 
+  public void updateName(String firstName, String lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.updatedAt = LocalDateTime.now();
+  }
+
   public void activate() {
     this.status = UserStatus.ACTIVE;
     this.updatedAt = LocalDateTime.now();
@@ -46,6 +52,6 @@ public class User {
   }
 
   public void changeEmail(Email newEmail) {
-    // changeEmail
+    // Logic for changing email
   }
 }

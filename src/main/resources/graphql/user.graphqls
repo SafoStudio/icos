@@ -6,6 +6,7 @@ extend type Query {
 extend type Mutation {
     createUser(input: UserCreateInput!): User!
     updateUser(id: ID!, input: UserUpdateInput!): User!
+    updateProfile(userId: ID!, input: ProfileUpdateInput!): UserProfile!
     deleteUser(id: ID!): Boolean!
     activateUser(id: ID!): Boolean!
     suspendUser(id: ID!): Boolean!
@@ -20,6 +21,15 @@ type User {
     role: String!
     departmentId: ID
     permissions: [String!]!
+    profile: UserProfile
+}
+
+type UserProfile {
+    userId: ID!
+    phoneNumber: String
+    address: String
+    hireDate: Date
+    birthDate: Date
 }
 
 input UserCreateInput {
@@ -32,5 +42,11 @@ input UserCreateInput {
 input UserUpdateInput {
     firstName: String
     lastName: String
-    email: String
+}
+
+input ProfileUpdateInput {
+    phoneNumber: String
+    address: String
+    hireDate: Date
+    birthDate: Date
 }

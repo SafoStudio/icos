@@ -18,4 +18,6 @@ public class UserResponseDto {
   private final UUID createdBy;
   private final LocalDateTime createdAt;
   private final LocalDateTime updatedAt;
+  private final ProfileResponseDto profile;
+  private final java.util.List<DocumentResponseDto> documents;
 }
