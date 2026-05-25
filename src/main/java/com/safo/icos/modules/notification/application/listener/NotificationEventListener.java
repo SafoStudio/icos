@@ -8,6 +8,11 @@ import com.safo.icos.modules.onboarding.api.event.OnboardingTaskAssignedEvent;
 import com.safo.icos.modules.workflow.tasks.api.event.TaskAssignedEvent;
 import com.safo.icos.modules.workflow.tasks.api.event.TaskStatusChangedEvent;
 import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
+import com.safo.icos.modules.timeoff.api.event.LeaveRequestApprovedEvent;
+import com.safo.icos.modules.timeoff.api.event.LeaveRequestCreatedEvent;
+import com.safo.icos.modules.timeoff.api.event.LeaveRequestRejectedEvent;
+import com.safo.icos.modules.user.api.UserProvider;
+import com.safo.icos.modules.user.api.dto.MembershipDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -21,6 +26,7 @@ import java.util.Map;
 public class NotificationEventListener {
 
     private final NotificationService notificationService;
+    private final UserProvider userProvider;
 
     @Async
     @EventListener
@@ -119,6 +125,54 @@ public class NotificationEventListener {
                         "eventId", event.getEventId().toString(),
                         "startTime", event.getStartTime().toString()
                 )
+        );
+    }
+
+    @Async
+    @EventListener
+    public void handleLeaveRequestCreated(LeaveRequestCreatedEvent event) {
+        log.info("Handling LeaveRequestCreatedEvent for user: {}", event.getLeaveRequest().getUserId());
+
+        // Notify manager
+        userProvider.findFirstActiveMembershipByUserId(event.getLeaveRequest().getUserId())
+                .ifPresent(membership -> {
+                    if (membership.getManagerId() != null) {
+                        notificationService.createNotification(
+                                membership.getManagerId(),
+                                NotificationType.LEAVE_REQUEST_CREATED,
+                                "New Leave Request",
+                                "Employee requested leave from " + event.getLeaveRequest().getStartDate() + " to " + event.getLeaveRequest().getEndDate(),
+                                Map.of("leaveRequestId", event.getLeaveRequest().getId().toString())
+                        );
+                    }
+                });
+    }
+
+    @Async
+    @EventListener
+    public void handleLeaveRequestApproved(LeaveRequestApprovedEvent event) {
+        log.info("Handling LeaveRequestApprovedEvent for user: {}", event.getLeaveRequest().getUserId());
+
+        notificationService.createNotification(
+                event.getLeaveRequest().getUserId(),
+                NotificationType.LEAVE_REQUEST_APPROVED,
+                "Leave Request Approved",
+                "Your leave request from " + event.getLeaveRequest().getStartDate() + " has been approved.",
+                Map.of("leaveRequestId", event.getLeaveRequest().getId().toString())
+        );
+    }
+
+    @Async
+    @EventListener
+    public void handleLeaveRequestRejected(LeaveRequestRejectedEvent event) {
+        log.info("Handling LeaveRequestRejectedEvent for user: {}", event.getLeaveRequest().getUserId());
+
+        notificationService.createNotification(
+                event.getLeaveRequest().getUserId(),
+                NotificationType.LEAVE_REQUEST_REJECTED,
+                "Leave Request Rejected",
+                "Your leave request from " + event.getLeaveRequest().getStartDate() + " has been rejected.",
+                Map.of("leaveRequestId", event.getLeaveRequest().getId().toString())
         );
     }
 }
