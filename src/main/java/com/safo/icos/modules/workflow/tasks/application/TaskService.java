@@ -1,9 +1,12 @@
 package com.safo.icos.modules.workflow.tasks.application;
 
+import com.safo.icos.modules.workflow.tasks.api.event.TaskAssignedEvent;
+import com.safo.icos.modules.workflow.tasks.api.event.TaskStatusChangedEvent;
 import com.safo.icos.modules.workflow.tasks.domain.model.Task;
 import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
 import com.safo.icos.modules.workflow.tasks.domain.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Task createTask(String title, String description, UUID assigneeId, UUID departmentId) {
@@ -24,7 +28,11 @@ public class TaskService {
                 .assigneeId(assigneeId)
                 .departmentId(departmentId)
                 .build();
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        eventPublisher.publishEvent(new TaskAssignedEvent(this, savedTask.getId(), assigneeId, title));
+
+        return savedTask;
     }
 
     @Transactional
@@ -46,6 +54,10 @@ public class TaskService {
                 .metadata(task.getMetadata())
                 .build();
                 
-        return taskRepository.save(updatedTask);
+        Task savedTask = taskRepository.save(updatedTask);
+
+        eventPublisher.publishEvent(new TaskStatusChangedEvent(this, savedTask.getId(), savedTask.getAssigneeId(), savedTask.getTitle(), newStatus));
+
+        return savedTask;
     }
 }

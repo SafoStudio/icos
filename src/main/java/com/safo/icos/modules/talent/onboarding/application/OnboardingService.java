@@ -4,6 +4,7 @@ import com.safo.icos.modules.user.api.dto.MembershipDto;
 import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.onboarding.api.constant.OnboardingErrorCode;
+import com.safo.icos.modules.onboarding.api.event.OnboardingTaskAssignedEvent;
 import com.safo.icos.modules.onboarding.domain.model.*;
 import com.safo.icos.modules.onboarding.domain.model.enums.*;
 import com.safo.icos.modules.onboarding.domain.repository.*;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class OnboardingService {
     private final OnboardingTemplateRepository templateRepository;
     private final OnboardingTaskTemplateRepository taskTemplateRepository;
     private final UserProvider userProvider;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OnboardingTemplate createTemplate(UUID companyId, String name, String description) {
         OnboardingTemplate template = OnboardingTemplate.create(companyId, name, description);
@@ -48,7 +51,15 @@ public class OnboardingService {
                     userId, // Assign to the user being onboarded for self-service tasks
                     startDate.plusDays(tt.getDaysFromStart())
             );
-            taskRepository.save(task);
+            OnboardingTask savedTask = taskRepository.save(task);
+
+            // Publish event for notifications
+            eventPublisher.publishEvent(new OnboardingTaskAssignedEvent(
+                    this,
+                    savedTask.getId(),
+                    userId,
+                    savedTask.getTitle()
+            ));
         }
 
         return savedProcess;

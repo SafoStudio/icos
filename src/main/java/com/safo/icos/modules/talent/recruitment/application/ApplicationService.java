@@ -6,6 +6,7 @@ import com.safo.icos.modules.recruitment.application.dto.ApplicationDto;
 import com.safo.icos.modules.recruitment.application.dto.KanbanBoardDto;
 import com.safo.icos.modules.recruitment.application.dto.KanbanColumnDto;
 import com.safo.icos.modules.recruitment.api.event.CandidateHiredEvent;
+import com.safo.icos.modules.recruitment.api.event.CandidateStageChangedEvent;
 import com.safo.icos.modules.recruitment.domain.model.Application;
 import com.safo.icos.modules.recruitment.domain.model.enums.ApplicationStatus;
 import com.safo.icos.modules.recruitment.domain.model.Vacancy;
@@ -93,6 +94,16 @@ public class ApplicationService {
                 .build();
 
         applicationRepository.save(updated);
+
+        // Publish event for notifications
+        // In a real scenario, we'd get the actual user ID of the recruiter/manager
+        eventPublisher.publishEvent(new CandidateStageChangedEvent(
+                this,
+                application.getCandidateId(),
+                application.getId(),
+                stageId,
+                application.getCandidateId() // Just as an example, notify the candidate
+        ));
     }
 
     public void hireCandidate(UUID applicationId, UUID userId) {

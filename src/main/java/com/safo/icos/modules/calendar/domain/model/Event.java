@@ -14,6 +14,7 @@ public class Event {
     private final UUID id;
     private final UUID userId;
     private final String title;
+    private final String description;
     private final EventType type;
     private final SourceType source;
     private final OffsetDateTime startAt;
