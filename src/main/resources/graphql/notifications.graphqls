@@ -1,0 +1,19 @@
+type Notification {
+    id: ID!
+    userId: ID!
+    type: String!
+    title: String!
+    message: String
+    isRead: Boolean!
+    createdAt: String!
+}
+
+type Query {
+    notifications(limit: Int = 20, offset: Int = 0): [Notification!]!
+    unreadNotificationCount: Int!
+}
+
+type Mutation {
+    markNotificationAsRead(id: ID!): Notification!
+    markAllNotificationsAsRead: Boolean!
+}

@@ -1,5 +1,6 @@
 package com.safo.icos.modules.compensation.application;
 
+import com.safo.icos.modules.compensation.application.dto.PayrollEntryDto;
 import com.safo.icos.modules.compensation.domain.model.Bonus;
 import com.safo.icos.modules.compensation.domain.model.CompensationRecord;
 import com.safo.icos.modules.compensation.domain.model.PayrollPeriod;
@@ -9,6 +10,8 @@ import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.modules.user.api.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;

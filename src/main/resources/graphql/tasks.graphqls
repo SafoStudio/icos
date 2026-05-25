@@ -1,0 +1,16 @@
+type Task {
+    id: ID!
+    title: String!
+    description: String
+    status: String!
+    assigneeId: ID!
+}
+
+type Query {
+    tasksByAssignee(assigneeId: ID!): [Task!]!
+}
+
+type Mutation {
+    createTask(title: String!, description: String, assigneeId: ID!, departmentId: ID!): Task!
+    moveTask(taskId: ID!, newStatus: String!): Task!
+}

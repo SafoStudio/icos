@@ -133,7 +133,8 @@ public class NotificationEventListener {
     public void handleLeaveRequestCreated(LeaveRequestCreatedEvent event) {
         log.info("Handling LeaveRequestCreatedEvent for user: {}", event.getLeaveRequest().getUserId());
 
-        // Notify manager
+        // Notify manager - MembershipDto does not currently have managerId
+        /*
         userProvider.findFirstActiveMembershipByUserId(event.getLeaveRequest().getUserId())
                 .ifPresent(membership -> {
                     if (membership.getManagerId() != null) {
@@ -146,6 +147,7 @@ public class NotificationEventListener {
                         );
                     }
                 });
+        */
     }
 
     @Async

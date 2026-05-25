@@ -1,0 +1,17 @@
+type ApprovalRequest {
+    id: ID!
+    targetEntityId: ID!
+    targetEntityType: String!
+    requesterId: ID!
+    approverId: ID
+    status: String!
+}
+
+type Query {
+    myApprovalRequests: [ApprovalRequest!]!
+}
+
+type Mutation {
+    approveRequest(id: ID!): ApprovalRequest!
+    rejectRequest(id: ID!): ApprovalRequest!
+}
