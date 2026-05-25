@@ -1,13 +1,16 @@
-package com.safo.icos.modules.onboarding.infrastructure.mapper;
+package com.safo.icos.modules.talent.onboarding.infrastructure.mapper;
 
-import com.safo.icos.modules.onboarding.domain.model.OnboardingProcess;
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTask;
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTaskTemplate;
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTemplate;
-import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingProcessJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTaskJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTaskTemplateJpaEntity;
-import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTemplateJpaEntity;
+import com.safo.icos.modules.talent.onboarding.api.dto.OnboardingProcessDto;
+import com.safo.icos.modules.talent.onboarding.api.dto.OnboardingTaskDto;
+import com.safo.icos.modules.talent.onboarding.api.dto.OnboardingTemplateDto;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingProcess;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTask;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTaskTemplate;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTemplate;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity.OnboardingProcessJpaEntity;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity.OnboardingTaskJpaEntity;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity.OnboardingTaskTemplateJpaEntity;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity.OnboardingTemplateJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -120,6 +123,36 @@ public class OnboardingMapper {
                 .daysFromStart(domain.getDaysFromStart())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
+                .build();
+    }
+
+    public OnboardingProcessDto toDto(OnboardingProcess domain) {
+        if (domain == null) return null;
+        return OnboardingProcessDto.builder()
+                .id(domain.getId())
+                .membershipId(domain.getMembershipId())
+                .status(domain.getStatus().name())
+                .startDate(domain.getStartDate())
+                .build();
+    }
+
+    public OnboardingTaskDto toDto(OnboardingTask domain) {
+        if (domain == null) return null;
+        return OnboardingTaskDto.builder()
+                .id(domain.getId())
+                .title(domain.getTitle())
+                .description(domain.getDescription())
+                .status(domain.getStatus().name())
+                .dueDate(domain.getDueDate())
+                .build();
+    }
+
+    public OnboardingTemplateDto toDto(OnboardingTemplate domain) {
+        if (domain == null) return null;
+        return OnboardingTemplateDto.builder()
+                .id(domain.getId())
+                .name(domain.getName())
+                .description(domain.getDescription())
                 .build();
     }
 }

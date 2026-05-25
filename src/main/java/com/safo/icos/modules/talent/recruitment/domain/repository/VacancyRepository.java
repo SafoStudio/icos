@@ -1,6 +1,6 @@
-package com.safo.icos.modules.recruitment.domain.repository;
+package com.safo.icos.modules.talent.recruitment.domain.repository;
 
-import com.safo.icos.modules.recruitment.domain.model.Vacancy;
+import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,9 +1,9 @@
-package com.safo.icos.modules.onboarding.infrastructure.repository.impl;
+package com.safo.icos.modules.talent.onboarding.infrastructure.repository.impl;
 
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTemplate;
-import com.safo.icos.modules.onboarding.domain.repository.OnboardingTemplateRepository;
-import com.safo.icos.modules.onboarding.infrastructure.mapper.OnboardingMapper;
-import com.safo.icos.modules.onboarding.infrastructure.repository.jpa.OnboardingTemplateJpaRepository;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTemplate;
+import com.safo.icos.modules.talent.onboarding.domain.repository.OnboardingTemplateRepository;
+import com.safo.icos.modules.talent.onboarding.infrastructure.mapper.OnboardingMapper;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.jpa.OnboardingTemplateJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

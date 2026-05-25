@@ -1,0 +1,18 @@
+type Event {
+    id: ID!
+    userId: ID!
+    title: String!
+    description: String
+    startAt: String!
+    endAt: String!
+}
+
+extend type Query {
+    calendarEvents(start: String!, end: String!): [Event!]!
+}
+
+extend type Mutation {
+    createCalendarEvent(title: String!, description: String, start: String!, end: String!): Event!
+}
+
+

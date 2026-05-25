@@ -1,4 +1,4 @@
-package com.safo.icos.modules.onboarding.api.event;
+package com.safo.icos.modules.talent.onboarding.api.event;
 
 import java.util.UUID;
 import lombok.Getter;

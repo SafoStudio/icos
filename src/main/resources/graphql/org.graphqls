@@ -31,3 +31,5 @@ extend type Mutation {
     createPosition(name: String!, description: String): Position
     updatePosition(id: ID!, name: String, description: String): Position
 }
+
+

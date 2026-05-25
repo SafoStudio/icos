@@ -10,6 +10,8 @@ public interface MembershipRepository {
 
   Optional<Membership> findActiveByUserIdAndCompanyId(UUID userId, UUID companyId);
 
+  List<Membership> findAllByCompanyId(UUID companyId);
+
   Optional<Membership> findFirstByUserIdAndActiveTrue(UUID userId);
 
   List<Membership> findByUserId(UUID userId);

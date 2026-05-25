@@ -1,6 +1,6 @@
-package com.safo.icos.modules.onboarding.infrastructure.repository.entity;
+package com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity;
 
-import com.safo.icos.modules.onboarding.domain.model.enums.OnboardingTaskStatus;
+import com.safo.icos.modules.talent.onboarding.domain.model.enums.OnboardingTaskStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

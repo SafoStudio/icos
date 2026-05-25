@@ -1,6 +1,6 @@
-package com.safo.icos.modules.onboarding.domain.repository;
+package com.safo.icos.modules.talent.onboarding.domain.repository;
 
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTask;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTask;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

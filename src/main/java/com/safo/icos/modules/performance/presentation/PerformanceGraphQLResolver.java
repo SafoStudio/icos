@@ -1,9 +1,9 @@
 package com.safo.icos.modules.performance.presentation;
-
+import com.safo.icos.modules.performance.api.dto.ObjectiveDto;
+import com.safo.icos.modules.performance.api.dto.PerformanceReviewDto;
 import com.safo.icos.modules.performance.application.OkrService;
 import com.safo.icos.modules.performance.application.PerformanceService;
-import com.safo.icos.modules.performance.domain.model.Objective;
-import com.safo.icos.modules.performance.domain.model.PerformanceReview;
+import com.safo.icos.modules.performance.infrastructure.mapper.PerformanceMapper;
 import com.safo.icos.security.context.IcosUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -11,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -21,25 +22,26 @@ public class PerformanceGraphQLResolver {
 
     private final OkrService okrService;
     private final PerformanceService performanceService;
+    private final PerformanceMapper mapper;
 
     @QueryMapping
-    public List<Objective> myObjectives(@AuthenticationPrincipal IcosUserPrincipal principal) {
-        return okrService.getUserObjectives(principal.getUserId());
+    public List<ObjectiveDto> myObjectives(@AuthenticationPrincipal IcosUserPrincipal principal) {
+        return okrService.getUserObjectives(principal.getUserId()).stream().map(mapper::toDto).toList();
     }
 
     @QueryMapping
-    public List<PerformanceReview> employeeReviews(@Argument UUID employeeId) {
-        return performanceService.getEmployeeReviews(employeeId);
+    public List<PerformanceReviewDto> employeeReviews(@Argument UUID employeeId) {
+        return performanceService.getEmployeeReviews(employeeId).stream().map(mapper::toDto).toList();
     }
 
     @MutationMapping
-    public Objective createObjective(@AuthenticationPrincipal IcosUserPrincipal principal, 
+    public ObjectiveDto createObjective(@AuthenticationPrincipal IcosUserPrincipal principal, 
                                      @Argument String title, @Argument String description, @Argument String startDate, @Argument String endDate) {
-        return okrService.createObjective(principal.getUserId(), title, description, LocalDate.parse(startDate), LocalDate.parse(endDate));
+        return mapper.toDto(okrService.createObjective(principal.getUserId(), title, description, LocalDate.parse(startDate), LocalDate.parse(endDate)));
     }
 
     @MutationMapping
-    public PerformanceReview finalizeReview(@Argument UUID id, @Argument Integer rating, @Argument String summary) {
-        return performanceService.finalizeReview(id, rating, summary);
+    public PerformanceReviewDto finalizeReview(@Argument UUID id, @Argument Integer rating, @Argument String summary) {
+        return mapper.toDto(performanceService.finalizeReview(id, rating, summary));
     }
 }

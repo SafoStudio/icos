@@ -6,11 +6,13 @@ type Task {
     assigneeId: ID!
 }
 
-type Query {
+extend type Query {
     tasksByAssignee(assigneeId: ID!): [Task!]!
 }
 
-type Mutation {
+extend type Mutation {
     createTask(title: String!, description: String, assigneeId: ID!, departmentId: ID!): Task!
     moveTask(taskId: ID!, newStatus: String!): Task!
 }
+
+

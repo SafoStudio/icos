@@ -26,6 +26,13 @@ public class MembershipRepositoryImpl implements MembershipRepository {
   }
 
   @Override
+  public List<Membership> findAllByCompanyId(UUID companyId) {
+    return jpaRepository.findAllByCompanyId(companyId).stream()
+            .map(this::toDomain)
+            .collect(Collectors.toList());
+  }
+
+  @Override
   public Optional<Membership> findFirstByUserIdAndActiveTrue(UUID userId) {
     return jpaRepository.findFirstByUserIdAndActiveTrue(userId).map(this::toDomain);
   }

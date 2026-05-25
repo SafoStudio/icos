@@ -1,7 +1,7 @@
-package com.safo.icos.modules.recruitment.application.dto;
+package com.safo.icos.modules.talent.recruitment.application.dto;
 
-import com.safo.icos.modules.recruitment.domain.model.Application;
-import com.safo.icos.modules.recruitment.domain.model.VacancyStage;
+import com.safo.icos.modules.talent.recruitment.domain.model.Application;
+import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;

@@ -14,6 +14,8 @@ public interface MembershipJpaRepository extends JpaRepository<MembershipJpaEnti
           "AND m.active = true")
   Optional<MembershipJpaEntity> findActiveByUserIdAndCompanyId(UUID userId, UUID companyId);
 
+  List<MembershipJpaEntity> findAllByCompanyId(UUID companyId);
+
   Optional<MembershipJpaEntity> findFirstByUserIdAndActiveTrue(UUID userId);
 
   List<MembershipJpaEntity> findByUserId(UUID userId);

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.onboarding;
+package com.safo.icos.modules.talent.onboarding;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

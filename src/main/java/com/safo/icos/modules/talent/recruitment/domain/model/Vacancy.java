@@ -1,6 +1,6 @@
-package com.safo.icos.modules.recruitment.domain.model;
+package com.safo.icos.modules.talent.recruitment.domain.model;
 
-import com.safo.icos.modules.recruitment.domain.model.enums.VacancyStatus;
+import com.safo.icos.modules.talent.recruitment.domain.model.enums.VacancyStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Builder;

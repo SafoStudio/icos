@@ -1,10 +1,10 @@
-package com.safo.icos.modules.recruitment.infrastructure.repository.impl;
+package com.safo.icos.modules.talent.recruitment.infrastructure.repository.impl;
 
-import com.safo.icos.modules.recruitment.domain.model.Application;
-import com.safo.icos.modules.recruitment.domain.repository.ApplicationRepository;
-import com.safo.icos.modules.recruitment.infrastructure.mapper.RecruitmentMapper;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.jpa.ApplicationJpaRepository;
+import com.safo.icos.modules.talent.recruitment.domain.model.Application;
+import com.safo.icos.modules.talent.recruitment.domain.repository.ApplicationRepository;
+import com.safo.icos.modules.talent.recruitment.infrastructure.mapper.RecruitmentMapper;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa.ApplicationJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

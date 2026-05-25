@@ -1,17 +1,19 @@
-package com.safo.icos.modules.recruitment.infrastructure.mapper;
+package com.safo.icos.modules.talent.recruitment.infrastructure.mapper;
 
-import com.safo.icos.modules.recruitment.domain.model.Application;
-import com.safo.icos.modules.recruitment.domain.model.Candidate;
-import com.safo.icos.modules.recruitment.domain.model.Vacancy;
-import com.safo.icos.modules.recruitment.domain.model.VacancyStage;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.CandidateJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.VacancyJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.VacancyStageJpaEntity;
+import com.safo.icos.modules.talent.recruitment.domain.model.Application;
+import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
+import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
+import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.CandidateJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.VacancyJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.VacancyStageJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RecruitmentMapper {
+
+    // --- Vacancy ---
 
     public Vacancy toDomain(VacancyJpaEntity entity) {
         if (entity == null) return null;
@@ -47,6 +49,8 @@ public class RecruitmentMapper {
                 .build();
     }
 
+    // --- Candidate ---
+
     public Candidate toDomain(CandidateJpaEntity entity) {
         if (entity == null) return null;
         return Candidate.builder()
@@ -77,6 +81,8 @@ public class RecruitmentMapper {
                 .build();
     }
 
+    // --- Application ---
+
     public Application toDomain(ApplicationJpaEntity entity) {
         if (entity == null) return null;
         return Application.builder()
@@ -104,6 +110,8 @@ public class RecruitmentMapper {
                 .updatedAt(domain.getUpdatedAt())
                 .build();
     }
+
+    // --- VacancyStage ---
 
     public VacancyStage toDomain(VacancyStageJpaEntity entity) {
         if (entity == null) return null;

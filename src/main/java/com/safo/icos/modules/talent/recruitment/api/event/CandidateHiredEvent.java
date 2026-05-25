@@ -1,4 +1,4 @@
-package com.safo.icos.modules.recruitment.api.event;
+package com.safo.icos.modules.talent.recruitment.api.event;
 
 import java.util.UUID;
 import lombok.Getter;

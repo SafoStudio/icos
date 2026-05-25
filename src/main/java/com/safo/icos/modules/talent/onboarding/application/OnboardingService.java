@@ -1,13 +1,13 @@
-package com.safo.icos.modules.onboarding.application;
+package com.safo.icos.modules.talent.onboarding.application;
 
 import com.safo.icos.modules.user.api.dto.MembershipDto;
 import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.modules.onboarding.api.constant.OnboardingErrorCode;
-import com.safo.icos.modules.onboarding.api.event.OnboardingTaskAssignedEvent;
-import com.safo.icos.modules.onboarding.domain.model.*;
-import com.safo.icos.modules.onboarding.domain.model.enums.*;
-import com.safo.icos.modules.onboarding.domain.repository.*;
+import com.safo.icos.modules.talent.onboarding.api.constant.OnboardingErrorCode;
+import com.safo.icos.modules.talent.onboarding.api.event.OnboardingTaskAssignedEvent;
+import com.safo.icos.modules.talent.onboarding.domain.model.*;
+import com.safo.icos.modules.talent.onboarding.domain.model.enums.*;
+import com.safo.icos.modules.talent.onboarding.domain.repository.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

@@ -1,10 +1,10 @@
-package com.safo.icos.modules.recruitment.infrastructure.repository.impl;
+package com.safo.icos.modules.talent.recruitment.infrastructure.repository.impl;
 
-import com.safo.icos.modules.recruitment.domain.model.Candidate;
-import com.safo.icos.modules.recruitment.domain.repository.CandidateRepository;
-import com.safo.icos.modules.recruitment.infrastructure.mapper.RecruitmentMapper;
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.CandidateJpaEntity;
-import com.safo.icos.modules.recruitment.infrastructure.repository.jpa.CandidateJpaRepository;
+import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
+import com.safo.icos.modules.talent.recruitment.domain.repository.CandidateRepository;
+import com.safo.icos.modules.talent.recruitment.infrastructure.mapper.RecruitmentMapper;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.CandidateJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa.CandidateJpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

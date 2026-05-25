@@ -1,4 +1,4 @@
-package com.safo.icos.modules.onboarding.domain.model.enums;
+package com.safo.icos.modules.talent.onboarding.domain.model.enums;
 
 public enum OnboardingProcessStatus {
     NOT_STARTED,

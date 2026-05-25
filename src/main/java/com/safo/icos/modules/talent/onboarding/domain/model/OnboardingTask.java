@@ -1,6 +1,6 @@
-package com.safo.icos.modules.onboarding.domain.model;
+package com.safo.icos.modules.talent.onboarding.domain.model;
 
-import com.safo.icos.modules.onboarding.domain.model.enums.OnboardingTaskStatus;
+import com.safo.icos.modules.talent.onboarding.domain.model.enums.OnboardingTaskStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;

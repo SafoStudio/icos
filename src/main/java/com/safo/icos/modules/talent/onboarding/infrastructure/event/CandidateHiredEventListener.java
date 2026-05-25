@@ -1,9 +1,9 @@
-package com.safo.icos.modules.onboarding.infrastructure.event;
+package com.safo.icos.modules.talent.onboarding.infrastructure.event;
 
-import com.safo.icos.modules.onboarding.application.OnboardingService;
-import com.safo.icos.modules.onboarding.domain.model.OnboardingTemplate;
-import com.safo.icos.modules.onboarding.domain.repository.OnboardingTemplateRepository;
-import com.safo.icos.modules.recruitment.api.event.CandidateHiredEvent;
+import com.safo.icos.modules.talent.onboarding.application.OnboardingService;
+import com.safo.icos.modules.talent.onboarding.domain.model.OnboardingTemplate;
+import com.safo.icos.modules.talent.onboarding.domain.repository.OnboardingTemplateRepository;
+import com.safo.icos.modules.talent.recruitment.api.event.CandidateHiredEvent;
 import com.safo.icos.modules.user.api.UserProvider;
 import com.safo.icos.modules.user.api.dto.MembershipDto;
 import java.time.LocalDate;
@@ -50,3 +50,4 @@ public class CandidateHiredEventListener {
         }
     }
 }
+

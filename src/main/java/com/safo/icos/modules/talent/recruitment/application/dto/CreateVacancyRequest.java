@@ -1,4 +1,4 @@
-package com.safo.icos.modules.recruitment.application.dto;
+package com.safo.icos.modules.talent.recruitment.application.dto;
 
 import java.util.UUID;
 import lombok.Getter;

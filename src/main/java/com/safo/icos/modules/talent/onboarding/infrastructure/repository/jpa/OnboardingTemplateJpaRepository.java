@@ -1,6 +1,6 @@
-package com.safo.icos.modules.onboarding.infrastructure.repository.jpa;
+package com.safo.icos.modules.talent.onboarding.infrastructure.repository.jpa;
 
-import com.safo.icos.modules.onboarding.infrastructure.repository.entity.OnboardingTemplateJpaEntity;
+import com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity.OnboardingTemplateJpaEntity;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

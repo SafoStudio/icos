@@ -12,3 +12,4 @@ type Mutation {
     # Empty type - it will be expanded in other files.
 }
 
+

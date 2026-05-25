@@ -8,12 +8,14 @@ type Notification {
     createdAt: String!
 }
 
-type Query {
+extend type Query {
     notifications(limit: Int = 20, offset: Int = 0): [Notification!]!
     unreadNotificationCount: Int!
 }
 
-type Mutation {
+extend type Mutation {
     markNotificationAsRead(id: ID!): Notification!
     markAllNotificationsAsRead: Boolean!
 }
+
+

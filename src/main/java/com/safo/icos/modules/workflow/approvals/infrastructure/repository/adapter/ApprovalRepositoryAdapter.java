@@ -6,6 +6,7 @@ import com.safo.icos.modules.workflow.approvals.infrastructure.mapper.ApprovalMa
 import com.safo.icos.modules.workflow.approvals.infrastructure.repository.jpa.ApprovalJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,5 +24,12 @@ public class ApprovalRepositoryAdapter implements ApprovalRepository {
     @Override
     public Optional<ApprovalRequest> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<ApprovalRequest> findAllByApproverId(UUID approverId) {
+        return jpaRepository.findAllByApproverId(approverId).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

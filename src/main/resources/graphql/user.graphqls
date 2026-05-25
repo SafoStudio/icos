@@ -50,3 +50,4 @@ input ProfileUpdateInput {
     hireDate: Date
     birthDate: Date
 }
+

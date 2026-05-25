@@ -1,5 +1,7 @@
 package com.safo.icos.modules.compensation.infrastructure.mapper;
 
+import com.safo.icos.modules.compensation.api.dto.CompensationDto;
+import com.safo.icos.modules.compensation.api.dto.SalaryRevisionDto;
 import com.safo.icos.modules.compensation.domain.model.*;
 import com.safo.icos.modules.compensation.domain.model.enums.PayFrequency;
 import com.safo.icos.modules.compensation.infrastructure.repository.entity.*;
@@ -57,6 +59,56 @@ public class CompensationMapper {
                 .effectiveDate(domain.getEffectiveDate())
                 .approvedBy(domain.getApprovedBy())
                 .createdAt(domain.getCreatedAt())
+                .build();
+    }
+
+    public CompensationDto toDto(CompensationRecord domain) {
+        if (domain == null) return null;
+        return CompensationDto.builder()
+                .id(domain.getId())
+                .userId(domain.getUserId())
+                .baseSalary(domain.getBaseSalary())
+                .currency(domain.getCurrency())
+                .payFrequency(domain.getPayFrequency().name())
+                .effectiveDate(domain.getEffectiveDate())
+                .build();
+    }
+
+    public SalaryRevisionDto toDto(SalaryRevision domain) {
+        if (domain == null) return null;
+        return SalaryRevisionDto.builder()
+                .id(domain.getId())
+                .userId(domain.getUserId())
+                .previousSalary(domain.getPreviousSalary())
+                .newSalary(domain.getNewSalary())
+                .reason(domain.getReason())
+                .effectiveDate(domain.getEffectiveDate())
+                .build();
+    }
+
+    public Bonus toDomain(BonusJpaEntity entity) {
+        if (entity == null) return null;
+        return Bonus.builder()
+                .id(entity.getId())
+                .userId(entity.getUserId())
+                .amount(entity.getAmount())
+                .type(entity.getType())
+                .description(entity.getDescription())
+                .status(entity.getStatus())
+                .paymentDate(entity.getPaymentDate())
+                .build();
+    }
+
+    public BonusJpaEntity toEntity(Bonus domain) {
+        if (domain == null) return null;
+        return BonusJpaEntity.builder()
+                .id(domain.getId())
+                .userId(domain.getUserId())
+                .amount(domain.getAmount())
+                .type(domain.getType())
+                .description(domain.getDescription())
+                .status(domain.getStatus())
+                .paymentDate(domain.getPaymentDate())
                 .build();
     }
 }

@@ -1,6 +1,6 @@
-package com.safo.icos.modules.recruitment.infrastructure.repository.entity;
+package com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity;
 
-import com.safo.icos.modules.recruitment.domain.model.enums.PipelineStageType;
+import com.safo.icos.modules.talent.recruitment.domain.model.enums.PipelineStageType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;

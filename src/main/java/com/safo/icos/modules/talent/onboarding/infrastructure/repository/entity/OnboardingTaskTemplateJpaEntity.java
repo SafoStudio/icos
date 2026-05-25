@@ -1,4 +1,4 @@
-package com.safo.icos.modules.onboarding.infrastructure.repository.entity;
+package com.safo.icos.modules.talent.onboarding.infrastructure.repository.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

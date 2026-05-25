@@ -1,6 +1,6 @@
-package com.safo.icos.modules.recruitment.infrastructure.repository.jpa;
+package com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa;
 
-import com.safo.icos.modules.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.entity.ApplicationJpaEntity;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

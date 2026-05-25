@@ -1,15 +1,15 @@
-package com.safo.icos.modules.recruitment.presentation;
+package com.safo.icos.modules.talent.recruitment.presentation;
 
-import com.safo.icos.modules.recruitment.application.ApplicationService;
-import com.safo.icos.modules.recruitment.application.CandidateService;
-import com.safo.icos.modules.recruitment.application.VacancyService;
-import com.safo.icos.modules.recruitment.application.dto.ApplicationDto;
-import com.safo.icos.modules.recruitment.application.dto.CreateVacancyRequest;
-import com.safo.icos.modules.recruitment.application.dto.KanbanBoardDto;
-import com.safo.icos.modules.recruitment.application.dto.VacancyDto;
-import com.safo.icos.modules.recruitment.domain.model.Application;
-import com.safo.icos.modules.recruitment.domain.model.Candidate;
-import com.safo.icos.modules.recruitment.domain.repository.CandidateRepository;
+import com.safo.icos.modules.talent.recruitment.application.ApplicationService;
+import com.safo.icos.modules.talent.recruitment.application.CandidateService;
+import com.safo.icos.modules.talent.recruitment.application.VacancyService;
+import com.safo.icos.modules.talent.recruitment.application.dto.ApplicationDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.CreateVacancyRequest;
+import com.safo.icos.modules.talent.recruitment.application.dto.KanbanBoardDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.VacancyDto;
+import com.safo.icos.modules.talent.recruitment.domain.model.Application;
+import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
+import com.safo.icos.modules.talent.recruitment.domain.repository.CandidateRepository;
 import com.safo.icos.security.permission.RequirePermission;
 import java.util.List;
 import java.util.UUID;

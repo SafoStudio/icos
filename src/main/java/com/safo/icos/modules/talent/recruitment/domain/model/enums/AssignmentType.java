@@ -1,4 +1,4 @@
-package com.safo.icos.modules.recruitment.domain.model.enums;
+package com.safo.icos.modules.talent.recruitment.domain.model.enums;
 
 public enum AssignmentType {
     HIRING_MANAGER,

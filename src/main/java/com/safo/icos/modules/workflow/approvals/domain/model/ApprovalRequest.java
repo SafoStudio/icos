@@ -13,13 +13,19 @@ public class ApprovalRequest {
     private final String targetEntityType;
     private final UUID requesterId;
     private final UUID approverId;
-    private final ApprovalStatus status;
+    private ApprovalStatus status;
 
-    public void approve() {
-        // Handle approval logic
+    public void approve(UUID approverId) {
+        if (this.status != ApprovalStatus.PENDING) {
+            throw new IllegalStateException("Only pending requests can be approved");
+        }
+        this.status = ApprovalStatus.APPROVED;
     }
 
-    public void reject() {
-        // Handle rejection logic
+    public void reject(UUID approverId) {
+        if (this.status != ApprovalStatus.PENDING) {
+            throw new IllegalStateException("Only pending requests can be rejected");
+        }
+        this.status = ApprovalStatus.REJECTED;
     }
 }

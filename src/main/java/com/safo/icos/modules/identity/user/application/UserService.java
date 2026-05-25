@@ -141,7 +141,13 @@ public class UserService {
   }
 
   public List<UserResponseDto> getUsersByCompanyId(UUID companyId) {
-    return List.of(); // Implementation for listing users in company
+    List<Membership> memberships = membershipRepository.findAllByCompanyId(companyId);
+    return memberships.stream()
+            .map(m -> userRepository.findById(m.getUserId()))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(this::toResponseDto)
+            .collect(Collectors.toList());
   }
 
   public void deleteUser(UUID userId) {

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.onboarding.domain.model;
+package com.safo.icos.modules.talent.onboarding.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

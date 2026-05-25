@@ -18,6 +18,11 @@ public class ApprovalService {
     private final ApprovalRepository approvalRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional(readOnly = true)
+    public List<ApprovalRequest> getApprovalsForUser(UUID userId) {
+        return approvalRepository.findAllByApproverId(userId);
+    }
+
     @Transactional
     public ApprovalRequest approveRequest(UUID id, UUID approverId) {
         ApprovalRequest request = approvalRepository.findById(id)

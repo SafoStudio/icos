@@ -7,11 +7,13 @@ type ApprovalRequest {
     status: String!
 }
 
-type Query {
+extend type Query {
     myApprovalRequests: [ApprovalRequest!]!
 }
 
-type Mutation {
+extend type Mutation {
     approveRequest(id: ID!): ApprovalRequest!
     rejectRequest(id: ID!): ApprovalRequest!
 }
+
+

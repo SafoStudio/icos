@@ -67,3 +67,4 @@ extend type Mutation {
     createCustomFieldDefinition(input: CustomFieldDefinitionInput!): CustomFieldDefinition!
     setCustomFieldValue(input: CustomFieldValueInput!): CustomFieldValue!
 }
+

@@ -1,7 +1,7 @@
-package com.safo.icos.modules.recruitment.application;
+package com.safo.icos.modules.talent.recruitment.application;
 
-import com.safo.icos.modules.recruitment.domain.model.Candidate;
-import com.safo.icos.modules.recruitment.domain.repository.CandidateRepository;
+import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
+import com.safo.icos.modules.talent.recruitment.domain.repository.CandidateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

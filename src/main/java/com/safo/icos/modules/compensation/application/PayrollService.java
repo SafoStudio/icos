@@ -24,12 +24,11 @@ public class PayrollService {
 
     private final CompensationRepository compensationRepository;
     private final PayrollRepository payrollRepository;
-    // We'll use this to get all employees eventually
-    // For now, let's assume we can fetch them via UserProvider
+    private final UserProvider userProvider;
 
-    public List<PayrollEntryDto> calculatePayroll(UUID periodId) {
-        // This is a simplified calculation
-        // In real life, it would iterate over employees
+    public List<PayrollEntryDto> calculatePayroll(UUID companyId, LocalDate startDate, LocalDate endDate) {
+        // Since UserProvider doesn't have findAllByCompanyId, this logic needs adjustment
+        // For demonstration, we assume we can filter or fetch differently
         return new ArrayList<>();
     }
 

@@ -1,5 +1,7 @@
 package com.safo.icos.modules.performance.infrastructure.mapper;
 
+import com.safo.icos.modules.performance.api.dto.ObjectiveDto;
+import com.safo.icos.modules.performance.api.dto.PerformanceReviewDto;
 import com.safo.icos.modules.performance.domain.model.*;
 import com.safo.icos.modules.performance.infrastructure.repository.entity.*;
 import org.springframework.stereotype.Component;
@@ -108,6 +110,26 @@ public class PerformanceMapper {
                 .summary(domain.getSummary())
                 .status(domain.getStatus())
                 .finalizedAt(domain.getFinalizedAt())
+                .build();
+    }
+
+    public ObjectiveDto toDto(Objective domain) {
+        if (domain == null) return null;
+        return ObjectiveDto.builder()
+                .id(domain.getId())
+                .title(domain.getTitle())
+                .progress(domain.getProgress())
+                .status(domain.getStatus().name())
+                .build();
+    }
+
+    public PerformanceReviewDto toDto(PerformanceReview domain) {
+        if (domain == null) return null;
+        return PerformanceReviewDto.builder()
+                .id(domain.getId())
+                .rating(domain.getRating())
+                .summary(domain.getSummary())
+                .status(domain.getStatus())
                 .build();
     }
 }
