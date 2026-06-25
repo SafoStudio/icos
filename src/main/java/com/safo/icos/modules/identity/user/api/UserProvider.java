@@ -1,9 +1,9 @@
-package com.safo.icos.modules.user.api;
+package com.safo.icos.modules.identity.user.api;
 
-import com.safo.icos.modules.user.api.dto.MembershipDto;
-import com.safo.icos.modules.user.api.dto.UserCreateDto;
-import com.safo.icos.modules.user.api.dto.UserDto;
-import com.safo.icos.modules.user.api.dto.UserPrincipalDto;
+import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
+import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
+import com.safo.icos.modules.identity.user.api.dto.UserDto;
+import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.invite.infrastructure.repository;
+package com.safo.icos.modules.identity.invite.infrastructure.repository;
 
 import java.util.Optional;
 import java.util.UUID;

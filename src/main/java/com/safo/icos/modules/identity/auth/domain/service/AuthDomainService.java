@@ -1,10 +1,10 @@
-package com.safo.icos.modules.auth.domain.service;
+package com.safo.icos.modules.identity.auth.domain.service;
 
-import com.safo.icos.modules.auth.domain.exception.TokenExpiredException;
-import com.safo.icos.modules.auth.domain.exception.TokenNotFoundException;
-import com.safo.icos.modules.auth.domain.exception.TokenRevokedException;
-import com.safo.icos.modules.auth.domain.model.RefreshToken;
-import com.safo.icos.modules.auth.domain.model.TokenValue;
+import com.safo.icos.modules.identity.auth.domain.exception.TokenExpiredException;
+import com.safo.icos.modules.identity.auth.domain.exception.TokenNotFoundException;
+import com.safo.icos.modules.identity.auth.domain.exception.TokenRevokedException;
+import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package com.safo.icos.security.jwt;
 
-import com.safo.icos.modules.auth.api.dto.AuthTokenDto;
-import com.safo.icos.modules.auth.api.AuthTokenProvider;
+import com.safo.icos.modules.identity.auth.api.AuthTokenProvider;
+import com.safo.icos.modules.identity.auth.api.dto.AuthTokenDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;

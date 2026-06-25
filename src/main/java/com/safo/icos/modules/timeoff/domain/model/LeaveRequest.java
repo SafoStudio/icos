@@ -1,12 +1,12 @@
 package com.safo.icos.modules.timeoff.domain.model;
 
 import com.safo.icos.modules.timeoff.domain.model.enums.LeaveRequestStatus;
-import lombok.Builder;
-import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder(toBuilder = true)

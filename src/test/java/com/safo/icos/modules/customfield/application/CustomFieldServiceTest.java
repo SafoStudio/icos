@@ -6,13 +6,12 @@ import com.safo.icos.modules.customfield.domain.model.CustomFieldDefinition;
 import com.safo.icos.modules.customfield.domain.model.CustomFieldValue;
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
 import com.safo.icos.modules.customfield.domain.model.enums.FieldType;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

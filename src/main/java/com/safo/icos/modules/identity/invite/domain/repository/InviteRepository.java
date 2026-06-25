@@ -1,6 +1,6 @@
-package com.safo.icos.modules.invite.domain.repository;
+package com.safo.icos.modules.identity.invite.domain.repository;
 
-import com.safo.icos.modules.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import java.util.Optional;
 import java.util.UUID;
 

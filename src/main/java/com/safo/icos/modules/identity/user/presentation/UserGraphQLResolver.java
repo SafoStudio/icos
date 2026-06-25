@@ -1,10 +1,10 @@
-package com.safo.icos.modules.user.presentation;
+package com.safo.icos.modules.identity.user.presentation;
 
-import com.safo.icos.modules.user.application.UserService;
-import com.safo.icos.modules.user.application.dto.ProfileResponseDto;
-import com.safo.icos.modules.user.application.dto.ProfileUpdateDto;
-import com.safo.icos.modules.user.application.dto.UserResponseDto;
-import com.safo.icos.modules.user.application.dto.UserUpdateDto;
+import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.dto.ProfileResponseDto;
+import com.safo.icos.modules.identity.user.application.dto.ProfileUpdateDto;
+import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
+import com.safo.icos.modules.identity.user.application.dto.UserUpdateDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

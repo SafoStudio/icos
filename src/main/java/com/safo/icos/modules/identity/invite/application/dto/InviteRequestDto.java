@@ -1,4 +1,4 @@
-package com.safo.icos.modules.invite.application.dto;
+package com.safo.icos.modules.identity.invite.application.dto;
 
 import com.safo.icos.modules.org.domain.model.enums.RoleName;
 import jakarta.validation.constraints.Email;

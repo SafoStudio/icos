@@ -1,8 +1,8 @@
 package com.safo.icos.modules.talent.onboarding.api.dto;
 
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import java.util.UUID;
 
 @Getter
 @Builder

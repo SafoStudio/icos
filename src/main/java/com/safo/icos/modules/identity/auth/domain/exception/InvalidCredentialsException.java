@@ -1,6 +1,6 @@
-package com.safo.icos.modules.auth.domain.exception;
+package com.safo.icos.modules.identity.auth.domain.exception;
 
-import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
+import com.safo.icos.modules.identity.auth.api.constant.AuthErrorCode;
 
 @SuppressWarnings("squid:S110")
 public class InvalidCredentialsException extends AuthDomainException {

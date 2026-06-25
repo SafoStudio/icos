@@ -3,13 +3,13 @@ package com.safo.icos.modules.calendar.application;
 import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.calendar.domain.model.Event;
 import com.safo.icos.modules.calendar.domain.repository.EventRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

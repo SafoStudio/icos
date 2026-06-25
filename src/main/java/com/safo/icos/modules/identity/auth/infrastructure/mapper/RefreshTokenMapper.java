@@ -1,9 +1,9 @@
-package com.safo.icos.modules.auth.infrastructure.mapper;
+package com.safo.icos.modules.identity.auth.infrastructure.mapper;
 
-import com.safo.icos.modules.auth.domain.model.RefreshToken;
-import com.safo.icos.modules.auth.domain.model.RefreshTokenId;
-import com.safo.icos.modules.auth.domain.model.TokenValue;
-import com.safo.icos.modules.auth.infrastructure.repository.RefreshTokenJpaEntity;
+import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.identity.auth.domain.model.RefreshTokenId;
+import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
+import com.safo.icos.modules.identity.auth.infrastructure.repository.RefreshTokenJpaEntity;
 import java.time.Instant;
 import org.springframework.stereotype.Component;
 

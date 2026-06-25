@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.domain.exception;
+package com.safo.icos.modules.identity.auth.domain.exception;
 
 import com.safo.icos.common.exception.BusinessException;
 

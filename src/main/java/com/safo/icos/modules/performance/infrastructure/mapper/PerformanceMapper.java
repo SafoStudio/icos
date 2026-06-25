@@ -2,8 +2,14 @@ package com.safo.icos.modules.performance.infrastructure.mapper;
 
 import com.safo.icos.modules.performance.api.dto.ObjectiveDto;
 import com.safo.icos.modules.performance.api.dto.PerformanceReviewDto;
-import com.safo.icos.modules.performance.domain.model.*;
-import com.safo.icos.modules.performance.infrastructure.repository.entity.*;
+import com.safo.icos.modules.performance.domain.model.KeyResult;
+import com.safo.icos.modules.performance.domain.model.Objective;
+import com.safo.icos.modules.performance.domain.model.PerformanceReview;
+import com.safo.icos.modules.performance.domain.model.ReviewCycle;
+import com.safo.icos.modules.performance.infrastructure.repository.entity.KeyResultJpaEntity;
+import com.safo.icos.modules.performance.infrastructure.repository.entity.ObjectiveJpaEntity;
+import com.safo.icos.modules.performance.infrastructure.repository.entity.PerformanceReviewJpaEntity;
+import com.safo.icos.modules.performance.infrastructure.repository.entity.ReviewCycleJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

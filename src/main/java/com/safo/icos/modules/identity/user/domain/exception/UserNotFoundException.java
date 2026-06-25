@@ -1,8 +1,8 @@
-package com.safo.icos.modules.user.domain.exception;
+package com.safo.icos.modules.identity.user.domain.exception;
 
 import com.safo.icos.common.exception.NotFoundException;
-import com.safo.icos.modules.user.domain.model.Email;
-import com.safo.icos.modules.user.domain.model.UserId;
+import com.safo.icos.modules.identity.user.domain.model.Email;
+import com.safo.icos.modules.identity.user.domain.model.UserId;
 
 public class UserNotFoundException extends NotFoundException {
   public UserNotFoundException(String message) {

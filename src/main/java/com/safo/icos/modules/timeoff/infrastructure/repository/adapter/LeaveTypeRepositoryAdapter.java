@@ -4,11 +4,11 @@ import com.safo.icos.modules.timeoff.domain.model.LeaveType;
 import com.safo.icos.modules.timeoff.domain.repository.LeaveTypeRepository;
 import com.safo.icos.modules.timeoff.infrastructure.mapper.TimeOffMapper;
 import com.safo.icos.modules.timeoff.infrastructure.repository.jpa.LeaveTypeJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.domain.model;
+package com.safo.icos.modules.identity.auth.domain.model;
 
 import java.time.Instant;
 import java.util.UUID;

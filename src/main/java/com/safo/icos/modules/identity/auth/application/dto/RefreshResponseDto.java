@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.application.dto;
+package com.safo.icos.modules.identity.auth.application.dto;
 
 import lombok.Builder;
 import lombok.Getter;

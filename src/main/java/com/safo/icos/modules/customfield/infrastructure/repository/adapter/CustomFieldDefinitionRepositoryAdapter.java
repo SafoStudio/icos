@@ -4,11 +4,11 @@ import com.safo.icos.modules.customfield.domain.model.CustomFieldDefinition;
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
 import com.safo.icos.modules.customfield.domain.repository.CustomFieldDefinitionRepository;
 import com.safo.icos.modules.customfield.infrastructure.repository.jpa.CustomFieldDefinitionJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

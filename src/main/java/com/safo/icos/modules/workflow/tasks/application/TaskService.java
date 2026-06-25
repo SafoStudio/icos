@@ -5,12 +5,11 @@ import com.safo.icos.modules.workflow.tasks.api.event.TaskStatusChangedEvent;
 import com.safo.icos.modules.workflow.tasks.domain.model.Task;
 import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
 import com.safo.icos.modules.workflow.tasks.domain.repository.TaskRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

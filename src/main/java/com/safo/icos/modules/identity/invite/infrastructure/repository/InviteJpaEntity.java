@@ -1,6 +1,6 @@
-package com.safo.icos.modules.invite.infrastructure.repository;
+package com.safo.icos.modules.identity.invite.infrastructure.repository;
 
-import com.safo.icos.modules.invite.domain.model.enums.InviteStatus;
+import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.modules.org.domain.model.enums.RoleName;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.invite.application.dto;
+package com.safo.icos.modules.identity.invite.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

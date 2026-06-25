@@ -1,6 +1,6 @@
-package com.safo.icos.modules.invite.infrastructure.email;
+package com.safo.icos.modules.identity.invite.infrastructure.email;
 
-import com.safo.icos.modules.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;

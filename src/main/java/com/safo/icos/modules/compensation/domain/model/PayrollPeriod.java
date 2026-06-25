@@ -1,10 +1,10 @@
 package com.safo.icos.modules.compensation.domain.model;
 
 import com.safo.icos.modules.compensation.domain.model.enums.PayrollStatus;
-import lombok.Builder;
-import lombok.Getter;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

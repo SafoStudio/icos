@@ -1,4 +1,4 @@
-package com.safo.icos.modules.user.domain.model;
+package com.safo.icos.modules.identity.user.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

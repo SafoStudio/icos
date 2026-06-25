@@ -8,15 +8,14 @@ import com.safo.icos.modules.customfield.domain.model.CustomFieldValue;
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
 import com.safo.icos.modules.customfield.domain.repository.CustomFieldDefinitionRepository;
 import com.safo.icos.modules.customfield.domain.repository.CustomFieldValueRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

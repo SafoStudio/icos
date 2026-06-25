@@ -1,6 +1,6 @@
-package com.safo.icos.modules.invite.domain.model;
+package com.safo.icos.modules.identity.invite.domain.model;
 
-import com.safo.icos.modules.invite.domain.model.enums.InviteStatus;
+import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.modules.org.domain.model.enums.RoleName;
 import java.time.OffsetDateTime;
 import java.util.UUID;

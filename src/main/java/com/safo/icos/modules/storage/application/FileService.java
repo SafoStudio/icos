@@ -1,8 +1,8 @@
 package com.safo.icos.modules.storage.application;
 
 import com.safo.icos.modules.storage.api.StorageProvider;
-import com.safo.icos.modules.user.application.UserService;
-import com.safo.icos.modules.user.application.dto.UserResponseDto;
+import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import java.io.InputStream;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

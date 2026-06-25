@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.api.constant;
+package com.safo.icos.modules.identity.auth.api.constant;
 
 public final class AuthErrorCode {
   public static final String INVALID_CREDENTIALS = "AUTH_001";

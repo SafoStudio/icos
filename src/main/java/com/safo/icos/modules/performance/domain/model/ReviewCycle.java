@@ -1,9 +1,9 @@
 package com.safo.icos.modules.performance.domain.model;
 
-import lombok.Builder;
-import lombok.Getter;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder(toBuilder = true)

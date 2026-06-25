@@ -1,9 +1,9 @@
-package com.safo.icos.modules.auth.infrastructure.repository;
+package com.safo.icos.modules.identity.auth.infrastructure.repository;
 
-import com.safo.icos.modules.auth.domain.model.RefreshToken;
-import com.safo.icos.modules.auth.domain.model.TokenValue;
-import com.safo.icos.modules.auth.domain.repository.RefreshTokenRepository;
-import com.safo.icos.modules.auth.infrastructure.mapper.RefreshTokenMapper;
+import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
+import com.safo.icos.modules.identity.auth.domain.repository.RefreshTokenRepository;
+import com.safo.icos.modules.identity.auth.infrastructure.mapper.RefreshTokenMapper;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

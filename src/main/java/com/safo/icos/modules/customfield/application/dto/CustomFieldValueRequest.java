@@ -1,9 +1,8 @@
 package com.safo.icos.modules.customfield.application.dto;
 
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
-import lombok.Data;
-
 import java.util.UUID;
+import lombok.Data;
 
 @Data
 public class CustomFieldValueRequest {

@@ -1,6 +1,6 @@
 package com.safo.icos.security.jwt;
 
-import com.safo.icos.modules.user.api.UserProvider;
+import com.safo.icos.modules.identity.user.api.UserProvider;
 import com.safo.icos.security.context.IcosUserPrincipal;
 import com.safo.icos.security.context.TenantContext;
 import jakarta.servlet.FilterChain;

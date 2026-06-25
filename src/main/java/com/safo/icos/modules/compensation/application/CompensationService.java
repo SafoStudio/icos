@@ -5,13 +5,13 @@ import com.safo.icos.modules.compensation.domain.model.CompensationRecord;
 import com.safo.icos.modules.compensation.domain.model.SalaryRevision;
 import com.safo.icos.modules.compensation.domain.model.enums.PayFrequency;
 import com.safo.icos.modules.compensation.domain.repository.CompensationRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

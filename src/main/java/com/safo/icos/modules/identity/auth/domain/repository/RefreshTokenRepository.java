@@ -1,7 +1,7 @@
-package com.safo.icos.modules.auth.domain.repository;
+package com.safo.icos.modules.identity.auth.domain.repository;
 
-import com.safo.icos.modules.auth.domain.model.RefreshToken;
-import com.safo.icos.modules.auth.domain.model.TokenValue;
+import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
+import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
 import java.util.Optional;
 import java.util.UUID;
 

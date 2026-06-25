@@ -1,4 +1,4 @@
-package com.safo.icos.modules.invite.domain.model.enums;
+package com.safo.icos.modules.identity.invite.domain.model.enums;
 
 public enum InviteStatus {
   PENDING,

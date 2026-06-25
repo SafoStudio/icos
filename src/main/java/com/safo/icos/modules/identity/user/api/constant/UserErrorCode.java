@@ -1,4 +1,4 @@
-package com.safo.icos.modules.user.api.constant;
+package com.safo.icos.modules.identity.user.api.constant;
 
 public final class UserErrorCode {
   public static final String USER_NOT_FOUND = "USER_001";

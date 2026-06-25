@@ -1,7 +1,6 @@
-package com.safo.icos.modules.user.application.dto;
+package com.safo.icos.modules.identity.user.application.dto;
 
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

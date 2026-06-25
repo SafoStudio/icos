@@ -1,6 +1,6 @@
-package com.safo.icos.modules.user.domain.repository;
+package com.safo.icos.modules.identity.user.domain.repository;
 
-import com.safo.icos.modules.user.domain.model.Membership;
+import com.safo.icos.modules.identity.user.domain.model.Membership;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

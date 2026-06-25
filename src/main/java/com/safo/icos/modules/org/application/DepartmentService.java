@@ -1,7 +1,7 @@
 package com.safo.icos.modules.org.application;
 
-import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.common.exception.BusinessException;
+import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
 import com.safo.icos.modules.org.domain.model.Department;
 import com.safo.icos.modules.org.domain.repository.DepartmentRepository;

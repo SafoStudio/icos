@@ -2,9 +2,13 @@ package com.safo.icos.modules.compensation.infrastructure.mapper;
 
 import com.safo.icos.modules.compensation.api.dto.CompensationDto;
 import com.safo.icos.modules.compensation.api.dto.SalaryRevisionDto;
-import com.safo.icos.modules.compensation.domain.model.*;
+import com.safo.icos.modules.compensation.domain.model.Bonus;
+import com.safo.icos.modules.compensation.domain.model.CompensationRecord;
+import com.safo.icos.modules.compensation.domain.model.SalaryRevision;
 import com.safo.icos.modules.compensation.domain.model.enums.PayFrequency;
-import com.safo.icos.modules.compensation.infrastructure.repository.entity.*;
+import com.safo.icos.modules.compensation.infrastructure.repository.entity.BonusJpaEntity;
+import com.safo.icos.modules.compensation.infrastructure.repository.entity.CompensationRecordJpaEntity;
+import com.safo.icos.modules.compensation.infrastructure.repository.entity.SalaryRevisionJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

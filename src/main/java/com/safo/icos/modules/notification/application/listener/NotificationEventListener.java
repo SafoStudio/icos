@@ -1,24 +1,23 @@
 package com.safo.icos.modules.notification.application.listener;
 
+import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.notification.application.NotificationService;
 import com.safo.icos.modules.notification.domain.model.NotificationType;
+import com.safo.icos.modules.talent.onboarding.api.event.OnboardingTaskAssignedEvent;
 import com.safo.icos.modules.talent.recruitment.api.event.CandidateHiredEvent;
 import com.safo.icos.modules.talent.recruitment.api.event.CandidateStageChangedEvent;
-import com.safo.icos.modules.talent.onboarding.api.event.OnboardingTaskAssignedEvent;
-import com.safo.icos.modules.workflow.tasks.api.event.TaskAssignedEvent;
-import com.safo.icos.modules.workflow.tasks.api.event.TaskStatusChangedEvent;
-import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.timeoff.api.event.LeaveRequestApprovedEvent;
 import com.safo.icos.modules.timeoff.api.event.LeaveRequestCreatedEvent;
 import com.safo.icos.modules.timeoff.api.event.LeaveRequestRejectedEvent;
-import com.safo.icos.modules.user.api.UserProvider;
-import com.safo.icos.modules.user.api.dto.MembershipDto;
+import com.safo.icos.modules.identity.user.api.UserProvider;
+import com.safo.icos.modules.workflow.tasks.api.event.TaskAssignedEvent;
+import com.safo.icos.modules.workflow.tasks.api.event.TaskStatusChangedEvent;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

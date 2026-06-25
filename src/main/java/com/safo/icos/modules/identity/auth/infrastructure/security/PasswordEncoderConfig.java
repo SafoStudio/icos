@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.infrastructure.security;
+package com.safo.icos.modules.identity.auth.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

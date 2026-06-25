@@ -4,11 +4,11 @@ import com.safo.icos.modules.workflow.approvals.domain.model.ApprovalRequest;
 import com.safo.icos.modules.workflow.approvals.domain.repository.ApprovalRepository;
 import com.safo.icos.modules.workflow.approvals.infrastructure.mapper.ApprovalMapper;
 import com.safo.icos.modules.workflow.approvals.infrastructure.repository.jpa.ApprovalJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

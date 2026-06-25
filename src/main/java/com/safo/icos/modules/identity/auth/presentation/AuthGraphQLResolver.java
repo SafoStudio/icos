@@ -1,14 +1,14 @@
-package com.safo.icos.modules.auth.presentation;
+package com.safo.icos.modules.identity.auth.presentation;
 
-import com.safo.icos.modules.user.api.dto.UserDto;
-import com.safo.icos.modules.user.api.UserProvider;
-import com.safo.icos.modules.auth.application.AuthService;
-import com.safo.icos.modules.auth.application.dto.AuthResponseDto;
-import com.safo.icos.modules.auth.application.dto.LoginRequestDto;
-import com.safo.icos.modules.auth.application.dto.RefreshResponseDto;
-import com.safo.icos.modules.auth.application.dto.RegisterRequestDto;
-import com.safo.icos.modules.auth.presentation.dto.AuthResponseView;
-import com.safo.icos.modules.auth.presentation.dto.RefreshResponseView;
+import com.safo.icos.modules.identity.auth.application.AuthService;
+import com.safo.icos.modules.identity.auth.application.dto.AuthResponseDto;
+import com.safo.icos.modules.identity.auth.application.dto.LoginRequestDto;
+import com.safo.icos.modules.identity.auth.application.dto.RefreshResponseDto;
+import com.safo.icos.modules.identity.auth.application.dto.RegisterRequestDto;
+import com.safo.icos.modules.identity.auth.presentation.dto.AuthResponseView;
+import com.safo.icos.modules.identity.auth.presentation.dto.RefreshResponseView;
+import com.safo.icos.modules.identity.user.api.UserProvider;
+import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.UUID;

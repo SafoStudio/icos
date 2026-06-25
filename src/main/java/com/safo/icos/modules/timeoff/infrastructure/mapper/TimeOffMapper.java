@@ -1,8 +1,14 @@
 package com.safo.icos.modules.timeoff.infrastructure.mapper;
 
 import com.safo.icos.modules.timeoff.api.dto.LeaveRequestDto;
-import com.safo.icos.modules.timeoff.domain.model.*;
-import com.safo.icos.modules.timeoff.infrastructure.repository.entity.*;
+import com.safo.icos.modules.timeoff.domain.model.LeaveAuditLog;
+import com.safo.icos.modules.timeoff.domain.model.LeaveBalance;
+import com.safo.icos.modules.timeoff.domain.model.LeaveRequest;
+import com.safo.icos.modules.timeoff.domain.model.LeaveType;
+import com.safo.icos.modules.timeoff.infrastructure.repository.entity.LeaveAuditLogJpaEntity;
+import com.safo.icos.modules.timeoff.infrastructure.repository.entity.LeaveBalanceJpaEntity;
+import com.safo.icos.modules.timeoff.infrastructure.repository.entity.LeaveRequestJpaEntity;
+import com.safo.icos.modules.timeoff.infrastructure.repository.entity.LeaveTypeJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

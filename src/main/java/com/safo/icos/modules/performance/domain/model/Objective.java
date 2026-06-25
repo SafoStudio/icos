@@ -1,11 +1,11 @@
 package com.safo.icos.modules.performance.domain.model;
 
 import com.safo.icos.modules.performance.domain.model.enums.ObjectiveStatus;
-import lombok.Builder;
-import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder(toBuilder = true)

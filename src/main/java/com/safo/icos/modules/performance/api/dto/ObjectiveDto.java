@@ -1,10 +1,9 @@
 package com.safo.icos.modules.performance.api.dto;
 
+import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Builder

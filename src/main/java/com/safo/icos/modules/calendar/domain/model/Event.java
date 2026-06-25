@@ -3,10 +3,10 @@ package com.safo.icos.modules.calendar.domain.model;
 import com.safo.icos.modules.calendar.domain.model.enums.EventType;
 import com.safo.icos.modules.calendar.domain.model.enums.SourceType;
 import com.safo.icos.modules.calendar.domain.model.enums.Visibility;
-import lombok.Builder;
-import lombok.Getter;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

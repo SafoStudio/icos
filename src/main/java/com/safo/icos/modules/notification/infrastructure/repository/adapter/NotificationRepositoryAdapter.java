@@ -4,13 +4,13 @@ import com.safo.icos.modules.notification.domain.model.Notification;
 import com.safo.icos.modules.notification.domain.repository.NotificationRepository;
 import com.safo.icos.modules.notification.infrastructure.mapper.NotificationMapper;
 import com.safo.icos.modules.notification.infrastructure.repository.jpa.NotificationJpaRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor

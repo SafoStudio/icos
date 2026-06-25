@@ -1,9 +1,9 @@
 package com.safo.icos.modules.workflow.approvals.domain.model;
 
 import com.safo.icos.modules.workflow.approvals.domain.model.enums.ApprovalStatus;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import java.util.UUID;
 
 @Getter
 @Builder

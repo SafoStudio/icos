@@ -1,7 +1,7 @@
-package com.safo.icos.modules.user.domain.repository;
+package com.safo.icos.modules.identity.user.domain.repository;
 
-import com.safo.icos.modules.user.domain.model.Email;
-import com.safo.icos.modules.user.domain.model.User;
+import com.safo.icos.modules.identity.user.domain.model.Email;
+import com.safo.icos.modules.identity.user.domain.model.User;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,6 +11,8 @@ public interface UserRepository {
   Optional<User> findByEmail(Email email);
 
   boolean existsByEmail(Email email);
+
+  boolean existsByEmailAndCompanyId(Email email, UUID companyId);
 
   User save(User user);
 

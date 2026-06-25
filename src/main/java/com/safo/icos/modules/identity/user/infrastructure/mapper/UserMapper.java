@@ -1,9 +1,9 @@
-package com.safo.icos.modules.user.infrastructure.mapper;
+package com.safo.icos.modules.identity.user.infrastructure.mapper;
 
-import com.safo.icos.modules.user.domain.model.Email;
-import com.safo.icos.modules.user.domain.model.User;
-import com.safo.icos.modules.user.domain.model.UserStatus;
-import com.safo.icos.modules.user.infrastructure.repository.UserJpaEntity;
+import com.safo.icos.modules.identity.user.domain.model.Email;
+import com.safo.icos.modules.identity.user.domain.model.User;
+import com.safo.icos.modules.identity.user.domain.model.enums.UserStatus;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

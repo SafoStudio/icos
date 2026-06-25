@@ -1,10 +1,10 @@
 package com.safo.icos.modules.workflow.tasks.domain.model;
 
 import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
-import lombok.Builder;
-import lombok.Getter;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder

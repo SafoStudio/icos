@@ -1,6 +1,6 @@
-package com.safo.icos.modules.auth.api;
+package com.safo.icos.modules.identity.auth.api;
 
-import com.safo.icos.modules.auth.api.dto.AuthTokenDto;
+import com.safo.icos.modules.identity.auth.api.dto.AuthTokenDto;
 import java.util.UUID;
 
 public interface AuthTokenProvider {

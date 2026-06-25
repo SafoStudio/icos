@@ -1,9 +1,9 @@
 package com.safo.icos.modules.timeoff.domain.model;
 
-import lombok.Builder;
-import lombok.Getter;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder(toBuilder = true)

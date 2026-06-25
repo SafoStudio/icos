@@ -1,6 +1,5 @@
 package com.safo.icos.modules.workflow.tasks.api.event;
 
-import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
 import java.util.UUID;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

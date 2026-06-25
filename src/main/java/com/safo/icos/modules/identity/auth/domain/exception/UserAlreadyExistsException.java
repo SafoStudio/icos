@@ -1,6 +1,6 @@
-package com.safo.icos.modules.auth.domain.exception;
+package com.safo.icos.modules.identity.auth.domain.exception;
 
-import com.safo.icos.modules.user.api.constant.UserErrorCode;
+import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
 
 @SuppressWarnings("squid:S110")
 public class UserAlreadyExistsException extends AuthDomainException {

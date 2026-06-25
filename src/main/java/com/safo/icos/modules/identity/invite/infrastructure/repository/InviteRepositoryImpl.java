@@ -1,8 +1,8 @@
-package com.safo.icos.modules.invite.infrastructure.repository;
+package com.safo.icos.modules.identity.invite.infrastructure.repository;
 
-import com.safo.icos.modules.invite.domain.model.Invite;
-import com.safo.icos.modules.invite.domain.repository.InviteRepository;
-import com.safo.icos.modules.invite.infrastructure.mapper.InviteMapper;
+import com.safo.icos.modules.identity.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
+import com.safo.icos.modules.identity.invite.infrastructure.mapper.InviteMapper;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

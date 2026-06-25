@@ -1,4 +1,4 @@
-package com.safo.icos.modules.auth.infrastructure.repository;
+package com.safo.icos.modules.identity.auth.infrastructure.repository;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

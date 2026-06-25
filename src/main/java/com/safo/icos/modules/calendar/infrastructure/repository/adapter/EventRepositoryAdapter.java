@@ -4,13 +4,12 @@ import com.safo.icos.modules.calendar.domain.model.Event;
 import com.safo.icos.modules.calendar.domain.repository.EventRepository;
 import com.safo.icos.modules.calendar.infrastructure.mapper.EventMapper;
 import com.safo.icos.modules.calendar.infrastructure.repository.jpa.EventJpaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor

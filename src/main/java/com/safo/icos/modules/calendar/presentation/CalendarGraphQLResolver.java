@@ -4,14 +4,14 @@ import com.safo.icos.modules.calendar.api.dto.EventDto;
 import com.safo.icos.modules.calendar.application.CalendarService;
 import com.safo.icos.modules.calendar.infrastructure.mapper.EventMapper;
 import com.safo.icos.security.context.IcosUserPrincipal;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import java.time.OffsetDateTime;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

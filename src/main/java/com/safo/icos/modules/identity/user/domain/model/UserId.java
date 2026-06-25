@@ -1,4 +1,4 @@
-package com.safo.icos.modules.user.domain.model;
+package com.safo.icos.modules.identity.user.domain.model;
 
 import java.util.Objects;
 import java.util.UUID;

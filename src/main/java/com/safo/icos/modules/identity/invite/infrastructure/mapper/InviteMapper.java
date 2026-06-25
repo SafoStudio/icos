@@ -1,7 +1,7 @@
-package com.safo.icos.modules.invite.infrastructure.mapper;
+package com.safo.icos.modules.identity.invite.infrastructure.mapper;
 
-import com.safo.icos.modules.invite.domain.model.Invite;
-import com.safo.icos.modules.invite.infrastructure.repository.InviteJpaEntity;
+import com.safo.icos.modules.identity.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.infrastructure.repository.InviteJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

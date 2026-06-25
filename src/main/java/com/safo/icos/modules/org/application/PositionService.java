@@ -1,7 +1,7 @@
 package com.safo.icos.modules.org.application;
 
-import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.common.exception.BusinessException;
+import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.modules.org.application.dto.PositionDto;
 import com.safo.icos.modules.org.domain.model.Position;
 import com.safo.icos.modules.org.domain.repository.PositionRepository;

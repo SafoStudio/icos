@@ -1,13 +1,13 @@
-package com.safo.icos.modules.invite.presentation;
+package com.safo.icos.modules.identity.invite.presentation;
 
-import com.safo.icos.modules.auth.application.AuthService;
-import com.safo.icos.modules.auth.application.dto.AuthResponseDto;
-import com.safo.icos.modules.invite.application.InviteService;
-import com.safo.icos.modules.invite.application.dto.InviteAcceptDto;
-import com.safo.icos.modules.invite.application.dto.InviteRequestDto;
-import com.safo.icos.modules.invite.application.dto.InviteResponseDto;
-import com.safo.icos.modules.invite.domain.model.Invite;
-import com.safo.icos.modules.invite.domain.repository.InviteRepository;
+import com.safo.icos.modules.identity.auth.application.AuthService;
+import com.safo.icos.modules.identity.auth.application.dto.AuthResponseDto;
+import com.safo.icos.modules.identity.invite.application.InviteService;
+import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
+import com.safo.icos.modules.identity.invite.application.dto.InviteRequestDto;
+import com.safo.icos.modules.identity.invite.application.dto.InviteResponseDto;
+import com.safo.icos.modules.identity.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.security.permission.RequirePermission;
 import jakarta.validation.Valid;
 import java.util.UUID;

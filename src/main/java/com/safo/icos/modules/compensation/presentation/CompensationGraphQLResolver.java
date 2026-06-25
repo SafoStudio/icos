@@ -5,17 +5,16 @@ import com.safo.icos.modules.compensation.api.dto.SalaryRevisionDto;
 import com.safo.icos.modules.compensation.application.CompensationService;
 import com.safo.icos.modules.compensation.infrastructure.mapper.CompensationMapper;
 import com.safo.icos.security.context.IcosUserPrincipal;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor

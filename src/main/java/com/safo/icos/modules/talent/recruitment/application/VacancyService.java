@@ -1,16 +1,16 @@
 package com.safo.icos.modules.talent.recruitment.application;
 
 import com.safo.icos.common.exception.BusinessException;
-import com.safo.icos.modules.auth.api.constant.AuthErrorCode;
+import com.safo.icos.modules.identity.auth.api.constant.AuthErrorCode;
 import com.safo.icos.modules.talent.recruitment.api.constant.RecruitmentErrorCode;
 import com.safo.icos.modules.talent.recruitment.application.dto.CreateVacancyRequest;
 import com.safo.icos.modules.talent.recruitment.application.dto.VacancyDto;
-import com.safo.icos.modules.talent.recruitment.domain.model.enums.PipelineStageType;
 import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
+import com.safo.icos.modules.talent.recruitment.domain.model.enums.PipelineStageType;
 import com.safo.icos.modules.talent.recruitment.domain.repository.VacancyRepository;
-import com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa.VacancyStageJpaRepository;
 import com.safo.icos.modules.talent.recruitment.infrastructure.mapper.RecruitmentMapper;
+import com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa.VacancyStageJpaRepository;
 import com.safo.icos.security.context.IcosUserPrincipal;
 import java.util.List;
 import java.util.UUID;

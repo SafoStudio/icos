@@ -3,13 +3,11 @@ package com.safo.icos.modules.workflow.tasks.presentation;
 import com.safo.icos.modules.workflow.tasks.application.TaskService;
 import com.safo.icos.modules.workflow.tasks.domain.model.Task;
 import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
-import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
