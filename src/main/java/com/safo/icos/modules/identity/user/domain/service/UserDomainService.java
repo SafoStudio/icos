@@ -9,7 +9,9 @@ import com.safo.icos.modules.identity.user.domain.model.UserName;
 import com.safo.icos.modules.identity.user.domain.repository.UserRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class UserDomainService {
     private final UserRepository userRepository;
