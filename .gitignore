@@ -36,3 +36,8 @@ build/
 .env
 m.sh
 r.sh
+
+### Frontend ###
+client/node_modules/
+client/dist/
+client/.angular/
