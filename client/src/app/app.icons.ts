@@ -1,0 +1,46 @@
+import { provideIcons } from '@ng-icons/core';
+import {
+  tablerDashboard,
+  tablerUserCheck,
+  tablerBriefcase,
+  tablerUsers,
+  tablerCalendarEvent,
+  tablerChartBar,
+  tablerClipboardList,
+  tablerMail,
+  tablerSettings,
+  tablerSearch,
+  tablerChevronLeft,
+  tablerChevronRight,
+  tablerBell,
+  tablerHelp,
+  tablerMenu2,
+  tablerBulb,
+  tablerCheckbox,
+  tablerUser,
+  tablerChevronDown,
+  tablerLogout
+} from '@ng-icons/tabler-icons';
+
+export const APP_ICONS = provideIcons({
+  tablerDashboard,
+  tablerUserCheck,
+  tablerBriefcase,
+  tablerUsers,
+  tablerCalendarEvent,
+  tablerChartBar,
+  tablerClipboardList,
+  tablerMail,
+  tablerSettings,
+  tablerSearch,
+  tablerChevronLeft,
+  tablerChevronRight,
+  tablerBell,
+  tablerHelp,
+  tablerMenu2,
+  tablerBulb,
+  tablerCheckbox,
+  tablerUser,
+  tablerChevronDown,
+  tablerLogout
+});

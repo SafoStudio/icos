@@ -1,0 +1,87 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed()">
+  <div class="user-section">
+    <button class="user-profile" (click)="logout()">
+      <div class="avatar">
+        <span class="avatar-letter">{{ userAvatar() }}</span>
+        <span class="status-dot online"></span>
+      </div>
+      @if (!isCollapsed()) {
+      <div class="user-info">
+        <div class="user-name">{{ userName() }}</div>
+        <div class="user-email">{{ userEmail() }}</div>
+      </div>
+      <button class="collapse-btn" (click)="$event.stopPropagation(); toggleSidebar()">
+        <ng-icon name="tablerChevronLeft" size="16"></ng-icon>
+      </button>
+      } @else {
+      <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
+        <ng-icon name="tablerChevronRight" size="16"></ng-icon>
+      </button>
+      }
+    </button>
+  </div>
+
+  <div class="divider"></div>
+
+  @if (!isCollapsed()) {
+  <div class="search-box">
+    <ng-icon name="tablerSearch" class="search-icon" size="18"></ng-icon>
+    <input type="text" placeholder="Search..." />
+  </div>
+  }
+
+  <div class="main-links">
+    @for (link of mainLinks; track link.label) {
+    <button class="main-link">
+      <div class="main-link-inner">
+        <ng-icon [name]="link.icon" class="main-link-icon" size="20"></ng-icon>
+        @if (!isCollapsed()) {
+        <span>{{ link.label }}</span>
+        }
+      </div>
+      @if (link.notifications && !isCollapsed()) {
+      <span class="badge">{{ link.notifications }}</span>
+      }
+    </button>
+    }
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="collections-section">
+    @if (!isCollapsed()) {
+    <div class="collections-header">
+      <span class="collections-title">Navigation</span>
+    </div>
+    }
+    <div class="collections">
+      @for (item of menuItems; track item.route) {
+      <a
+        [routerLink]="[item.route]"
+        routerLinkActive="active"
+        class="collection-link"
+        [class.active]="isActive(item.route)"
+      >
+        <ng-icon [name]="item.icon" class="collection-icon" size="20"></ng-icon>
+        @if (!isCollapsed()) {
+        <span class="collection-label">{{ item.label }}</span>
+        @if (item.badge) {
+        <span class="badge">{{ item.badge }}</span>
+        }
+        }
+      </a>
+      }
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+      <div class="logout-btn-inner">
+        <ng-icon name="tablerLogout" class="logout-icon" size="20"></ng-icon>
+        @if (!isCollapsed()) {
+        <span>Logout</span>
+        }
+      </div>
+    </button>
+  </div>
+</aside>
