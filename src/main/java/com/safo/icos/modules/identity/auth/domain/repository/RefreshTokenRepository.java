@@ -13,6 +13,4 @@ public interface RefreshTokenRepository {
   Optional<RefreshToken> findById(UUID id);
 
   void delete(RefreshToken token);
-
-  void deleteByMembershipId(UUID membershipId);
 }

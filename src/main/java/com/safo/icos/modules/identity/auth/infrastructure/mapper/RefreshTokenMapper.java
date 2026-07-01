@@ -3,7 +3,7 @@ package com.safo.icos.modules.identity.auth.infrastructure.mapper;
 import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
 import com.safo.icos.modules.identity.auth.domain.model.RefreshTokenId;
 import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
-import com.safo.icos.modules.identity.auth.infrastructure.repository.RefreshTokenJpaEntity;
+import com.safo.icos.modules.identity.auth.infrastructure.repository.entity.RefreshTokenJpaEntity;
 import java.time.Instant;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class RefreshTokenMapper {
     return RefreshTokenJpaEntity.builder()
             .id(domain.getId().value())
             .membershipId(domain.getMembershipId())
-            .tokenHash(domain.getToken().value())
+            .tokenHash(domain.getToken().hash())
             .deviceInfo(domain.getDeviceInfo())
             .expiresAt(domain.getExpiresAt())
             .revoked(domain.isRevoked())

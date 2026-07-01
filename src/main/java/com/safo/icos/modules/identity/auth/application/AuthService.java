@@ -4,18 +4,16 @@ import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.identity.auth.api.AuthTokenProvider;
 import com.safo.icos.modules.identity.auth.api.constant.AuthErrorCode;
 import com.safo.icos.modules.identity.auth.api.dto.AuthTokenDto;
-import com.safo.icos.modules.identity.auth.application.dto.AuthResponseDto;
-import com.safo.icos.modules.identity.auth.application.dto.LoginRequestDto;
-import com.safo.icos.modules.identity.auth.application.dto.RefreshResponseDto;
-import com.safo.icos.modules.identity.auth.application.dto.RegisterRequestDto;
+import com.safo.icos.modules.identity.auth.application.dto.*;
 import com.safo.icos.modules.identity.auth.domain.exception.InvalidCredentialsException;
 import com.safo.icos.modules.identity.auth.domain.exception.UserAlreadyExistsException;
 import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
 import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
 import com.safo.icos.modules.identity.auth.domain.repository.RefreshTokenRepository;
 import com.safo.icos.modules.identity.auth.domain.service.AuthDomainService;
-import com.safo.icos.modules.identity.auth.infrastructure.repository.AuthCredentialsJpaEntity;
-import com.safo.icos.modules.identity.auth.infrastructure.repository.AuthCredentialsJpaRepository;
+import com.safo.icos.modules.identity.auth.domain.service.RefreshTokenCreationResult;
+import com.safo.icos.modules.identity.auth.infrastructure.repository.entity.AuthCredentialsJpaEntity;
+import com.safo.icos.modules.identity.auth.infrastructure.repository.jpa.AuthCredentialsJpaRepository;
 import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
 import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import com.safo.icos.modules.org.application.CompanyService;
@@ -28,15 +26,16 @@ import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
-import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -63,61 +62,21 @@ public class AuthService {
       throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
     }
 
-    UserCreateDto createData = UserCreateDto.builder()
-            .email(request.getEmail())
-            .firstName(request.getFirstName())
-            .lastName(request.getLastName())
-            .createdBy(null)
-            .build();
-
-    UserDto user = userProvider.createUser(createData);
-
-    // Save password
-    AuthCredentialsJpaEntity credentials = AuthCredentialsJpaEntity.builder()
-            .userId(user.getId())
-            .passwordHash(passwordEncoder.encode(request.getPassword()))
-            .build();
-    credentialsRepository.save(credentials);
-
-    // Create company and membership
+    UserDto user = createUserFromRequest(request, null);
+    savePassword(user.getId(), request.getPassword());
     CompanyDto company = companyService.createCompanyInternal(request.getCompanyName(), null);
+    MembershipDto membership = createOwnerMembership(user.getId(), company.getId());
+    UserDto userWithCompany = enrichUserWithCompany(user, membership);
 
-    UUID ownerRoleId = roleJpaRepository.findByName("OWNER")
-            .map(RoleJpaEntity::getId)
-            .orElseThrow(() -> new RuntimeException("Role OWNER not found"));
-
-    MembershipDto membership = userProvider.createMembership(user.getId(), company.getId(), ownerRoleId, null, null);
-
-    UserDto userWithCompany = UserDto.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .companyId(membership.getCompanyId().toString())
-            .role(membership.getRole())
-            .departmentId(membership.getDepartmentId())
-            .permissions(roleJpaRepository.findById(membership.getRoleId())
-                    .map(role -> role.getPermissions().stream()
-                            .map(PermissionJpaEntity::getName)
-                            .toList())
-                    .orElse(List.of()))
-            .status(user.getStatus())
-            .createdAt(user.getCreatedAt())
-            .updatedAt(user.getUpdatedAt())
-            .build();
-
-    RefreshToken refreshToken = authDomainService.createRefreshToken(
+    RefreshTokenCreationResult rtResult = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);
-    refreshTokenRepository.save(refreshToken);
+    refreshTokenRepository.save(rtResult.entity());
 
-    AuthTokenDto tokens = authTokenProvider.generateTokens(
-            user.getId(),
-            membership.getCompanyId()
-    );
+    AuthTokenDto tokens = authTokenProvider.generateAccessToken(user.getId(), membership.getCompanyId());
 
     return AuthResponseDto.builder()
             .accessToken(tokens.getAccessToken())
-            .refreshToken(tokens.getRefreshToken())
+            .refreshToken(rtResult.rawToken())
             .tokenType(tokens.getTokenType())
             .expiresIn(tokens.getExpiresIn())
             .user(userWithCompany)
@@ -129,49 +88,23 @@ public class AuthService {
 
     UserDto user = userProvider.findByEmail(request.getEmail())
             .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
-
-    AuthCredentialsJpaEntity credentials = credentialsRepository.findById(user.getId())
-            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
-
-    if (!passwordEncoder.matches(request.getPassword(), credentials.getPasswordHash())) {
-      throw new InvalidCredentialsException("Invalid email or password");
-    }
+    validatePassword(user.getId(), request.getPassword());
 
     MembershipDto membership = userProvider.findFirstActiveMembershipByUserId(user.getId())
             .orElseThrow(() -> new BusinessException(
                     "User does not have an active membership",
                     UserErrorCode.USER_NOT_ACTIVE));
 
-    RefreshToken refreshToken = authDomainService.createRefreshToken(
+    RefreshTokenCreationResult rtResult = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);
-    refreshTokenRepository.save(refreshToken);
+    refreshTokenRepository.save(rtResult.entity());
 
-    AuthTokenDto tokens = authTokenProvider.generateTokens(
-            user.getId(),
-            membership.getCompanyId()
-    );
-
-    UserDto userWithCompany = UserDto.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .companyId(membership.getCompanyId().toString())
-            .role(membership.getRole())
-            .departmentId(membership.getDepartmentId())
-            .permissions(roleJpaRepository.findById(membership.getRoleId())
-                    .map(role -> role.getPermissions().stream()
-                            .map(PermissionJpaEntity::getName)
-                            .toList())
-                    .orElse(List.of()))
-            .status(user.getStatus())
-            .createdAt(user.getCreatedAt())
-            .updatedAt(user.getUpdatedAt())
-            .build();
+    AuthTokenDto tokens = authTokenProvider.generateAccessToken(user.getId(), membership.getCompanyId());
+    UserDto userWithCompany = enrichUserWithCompany(user, membership);
 
     return AuthResponseDto.builder()
             .accessToken(tokens.getAccessToken())
-            .refreshToken(tokens.getRefreshToken())
+            .refreshToken(rtResult.rawToken())
             .tokenType(tokens.getTokenType())
             .expiresIn(tokens.getExpiresIn())
             .user(userWithCompany)
@@ -181,46 +114,37 @@ public class AuthService {
   public RefreshResponseDto refresh(String refreshTokenValue, String deviceInfo) {
     log.debug("Refreshing token");
 
-    RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(new TokenValue(refreshTokenValue))
+    TokenValue tokenHash = TokenValue.fromRaw(refreshTokenValue);
+    RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash)
             .orElseThrow(() -> new BusinessException("Invalid refresh token", AuthErrorCode.TOKEN_NOT_FOUND));
 
     authDomainService.validateRefreshToken(refreshToken);
 
     // Rotation: revoke old token
-    RefreshToken revoked = refreshToken.revoke();
-    refreshTokenRepository.save(revoked);
+    refreshTokenRepository.save(refreshToken.revoke());
 
-    // Get membership and user details
     MembershipDto membership = userProvider.findMembershipById(refreshToken.getMembershipId())
             .orElseThrow(() -> new BusinessException("Membership not found", UserErrorCode.USER_NOT_FOUND));
-
     UserDto user = userProvider.findById(membership.getUserId())
             .orElseThrow(() -> new BusinessException("User not found", UserErrorCode.USER_NOT_FOUND));
 
-    // Create new refresh token
-    RefreshToken newToken = authDomainService.createRefreshToken(
+    RefreshTokenCreationResult newRtResult = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);
-    refreshTokenRepository.save(newToken);
+    refreshTokenRepository.save(newRtResult.entity());
 
-    // Generate new JWT
-    AuthTokenDto tokens = authTokenProvider.generateTokens(
-            user.getId(),
-            membership.getCompanyId()
-    );
+    AuthTokenDto tokens = authTokenProvider.generateAccessToken(user.getId(), membership.getCompanyId());
 
     return RefreshResponseDto.builder()
             .accessToken(tokens.getAccessToken())
-            .refreshToken(tokens.getRefreshToken())
+            .refreshToken(newRtResult.rawToken())
             .expiresIn(tokens.getExpiresIn())
             .build();
   }
 
   public void logout(String refreshTokenValue) {
-    refreshTokenRepository.findByTokenHash(new TokenValue(refreshTokenValue))
-            .ifPresent(token -> {
-              RefreshToken revoked = token.revoke();
-              refreshTokenRepository.save(revoked);
-            });
+    TokenValue tokenHash = TokenValue.fromRaw(refreshTokenValue);
+    refreshTokenRepository.findByTokenHash(tokenHash)
+            .ifPresent(token -> refreshTokenRepository.save(token.revoke()));
   }
 
   public AuthResponseDto registerFromInvite(Invite invite, InviteAcceptDto request, String deviceInfo) {
@@ -230,35 +154,85 @@ public class AuthService {
       throw new UserAlreadyExistsException("User with email " + invite.getEmail() + " already exists");
     }
 
+    UserDto user = createUserFromInvite(invite, request);
+    savePassword(user.getId(), request.password());
+
+    UUID roleId = roleJpaRepository.findByName(invite.getRole().name())
+            .map(RoleJpaEntity::getId)
+            .orElseThrow(() -> new RuntimeException("Role " + invite.getRole().name() + " not found"));
+
+    MembershipDto membership = userProvider.createMembership(
+            user.getId(), invite.getCompanyId(), roleId, invite.getDepartmentId(), invite.getManagerId());
+    UserDto userWithCompany = enrichUserWithCompany(user, membership);
+
+    RefreshTokenCreationResult rtResult = authDomainService.createRefreshToken(
+            membership.getId(), deviceInfo, refreshTokenTtl);
+    refreshTokenRepository.save(rtResult.entity());
+
+    AuthTokenDto tokens = authTokenProvider.generateAccessToken(user.getId(), membership.getCompanyId());
+
+    return AuthResponseDto.builder()
+            .accessToken(tokens.getAccessToken())
+            .refreshToken(rtResult.rawToken())
+            .tokenType(tokens.getTokenType())
+            .expiresIn(tokens.getExpiresIn())
+            .user(userWithCompany)
+            .build();
+  }
+
+  // ---------- private helper methods ----------
+
+  private UserDto createUserFromRequest(RegisterRequestDto request, UUID createdBy) {
+    UserCreateDto createData = UserCreateDto.builder()
+            .email(request.getEmail())
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .createdBy(createdBy)
+            .build();
+    return userProvider.createUser(createData);
+  }
+
+  private UserDto createUserFromInvite(Invite invite, InviteAcceptDto request) {
     UserCreateDto createData = UserCreateDto.builder()
             .email(invite.getEmail())
             .firstName(request.firstName())
             .lastName(request.lastName())
             .createdBy(invite.getInvitedById())
             .build();
+    return userProvider.createUser(createData);
+  }
 
-    UserDto user = userProvider.createUser(createData);
-
-    // Save password
+  private void savePassword(UUID userId, String rawPassword) {
     AuthCredentialsJpaEntity credentials = AuthCredentialsJpaEntity.builder()
-            .userId(user.getId())
-            .passwordHash(passwordEncoder.encode(request.password()))
+            .userId(userId)
+            .passwordHash(passwordEncoder.encode(rawPassword))
             .build();
     credentialsRepository.save(credentials);
+  }
 
-    // Create membership from invite
-    UUID roleId = roleJpaRepository.findByName(invite.getRole().name())
+  private void validatePassword(UUID userId, String rawPassword) {
+    AuthCredentialsJpaEntity credentials = credentialsRepository.findById(userId)
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+    if (!passwordEncoder.matches(rawPassword, credentials.getPasswordHash())) {
+      throw new InvalidCredentialsException("Invalid email or password");
+    }
+  }
+
+  private MembershipDto createOwnerMembership(UUID userId, UUID companyId) {
+    UUID ownerRoleId = roleJpaRepository.findByName("OWNER")
             .map(RoleJpaEntity::getId)
-            .orElseThrow(() -> new RuntimeException("Role " + invite.getRole().name() + " not found"));
+            .orElseThrow(() -> new RuntimeException("Role OWNER not found"));
+    return userProvider.createMembership(userId, companyId, ownerRoleId, null, null);
+  }
 
-    MembershipDto membership = userProvider.createMembership(
-            user.getId(),
-            invite.getCompanyId(),
-            roleId,
-            invite.getDepartmentId(),
-            invite.getManagerId());
+  private UserDto enrichUserWithCompany(UserDto user, MembershipDto membership) {
+    List<String> permissions = roleJpaRepository.findById(membership.getRoleId())
+            .map(role -> role.getPermissions().stream()
+                    .map(PermissionJpaEntity::getName)
+                    .toList())
+            .orElse(List.of());
 
-    UserDto userWithCompany = UserDto.builder()
+    return UserDto.builder()
             .id(user.getId())
             .email(user.getEmail())
             .firstName(user.getFirstName())
@@ -266,31 +240,10 @@ public class AuthService {
             .companyId(membership.getCompanyId().toString())
             .role(membership.getRole())
             .departmentId(membership.getDepartmentId())
-            .permissions(roleJpaRepository.findById(membership.getRoleId())
-                    .map(role -> role.getPermissions().stream()
-                            .map(PermissionJpaEntity::getName)
-                            .toList())
-                    .orElse(List.of()))
+            .permissions(permissions)
             .status(user.getStatus())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
-            .build();
-
-    RefreshToken refreshToken = authDomainService.createRefreshToken(
-            membership.getId(), deviceInfo, refreshTokenTtl);
-    refreshTokenRepository.save(refreshToken);
-
-    AuthTokenDto tokens = authTokenProvider.generateTokens(
-            user.getId(),
-            membership.getCompanyId()
-    );
-
-    return AuthResponseDto.builder()
-            .accessToken(tokens.getAccessToken())
-            .refreshToken(tokens.getRefreshToken())
-            .tokenType(tokens.getTokenType())
-            .expiresIn(tokens.getExpiresIn())
-            .user(userWithCompany)
             .build();
   }
 }

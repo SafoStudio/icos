@@ -5,14 +5,15 @@ import com.safo.icos.modules.identity.auth.api.dto.AuthTokenDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
-import javax.crypto.SecretKey;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -32,38 +33,22 @@ public class JwtService implements AuthTokenProvider {
   }
 
   @Override
-  public AuthTokenDto generateTokens(UUID userId, UUID tenantId) {
-    String accessToken = generateAccessToken(userId, tenantId);
-    String refreshToken = generateRefreshToken(userId);
-
+  public AuthTokenDto generateAccessToken(UUID userId, UUID tenantId) {
+    String accessToken = generateAccessTokenValue(userId, tenantId);
     return AuthTokenDto.builder()
             .accessToken(accessToken)
-            .refreshToken(refreshToken)
             .tokenType("Bearer")
             .expiresIn(accessTokenTtlSeconds)
             .build();
   }
 
-  private String generateAccessToken(UUID userId, UUID tenantId) {
+  private String generateAccessTokenValue(UUID userId, UUID tenantId) {
     Instant now = Instant.now();
     Instant expiry = now.plusSeconds(accessTokenTtlSeconds);
 
     return Jwts.builder()
             .subject(userId.toString())
             .claim("tenantId", tenantId.toString())
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiry))
-            .signWith(signingKey)
-            .compact();
-  }
-
-  private String generateRefreshToken(UUID userId) {
-    Instant now = Instant.now();
-    Instant expiry = now.plusSeconds(2592000); // 30 days
-
-    return Jwts.builder()
-            .subject(userId.toString())
-            .claim("type", "refresh")
             .issuedAt(Date.from(now))
             .expiration(Date.from(expiry))
             .signWith(signingKey)

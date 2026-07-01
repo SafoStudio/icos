@@ -5,23 +5,45 @@ import com.safo.icos.modules.identity.auth.domain.exception.TokenNotFoundExcepti
 import com.safo.icos.modules.identity.auth.domain.exception.TokenRevokedException;
 import com.safo.icos.modules.identity.auth.domain.model.RefreshToken;
 import com.safo.icos.modules.identity.auth.domain.model.TokenValue;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.UUID;
+
+/**
+ * Domain service for managing refresh tokens.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthDomainService {
 
-  public RefreshToken createRefreshToken(UUID membershipId, String deviceInfo, Duration ttl) {
-    TokenValue token = TokenValue.generate();
+  /**
+   * Creates a new refresh token for the specified membership.
+   *
+   * @param membershipId : User membership ID
+   * @param deviceInfo : Device information
+   * @param ttl : Token lifetime
+   * @return a result containing the token entity and the raw value to send to the client
+   */
+  public RefreshTokenCreationResult createRefreshToken(UUID membershipId, String deviceInfo, Duration ttl) {
+    String rawToken = TokenValue.generateRaw();
+    TokenValue tokenHash = TokenValue.fromRaw(rawToken);
     Instant expiresAt = Instant.now().plus(ttl);
 
-    return RefreshToken.create(membershipId, token, deviceInfo, expiresAt);
+    RefreshToken entity = RefreshToken.create(membershipId, tokenHash, deviceInfo, expiresAt);
+    return new RefreshTokenCreationResult(entity, rawToken);
   }
 
+  /**
+   * Checks if the refresh token is valid.
+   *
+   * @param token : token domain model
+   * @throws TokenNotFoundException if the token is not found
+   * @throws TokenRevokedException if the token is revoked
+   * @throws TokenExpiredException if the token has expired
+   */
   public void validateRefreshToken(RefreshToken token) {
     if (token == null) {
       throw new TokenNotFoundException("Refresh token not found");
