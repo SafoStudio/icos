@@ -9,6 +9,7 @@ import com.safo.icos.modules.identity.auth.presentation.dto.AuthResponseView;
 import com.safo.icos.modules.identity.auth.presentation.dto.RefreshResponseView;
 import com.safo.icos.modules.identity.user.api.UserProvider;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
 import java.util.UUID;
@@ -32,9 +33,26 @@ public class AuthGraphQLResolver {
   private final AuthService authService;
   private final UserProvider userProvider;
 
+  private HttpServletRequest getRequest() {
+    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    return attributes != null ? attributes.getRequest() : null;
+  }
+
   private HttpServletResponse getResponse() {
     ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     return attributes != null ? attributes.getResponse() : null;
+  }
+
+  private String getRefreshTokenFromCookie() {
+    HttpServletRequest request = getRequest();
+    if (request != null && request.getCookies() != null) {
+      for (var cookie : request.getCookies()) {
+        if ("refreshToken".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
   }
 
   private void setRefreshTokenCookie(String token) {
@@ -101,9 +119,16 @@ public class AuthGraphQLResolver {
 
   @MutationMapping
   public RefreshResponseView refresh(
-          @Argument String refreshToken,
+          @Argument(name = "refreshToken") String refreshTokenArg,
           @ContextValue(name = "deviceInfo", required = false) String deviceInfo
   ) {
+    String refreshToken = refreshTokenArg;
+    if (refreshToken == null || refreshToken.isBlank()) {
+      refreshToken = getRefreshTokenFromCookie();
+    }
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new IllegalArgumentException("Refresh token is missing");
+    }
     RefreshResponseDto result = authService.refresh(refreshToken, resolveDevice(deviceInfo));
     setRefreshTokenCookie(result.getRefreshToken());
     return RefreshResponseView.builder()
@@ -113,8 +138,14 @@ public class AuthGraphQLResolver {
   }
 
   @MutationMapping
-  public boolean logout(@Argument String refreshToken) {
-    authService.logout(refreshToken);
+  public boolean logout(@Argument(name = "refreshToken") String refreshTokenArg) {
+    String refreshToken = refreshTokenArg;
+    if (refreshToken == null || refreshToken.isBlank()) {
+      refreshToken = getRefreshTokenFromCookie();
+    }
+    if (refreshToken != null && !refreshToken.isBlank()) {
+      authService.logout(refreshToken);
+    }
     HttpServletResponse response = getResponse();
     if (response != null) {
       ResponseCookie cookie = ResponseCookie.from("refreshToken", "")

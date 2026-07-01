@@ -1,0 +1,201 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="brand">
+      <div class="logo">I</div>
+      <span class="brand-name">ICOS</span>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-danger">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        {{ successMessage() }}
+      </div>
+    }
+
+    <!-- INVITE FLOW -->
+    @if (token()) {
+      @if (inviteInfo()) {
+        <h2>Complete Registration</h2>
+        <p class="subtitle">
+          You've been invited to join <strong>{{ inviteInfo()?.companyName }}</strong>
+        </p>
+
+        <div class="invite-details">
+          <div class="detail-item">
+            <span class="label">Role:</span>
+            <span class="value">{{ inviteInfo()?.role }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Department:</span>
+            <span class="value">{{ inviteInfo()?.departmentName }}</span>
+          </div>
+          @if (inviteInfo()?.managerName && inviteInfo()?.managerName !== 'None') {
+            <div class="detail-item">
+              <span class="label">Manager:</span>
+              <span class="value">{{ inviteInfo()?.managerName }}</span>
+            </div>
+          }
+          <div class="detail-item">
+            <span class="label">Email:</span>
+            <span class="value">{{ inviteInfo()?.email }}</span>
+          </div>
+        </div>
+
+        <form [formGroup]="inviteForm" (ngSubmit)="onInviteSubmit()" class="auth-form">
+          <div class="row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                formControlName="firstName"
+                placeholder="John"
+                [class.error]="inviteForm.get('firstName')?.touched && inviteForm.get('firstName')?.invalid"
+              />
+              @if (inviteForm.get('firstName')?.touched && inviteForm.get('firstName')?.invalid) {
+                <span class="error-text">First name is required</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                formControlName="lastName"
+                placeholder="Doe"
+                [class.error]="inviteForm.get('lastName')?.touched && inviteForm.get('lastName')?.invalid"
+              />
+              @if (inviteForm.get('lastName')?.touched && inviteForm.get('lastName')?.invalid) {
+                <span class="error-text">Last name is required</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Create Password</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="•••••••• (min 8 chars)"
+              [class.error]="inviteForm.get('password')?.touched && inviteForm.get('password')?.invalid"
+            />
+            @if (inviteForm.get('password')?.touched && inviteForm.get('password')?.invalid) {
+              <span class="error-text">Password must be at least 8 characters</span>
+            }
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading() || inviteForm.invalid">
+            @if (isLoading()) {
+              <span class="spinner"></span> Joining...
+            } @else {
+              Complete Registration
+            }
+          </button>
+        </form>
+      } @else if (isLoading()) {
+        <div class="loading-state">
+          <span class="spinner"></span>
+          <p>Verifying invitation token...</p>
+        </div>
+      }
+    } @else {
+      <!-- COMPANY REGISTRATION FLOW -->
+      <h2>Register Company</h2>
+      <p class="subtitle">Set up your company and administrator account</p>
+
+      <form [formGroup]="companyForm" (ngSubmit)="onCompanySubmit()" class="auth-form">
+        <div class="form-group">
+          <label for="companyName">Company Name</label>
+          <input
+            type="text"
+            id="companyName"
+            formControlName="companyName"
+            placeholder="Acme Corp"
+            [class.error]="companyForm.get('companyName')?.touched && companyForm.get('companyName')?.invalid"
+          />
+          @if (companyForm.get('companyName')?.touched && companyForm.get('companyName')?.invalid) {
+            <span class="error-text">Company name is required</span>
+          }
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              placeholder="John"
+              [class.error]="companyForm.get('firstName')?.touched && companyForm.get('firstName')?.invalid"
+            />
+            @if (companyForm.get('firstName')?.touched && companyForm.get('firstName')?.invalid) {
+              <span class="error-text">First name is required</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              placeholder="Doe"
+              [class.error]="companyForm.get('lastName')?.touched && companyForm.get('lastName')?.invalid"
+            />
+            @if (companyForm.get('lastName')?.touched && companyForm.get('lastName')?.invalid) {
+              <span class="error-text">Last name is required</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Admin Email Address</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="admin@company.com"
+            [class.error]="companyForm.get('email')?.touched && companyForm.get('email')?.invalid"
+          />
+          @if (companyForm.get('email')?.touched && companyForm.get('email')?.invalid) {
+            <span class="error-text">Please enter a valid email address</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Admin Password</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="•••••••• (min 8 chars)"
+            [class.error]="companyForm.get('password')?.touched && companyForm.get('password')?.invalid"
+          />
+          @if (companyForm.get('password')?.touched && companyForm.get('password')?.invalid) {
+            <span class="error-text">Password must be at least 8 characters</span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading() || companyForm.invalid">
+          @if (isLoading()) {
+            <span class="spinner"></span> Registering...
+          } @else {
+            Register Company
+          }
+        </button>
+      </form>
+    }
+
+    <div class="auth-footer">
+      <span>Already have an account?</span>
+      <a routerLink="/login">Sign In</a>
+    </div>
+  </div>
+</div>

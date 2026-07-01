@@ -18,6 +18,9 @@ public class UserResponseDto {
   private final UUID createdBy;
   private final LocalDateTime createdAt;
   private final LocalDateTime updatedAt;
+  private final String role;
+  private final UUID departmentId;
+  private final java.util.List<String> permissions;
   private final ProfileResponseDto profile;
   private final java.util.List<DocumentResponseDto> documents;
 }

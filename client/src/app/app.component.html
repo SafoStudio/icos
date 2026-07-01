@@ -1,6 +1,12 @@
-<div class="app-layout">
-  <app-sidebar (collapsedChange)="isCollapsed = $event"></app-sidebar>
-  <main class="content" [class.sidebar-collapsed]="isCollapsed">
+@if (isLoggedIn()) {
+  <div class="app-layout">
+    <app-sidebar (collapsedChange)="isCollapsed = $event"></app-sidebar>
+    <main class="content" [class.sidebar-collapsed]="isCollapsed">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+} @else {
+  <div class="auth-layout">
     <router-outlet></router-outlet>
-  </main>
-</div>
+  </div>
+}

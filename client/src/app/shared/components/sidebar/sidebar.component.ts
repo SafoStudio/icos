@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface MainLink {
   label: string;
@@ -25,13 +26,26 @@ interface MenuItem {
 })
 export class SidebarComponent {
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly isCollapsedSignal = signal(false);
+  
   isCollapsed = computed(() => this.isCollapsedSignal());
   collapsedChange = output<boolean>();
 
-  userName = signal('John Doe');
-  userEmail = signal('john.doe@hrplatform.com');
-  userAvatar = signal('A');
+  userName = computed(() => {
+    const user = this.authService.currentUser();
+    return user ? `${user.firstName} ${user.lastName}` : 'Guest User';
+  });
+
+  userEmail = computed(() => {
+    const user = this.authService.currentUser();
+    return user ? user.email : '';
+  });
+
+  userAvatar = computed(() => {
+    const user = this.authService.currentUser();
+    return user ? user.firstName.charAt(0).toUpperCase() : '?';
+  });
 
   mainLinks: MainLink[] = [
     { label: 'Activity', icon: 'tablerBulb', notifications: 1 },
@@ -60,6 +74,6 @@ export class SidebarComponent {
   }
 
   logout(): void {
-    console.log('Logout clicked');
+    this.authService.logout();
   }
 }

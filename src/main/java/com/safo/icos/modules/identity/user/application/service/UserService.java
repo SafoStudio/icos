@@ -17,6 +17,7 @@ import com.safo.icos.modules.identity.user.domain.model.UserId;
 import com.safo.icos.modules.identity.user.domain.model.UserName;
 import com.safo.icos.modules.identity.user.domain.service.UserDomainService;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserDocumentJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserProfileJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
@@ -213,17 +214,40 @@ public class UserService {
             .map(this::toDocumentResponseDto)
             .collect(Collectors.toList());
 
+    var membershipOpt = membershipRepository.findFirstByUserIdAndActiveTrue(user.getId());
+    String roleName = membershipOpt.map(m -> {
+      return roleJpaRepository.findById(m.getRoleId())
+              .map(RoleJpaEntity::getName)
+              .orElse("SPECIALIST");
+    }).orElse("SPECIALIST");
+
+    UUID departmentId = membershipOpt.map(Membership::getDepartmentId).orElse(null);
+
+    List<String> permissions = membershipOpt.map(m -> {
+      return roleJpaRepository.findById(m.getRoleId())
+              .map(role -> role.getPermissions().stream()
+                      .map(PermissionJpaEntity::getName)
+                      .toList())
+              .orElse(List.of());
+    }).orElse(List.of());
+
+    UUID companyId = membershipOpt.map(Membership::getCompanyId).orElse(null);
+
     return UserResponseDto.builder()
             .id(user.getId())
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
             .email(user.getEmail().value())
             .status(user.getStatus())
+            .companyId(companyId)
             .createdBy(user.getCreatedBy())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
             .profile(profileDto)
             .documents(documents)
+            .role(roleName)
+            .departmentId(departmentId)
+            .permissions(permissions)
             .build();
   }
 

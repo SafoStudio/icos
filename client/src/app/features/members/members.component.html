@@ -1,0 +1,156 @@
+<div class="members-container">
+  <div class="header">
+    <div class="header-text">
+      <h1>Company Members</h1>
+      <p class="subtitle">Manage your company team, roles, and department members</p>
+    </div>
+    @if (canInvite()) {
+      <button class="btn btn-primary btn-invite" (click)="openInviteModal()">
+        <span>Invite Member</span>
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <p>Loading members list...</p>
+    </div>
+  } @else {
+    @if (members().length === 0) {
+      <div class="empty-state">
+        <p>No members found in this company.</p>
+        @if (canInvite()) {
+          <button class="btn btn-secondary" (click)="openInviteModal()">Invite the first member</button>
+        }
+      </div>
+    } @else {
+      <div class="table-container">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>Member Name</th>
+              <th>Email Address</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (member of members(); track member.id) {
+              <tr>
+                <td>
+                  <div class="member-name-cell">
+                    <div class="avatar-circle">
+                      {{ member.firstName.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="full-name">{{ member.firstName }} {{ member.lastName }}</span>
+                  </div>
+                </td>
+                <td><span class="email-cell">{{ member.email }}</span></td>
+                <td>
+                  <span class="badge badge-role" [class]="'role-' + member.role.toLowerCase()">
+                    {{ member.role }}
+                  </span>
+                </td>
+                <td><span class="dept-cell">{{ member.departmentName }}</span></td>
+                <td>
+                  <span class="badge badge-status" [class]="'status-' + member.status.toLowerCase()">
+                    {{ member.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  <!-- INVITE MODAL -->
+  @if (showInviteModal()) {
+    <div class="modal-overlay" (click)="closeInviteModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Invite New Team Member</h2>
+          <button class="close-btn" (click)="closeInviteModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          @if (inviteError()) {
+            <div class="alert alert-danger">
+              {{ inviteError() }}
+            </div>
+          }
+          @if (inviteSuccess()) {
+            <div class="alert alert-success">
+              {{ inviteSuccess() }}
+            </div>
+          }
+
+          <form [formGroup]="inviteForm" (ngSubmit)="submitInvite()" class="invite-form">
+            <div class="form-group">
+              <label for="invite-email">Email Address</label>
+              <input
+                type="email"
+                id="invite-email"
+                formControlName="email"
+                placeholder="colleague@company.com"
+                [class.error]="inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid"
+              />
+              @if (inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid) {
+                <span class="error-text">Please enter a valid email address</span>
+              }
+            </div>
+
+            <div class="row">
+              <div class="form-group">
+                <label for="invite-role">Role</label>
+                <select id="invite-role" formControlName="role">
+                  @for (role of availableRoles(); track role) {
+                    <option [value]="role">{{ role }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="invite-dept">Department</label>
+                <select id="invite-dept" formControlName="departmentId">
+                  @for (dept of departments(); track dept.id) {
+                    <option [value]="dept.id">{{ dept.name }}</option>
+                  }
+                </select>
+                @if (inviteForm.get('departmentId')?.touched && inviteForm.get('departmentId')?.invalid) {
+                  <span class="error-text">Department is required</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="invite-manager">Head of Department / Manager</label>
+              <select id="invite-manager" formControlName="managerId">
+                <option value="">None</option>
+                @for (m of members(); track m.id) {
+                  <option [value]="m.id">{{ m.firstName }} {{ m.lastName }} ({{ m.role }})</option>
+                }
+              </select>
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" (click)="closeInviteModal()" [disabled]="isInviting()">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="isInviting() || inviteForm.invalid">
+                @if (isInviting()) {
+                  <span class="spinner"></span> Sending...
+                } @else {
+                  Send Invitation
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>
