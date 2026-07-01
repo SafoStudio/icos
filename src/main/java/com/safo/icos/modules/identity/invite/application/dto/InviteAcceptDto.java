@@ -3,6 +3,9 @@ package com.safo.icos.modules.identity.invite.application.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/**
+ * Request payload for accepting an invitation.
+ */
 public record InviteAcceptDto(
         @NotBlank String firstName,
         @NotBlank String lastName,

@@ -8,6 +8,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+/**
+ * JPA-based implementation of {@link InviteRepository}.
+ * Adapts domain persistence operations to Spring Data JPA.
+ */
 @Repository
 @RequiredArgsConstructor
 public class InviteRepositoryImpl implements InviteRepository {

@@ -26,6 +26,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Application service for invitation management.
+ * Handles creating, viewing, resending, and cancelling invitations.
+ * Only users with ADMIN, OWNER, or HR department membership
+ * can manage invites.
+ */
 @Service
 @RequiredArgsConstructor
 public class InviteService {
@@ -38,6 +44,12 @@ public class InviteService {
   private final DepartmentService departmentService;
   private final SecureRandom secureRandom = new SecureRandom();
 
+  /**
+   * Extracts the currently authenticated principal from the security context.
+   *
+   * @return the current user's principal
+   * @throws BusinessException if no authenticated user is found
+   */
   private IcosUserPrincipal getPrincipal() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
@@ -46,6 +58,12 @@ public class InviteService {
     return principal;
   }
 
+  /**
+   * Checks that the current user has permission to manage invites.
+   * Allowed roles: ADMIN, OWNER, or any member of the HR department.
+   *
+   * @throws BusinessException if the user lacks permission
+   */
   private void checkInvitePermissions() {
     IcosUserPrincipal principal = getPrincipal();
 
@@ -60,6 +78,16 @@ public class InviteService {
     }
   }
 
+  /**
+   * Creates a new invitation for the given company.
+   * Generates a secure token, hashes it for storage, and sends
+   * the raw token to the invitee via email.
+   *
+   * @param companyId the target company
+   * @param dto       invitation details (email, role, department, manager)
+   * @return the created invitation with resolved names
+   * @throws BusinessException if an invite for this email already exists
+   */
   @Transactional
   public InviteResponseDto createInvite(UUID companyId, InviteRequestDto dto) {
     checkInvitePermissions();
@@ -105,6 +133,16 @@ public class InviteService {
     return toResponseDto(saved, company.getName(), department.getName(), managerName);
   }
 
+  /**
+   * Retrieves an invitation by its raw token.
+   * The token is hashed before lookup. Validates that the invite
+   * is still pending and not expired.
+   *
+   * @param token the raw token from the invitation link
+   * @return the invitation details
+   * @throws NotFoundException if the token does not match any invite
+   * @throws BusinessException if the invite is not pending or has expired
+   */
   public InviteResponseDto getInviteByToken(String token) {
     Invite invite = repository.findByToken(HashUtils.hash(token))
             .orElseThrow(() -> new NotFoundException(INVITE_NOT_FOUND_MSG));
@@ -154,6 +192,14 @@ public class InviteService {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 
+  /**
+   * Resends an existing invitation with a new token and expiration date.
+   *
+   * @param inviteId the ID of the invite to resend
+   * @return the updated invitation
+   * @throws NotFoundException if the invite does not exist
+   * @throws BusinessException if the invite has already been accepted
+   */
   @Transactional
   public InviteResponseDto resendInvite(UUID inviteId) {
     checkInvitePermissions();
@@ -201,6 +247,12 @@ public class InviteService {
     return toResponseDto(saved, company.getName(), department.getName(), managerName);
   }
 
+  /**
+   * Cancels a pending invitation.
+   *
+   * @param inviteId the ID of the invite to cancel
+   * @throws NotFoundException if the invite does not exist
+   */
   @Transactional
   public void cancelInvite(UUID inviteId) {
     checkInvitePermissions();

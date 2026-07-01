@@ -5,6 +5,10 @@ import com.safo.icos.modules.org.domain.model.enums.RoleName;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+/**
+ * Response returned after creating or retrieving an invitation.
+ * Contains full invite details with resolved names for display.
+ */
 public record InviteResponseDto(
         UUID id,
         String email,
