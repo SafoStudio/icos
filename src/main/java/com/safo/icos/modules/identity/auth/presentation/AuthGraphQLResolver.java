@@ -30,6 +30,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequiredArgsConstructor
 public class AuthGraphQLResolver {
 
+  private static final String REFRESH_TOKEN_COOKIE = "refreshToken";
+  private static final String DEFAULT_DEVICE = "graphql-client";
+  private static final Duration COOKIE_MAX_AGE = Duration.ofDays(30);
+
   private final AuthService authService;
   private final UserProvider userProvider;
 
@@ -47,7 +51,7 @@ public class AuthGraphQLResolver {
     HttpServletRequest request = getRequest();
     if (request != null && request.getCookies() != null) {
       for (var cookie : request.getCookies()) {
-        if ("refreshToken".equals(cookie.getName())) {
+        if (REFRESH_TOKEN_COOKIE.equals(cookie.getName())) {
           return cookie.getValue();
         }
       }
@@ -58,19 +62,19 @@ public class AuthGraphQLResolver {
   private void setRefreshTokenCookie(String token) {
     HttpServletResponse response = getResponse();
     if (response != null) {
-      ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+      ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE, token)
               .httpOnly(true)
               .secure(true)
               .sameSite("Strict")
               .path("/")
-              .maxAge(Duration.ofDays(30))
+              .maxAge(COOKIE_MAX_AGE)
               .build();
       response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
   }
 
   private String resolveDevice(String deviceInfo) {
-    return deviceInfo != null ? deviceInfo : "graphql-client";
+    return deviceInfo != null ? deviceInfo : DEFAULT_DEVICE;
   }
 
   private AuthResponseView mapToAuthResponseView(AuthResponseDto result) {
@@ -148,7 +152,7 @@ public class AuthGraphQLResolver {
     }
     HttpServletResponse response = getResponse();
     if (response != null) {
-      ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+      ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE, "")
               .httpOnly(true)
               .secure(true)
               .sameSite("Strict")

@@ -13,7 +13,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Domain service for managing refresh tokens.
+ * Domain service for refresh token lifecycle management.
+ * Handles creation and validation of refresh tokens.
+ * Tokens are stored as SHA-256 hashes — raw values are never persisted.
  */
 @Service
 @RequiredArgsConstructor
