@@ -53,9 +53,8 @@ public class MembershipRepositoryImpl implements MembershipRepository {
     return toDomain(saved);
   }
 
-  @Override
-  public void delete(Membership membership) {
-    jpaRepository.deleteById(membership.getId());
+  public void deleteById(UUID id) {
+    jpaRepository.deleteById(id);
   }
 
   private MembershipJpaEntity toJpaEntity(Membership domain) {

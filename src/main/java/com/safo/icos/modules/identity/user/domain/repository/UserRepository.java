@@ -12,11 +12,7 @@ public interface UserRepository {
 
   boolean existsByEmail(Email email);
 
-  boolean existsByEmailAndCompanyId(Email email, UUID companyId);
-
   User save(User user);
-
-  void delete(User user);
 
   void deleteById(UUID id);
 }

@@ -4,8 +4,12 @@ import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 
+/**
+ * Strongly-typed identifier for a {@link User} entity.
+ */
 @Getter
 public class UserId {
+
   private final UUID value;
 
   private UserId(UUID value) {
@@ -15,14 +19,32 @@ public class UserId {
     this.value = value;
   }
 
+  /**
+   * Creates a {@code UserId} from an existing UUID.
+   *
+   * @param uuid the user's UUID
+   * @return a new {@code UserId}
+   */
   public static UserId fromUUID(UUID uuid) {
     return new UserId(uuid);
   }
 
+  /**
+   * Generates a new random {@code UserId}.
+   *
+   * @return a new unique identifier
+   */
   public static UserId generate() {
     return new UserId(UUID.randomUUID());
   }
 
+  /**
+   * Creates a {@code UserId} from its string representation.
+   *
+   * @param value UUID string
+   * @return the corresponding {@code UserId}
+   * @throws IllegalArgumentException if the string is not a valid UUID
+   */
   public static UserId fromString(String value) {
     return new UserId(UUID.fromString(value));
   }

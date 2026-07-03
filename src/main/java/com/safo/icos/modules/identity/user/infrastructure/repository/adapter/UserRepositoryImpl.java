@@ -35,22 +35,10 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public boolean existsByEmailAndCompanyId(Email email, UUID companyId) {
-    return jpaRepository.findByEmail(email.value())
-            .flatMap(user -> membershipRepository.findActiveByUserIdAndCompanyId(user.getId(), companyId))
-            .isPresent();
-  }
-
-  @Override
   public User save(User user) {
     UserJpaEntity entity = toJpaEntity(user);
     UserJpaEntity saved = jpaRepository.save(entity);
     return toDomain(saved);
-  }
-
-  @Override
-  public void delete(User user) {
-    jpaRepository.deleteById(user.getId());
   }
 
   @Override

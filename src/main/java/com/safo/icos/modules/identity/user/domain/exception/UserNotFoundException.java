@@ -4,7 +4,11 @@ import com.safo.icos.common.exception.NotFoundException;
 import com.safo.icos.modules.identity.user.domain.model.Email;
 import com.safo.icos.modules.identity.user.domain.model.UserId;
 
+/**
+ * Thrown when a user cannot be found by ID or email.
+ */
 public class UserNotFoundException extends NotFoundException {
+
   public UserNotFoundException(String message) {
     super(message);
   }
