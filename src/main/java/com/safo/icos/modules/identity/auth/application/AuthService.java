@@ -42,7 +42,6 @@ import java.util.UUID;
  * Orchestrates user registration, login, token refresh, and logout.
  * Delegates token generation to {@link AuthTokenProvider} and
  * refresh token management to {@link AuthDomainService}.
- * <p>
  * All public methods run within a single transaction.
  */
 @Slf4j
