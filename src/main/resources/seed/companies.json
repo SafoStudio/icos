@@ -1,0 +1,10 @@
+[
+  {
+    "id": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Acme Corporation",
+    "taxId": "TAX-123456789",
+    "policyVersion": 1,
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]

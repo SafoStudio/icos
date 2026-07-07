@@ -1,0 +1,18 @@
+[
+  {
+    "id": "a0f7e1b5-ec6e-4b68-b78f-ef816a3a936a",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Engineering",
+    "description": "Software engineering, research, and development department",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "b1f7e1b5-ec6e-4b68-b78f-ef816a3a936b",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Human Resources",
+    "description": "Talent acquisition, employee welfare, and relations",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]

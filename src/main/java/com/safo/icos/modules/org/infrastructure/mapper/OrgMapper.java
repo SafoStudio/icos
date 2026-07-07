@@ -5,7 +5,7 @@ import com.safo.icos.modules.org.domain.model.Department;
 import com.safo.icos.modules.org.domain.model.Position;
 import com.safo.icos.modules.org.infrastructure.repository.CompanyJpaEntity;
 import com.safo.icos.modules.org.infrastructure.repository.PositionJpaEntity;
-import com.safo.icos.modules.identity.user.infrastructure.repository.entity.DepartmentJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.DepartmentJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

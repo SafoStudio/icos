@@ -1,0 +1,18 @@
+[
+  {
+    "id": "d608e5c2-f1df-4b5b-8e1f-7b0b3d68fb9d",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Software Engineer",
+    "description": "Responsible for developing and maintaining software applications",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "e708e5c2-f1df-4b5b-8e1f-7b0b3d68fb9e",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "HR Manager",
+    "description": "Responsible for HR operations and recruitment",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]

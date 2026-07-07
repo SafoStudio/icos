@@ -145,10 +145,19 @@
             <version>26.0.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     <dependency>
     	<groupId>io.minio</groupId>
     	<artifactId>minio</artifactId>
     	<version>8.5.7</version>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     </dependencies>
     <build>
@@ -214,6 +223,7 @@
                 <version>1.15.0</version>
                 <configuration>
                     <workingDirectory>client</workingDirectory>
+                    <skip>true</skip>
                 </configuration>
                 <executions>
                     <execution>

@@ -24,6 +24,9 @@ public class PositionJpaEntity {
   @Column(name = "company_id", nullable = false)
   private UUID companyId;
 
+  @Column(name = "department_id")
+  private UUID departmentId;
+
   @Column(name = "name", nullable = false)
   private String name;
 

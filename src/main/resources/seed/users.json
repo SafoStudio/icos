@@ -1,0 +1,32 @@
+[
+  {
+    "id": "7a67f6e0-2f98-4680-bc9b-efb2b7ea672a",
+    "email": "john.doe@acme.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "status": "ACTIVE",
+    "password": "password123",
+    "phoneNumber": "+15550199",
+    "address": "123 Innovation Way, Tech City",
+    "hireDate": "2026-01-15",
+    "birthDate": "1990-05-20",
+    "avatarPath": "/avatars/john_doe.png",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "8b67f6e0-2f98-4680-bc9b-efb2b7ea672b",
+    "email": "jane.smith@acme.com",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "status": "ACTIVE",
+    "password": "password123",
+    "phoneNumber": "+15550288",
+    "address": "456 Developer Ave, Tech City",
+    "hireDate": "2026-03-01",
+    "birthDate": "1993-08-12",
+    "avatarPath": "/avatars/jane_smith.png",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]

@@ -1,4 +1,4 @@
-package com.safo.icos.modules.identity.user.infrastructure.repository.entity;
+package com.safo.icos.modules.org.infrastructure.repository;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,6 +23,9 @@ public class DepartmentJpaEntity {
 
   @Column(name = "company_id", nullable = false)
   private UUID companyId;
+
+  @Column(name = "parent_id")
+  private UUID parentId;
 
   @Column(name = "name", nullable = false)
   private String name;

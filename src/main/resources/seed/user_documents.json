@@ -1,0 +1,13 @@
+[
+  {
+    "id": "f1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c",
+    "userId": "7a67f6e0-2f98-4680-bc9b-efb2b7ea672a",
+    "type": "CONTRACT",
+    "filename": "employment_contract_john_doe.pdf",
+    "filePath": "/documents/employment_contract_john_doe.pdf",
+    "contentType": "application/pdf",
+    "fileSize": 1048576,
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]

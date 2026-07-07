@@ -1,0 +1,23 @@
+[
+  {
+    "id": "c5d1e2e3-4f5a-6b7c-8d9e-0f1a2b3c4d5e",
+    "userId": "7a67f6e0-2f98-4680-bc9b-efb2b7ea672a",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "roleName": "ADMIN",
+    "departmentId": "a0f7e1b5-ec6e-4b68-b78f-ef816a3a936a",
+    "active": true,
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "d5d1e2e3-4f5a-6b7c-8d9e-0f1a2b3c4d5f",
+    "userId": "8b67f6e0-2f98-4680-bc9b-efb2b7ea672b",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "roleName": "SPECIALIST",
+    "departmentId": "a0f7e1b5-ec6e-4b68-b78f-ef816a3a936a",
+    "managerId": "7a67f6e0-2f98-4680-bc9b-efb2b7ea672a",
+    "active": true,
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  }
+]
