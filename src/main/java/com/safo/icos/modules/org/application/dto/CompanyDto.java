@@ -4,6 +4,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing a company.
+ */
 @Getter
 @Builder
 public class CompanyDto {

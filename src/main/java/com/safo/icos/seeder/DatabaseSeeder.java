@@ -1,6 +1,6 @@
 package com.safo.icos.seeder;
 
-import com.safo.icos.modules.org.infrastructure.repository.CompanyJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.CompanyJpaRepository;
 import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

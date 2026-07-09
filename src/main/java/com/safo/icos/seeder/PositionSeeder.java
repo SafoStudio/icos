@@ -1,7 +1,7 @@
 package com.safo.icos.seeder;
 
-import com.safo.icos.modules.org.infrastructure.repository.PositionJpaEntity;
-import com.safo.icos.modules.org.infrastructure.repository.PositionJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.entity.PositionJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.PositionJpaRepository;
 import com.safo.icos.seeder.dto.PositionSeedDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;

@@ -5,6 +5,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * Domain entity representing a department within a company.
+ */
 @Getter
 @Builder
 public class Department {
@@ -15,6 +18,14 @@ public class Department {
   private String description;
   private LocalDateTime updatedAt;
 
+  /**
+   * Creates a new department.
+   *
+   * @param companyId   the owning company
+   * @param name        department name
+   * @param description optional description
+   * @return a newly created {@code Department}
+   */
   public static Department create(UUID companyId, String name, String description) {
     return Department.builder()
             .id(UUID.randomUUID())
@@ -26,6 +37,13 @@ public class Department {
             .build();
   }
 
+  /**
+   * Updates the department name and/or description.
+   * {@code null} arguments are ignored.
+   *
+   * @param name        new name, or {@code null} to keep current
+   * @param description new description, or {@code null} to keep current
+   */
   public void update(String name, String description) {
     if (name != null) this.name = name;
     if (description != null) this.description = description;

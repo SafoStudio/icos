@@ -1,5 +1,6 @@
-package com.safo.icos.modules.org.infrastructure.repository;
+package com.safo.icos.modules.org.infrastructure.repository.jpa;
 
+import com.safo.icos.modules.org.infrastructure.repository.entity.DepartmentJpaEntity;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

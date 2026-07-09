@@ -4,6 +4,9 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing a job position within a company.
+ */
 @Getter
 @Builder
 public class PositionDto {

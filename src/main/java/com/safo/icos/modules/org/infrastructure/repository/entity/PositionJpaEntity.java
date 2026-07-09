@@ -1,4 +1,4 @@
-package com.safo.icos.modules.org.infrastructure.repository;
+package com.safo.icos.modules.org.infrastructure.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,20 +12,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "departments")
+@Table(name = "positions")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DepartmentJpaEntity {
+public class PositionJpaEntity {
   @Id
   private UUID id;
 
   @Column(name = "company_id", nullable = false)
   private UUID companyId;
 
-  @Column(name = "parent_id")
-  private UUID parentId;
+  @Column(name = "department_id")
+  private UUID departmentId;
 
   @Column(name = "name", nullable = false)
   private String name;

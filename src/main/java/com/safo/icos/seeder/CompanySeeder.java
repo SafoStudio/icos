@@ -1,7 +1,7 @@
 package com.safo.icos.seeder;
 
-import com.safo.icos.modules.org.infrastructure.repository.CompanyJpaEntity;
-import com.safo.icos.modules.org.infrastructure.repository.CompanyJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.entity.CompanyJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.CompanyJpaRepository;
 import com.safo.icos.seeder.dto.CompanySeedDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
