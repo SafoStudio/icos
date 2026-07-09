@@ -16,6 +16,8 @@ import com.safo.icos.modules.identity.auth.infrastructure.repository.entity.Auth
 import com.safo.icos.modules.identity.auth.infrastructure.repository.jpa.AuthCredentialsJpaRepository;
 import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
 import com.safo.icos.modules.identity.invite.domain.model.Invite;
+import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
+import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.identity.user.api.UserProvider;
@@ -58,6 +60,7 @@ public class AuthService {
   private final AuthCredentialsJpaRepository credentialsRepository;
   private final CompanyService companyService;
   private final RoleJpaRepository roleJpaRepository;
+  private final InviteRepository inviteRepository;
 
   @Value("${app.auth.refresh-token-ttl:30d}")
   private Duration refreshTokenTtl;
@@ -211,6 +214,9 @@ public class AuthService {
     MembershipDto membership = userProvider.createMembership(
             user.getId(), invite.getCompanyId(), roleId, invite.getDepartmentId(), invite.getManagerId());
     UserDto userWithCompany = enrichUserWithCompany(user, membership);
+
+    invite.accept();
+    inviteRepository.save(invite);
 
     RefreshTokenCreationResult rtResult = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);

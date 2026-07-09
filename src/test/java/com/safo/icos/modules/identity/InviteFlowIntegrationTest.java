@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.when;
  * Uses existing seed data IDs from the database.
  */
 @SpringBootTest
+@Transactional
 class InviteFlowIntegrationTest {
 
   @Autowired
