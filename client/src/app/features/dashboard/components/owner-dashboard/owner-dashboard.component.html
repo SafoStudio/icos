@@ -1,0 +1,90 @@
+<div class="dashboard-content">
+  <!-- Метрики -->
+  <div class="metrics-grid">
+    @for (metric of metrics; track metric.label) {
+    <div class="metric-card">
+      <div class="metric-label">{{ metric.label }}</div>
+      <div class="metric-value">{{ metric.value }}</div>
+      <div class="metric-change" [class.positive]="metric.changeType === 'positive'" [class.negative]="metric.changeType === 'negative'">
+        {{ metric.change }}
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Heads of departments -->
+  <div class="table-section">
+    <div class="section-header">
+      <h3>Heads of departments</h3>
+      <button class="btn-text">View All</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for (employee of employees; track employee.email) {
+        <tr>
+          <td>{{ employee.name }}</td>
+          <td>{{ employee.position }}</td>
+          <td>{{ employee.department }}</td>
+          <td>
+                <span class="status-badge" [class]="employee.status.toLowerCase().replace(' ', '-')">
+                  {{ employee.status }}
+                </span>
+          </td>
+          <td>{{ employee.email }}</td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Active Projects -->
+  <div class="table-section">
+    <div class="section-header">
+      <h3>Active Projects</h3>
+      <button class="btn-text">View All</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Project</th>
+          <th>Team</th>
+          <th>Deadline</th>
+          <th>Status</th>
+          <th>Priority</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for (project of projects; track project.name) {
+        <tr>
+          <td>{{ project.name }}</td>
+          <td>{{ project.team }} members</td>
+          <td>{{ project.deadline }}</td>
+          <td>
+                <span class="status-badge" [class]="project.status.toLowerCase().replace(' ', '-')">
+                  {{ project.status }}
+                </span>
+          </td>
+          <td>
+                <span class="priority-badge" [class]="project.priority.toLowerCase()">
+                  {{ project.priority }}
+                </span>
+          </td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

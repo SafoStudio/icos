@@ -1,0 +1,46 @@
+<div class="dashboard-content">
+  <div class="metrics-grid">
+    @for (metric of metrics; track metric.label) {
+    <div class="metric-card">
+      <div class="metric-label">{{ metric.label }}</div>
+      <div class="metric-value">{{ metric.value }}</div>
+      <div class="metric-change" [class.positive]="metric.changeType === 'positive'" [class.negative]="metric.changeType === 'negative'">
+        {{ metric.change }}
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="table-section">
+    <div class="section-header">
+      <h3>My Tasks</h3>
+      <button class="btn-text">View All</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Task</th>
+          <th>Project</th>
+          <th>Due Date</th>
+          <th>Priority</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for (task of tasks; track task.title) {
+        <tr>
+          <td>{{ task.title }}</td>
+          <td>{{ task.project }}</td>
+          <td>{{ task.dueDate }}</td>
+          <td>
+                <span class="priority-badge" [class]="task.priority.toLowerCase()">
+                  {{ task.priority }}
+                </span>
+          </td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,24 +1,27 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { OwnerDashboardComponent } from './components/owner-dashboard/owner-dashboard.component';
+import { HrDashboardComponent } from './components/hr-dashboard/hr-dashboard.component';
+import { MemberDashboardComponent } from './components/member-dashboard/member-dashboard.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    OwnerDashboardComponent,
+    HrDashboardComponent,
+    MemberDashboardComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
   readonly authService = inject(AuthService);
 
-  userName = computed(() => {
+  userRole = computed(() => {
     const user = this.authService.currentUser();
-    return user ? `${user.firstName} ${user.lastName}` : 'User';
-  });
-
-  companyRole = computed(() => {
-    const user = this.authService.currentUser();
-    return user ? user.role : 'Member';
+    return user?.role || 'SPECIALIST';
   });
 }

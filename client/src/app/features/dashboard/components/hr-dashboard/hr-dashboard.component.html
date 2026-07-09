@@ -1,0 +1,46 @@
+<div class="dashboard-content">
+  <div class="metrics-grid">
+    @for (metric of metrics; track metric.label) {
+    <div class="metric-card">
+      <div class="metric-label">{{ metric.label }}</div>
+      <div class="metric-value">{{ metric.value }}</div>
+      <div class="metric-change" [class.positive]="metric.changeType === 'positive'" [class.negative]="metric.changeType === 'negative'">
+        {{ metric.change }}
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="table-section">
+    <div class="section-header">
+      <h3>Recent Candidates</h3>
+      <button class="btn-text">View All</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for (candidate of candidates; track candidate.name) {
+        <tr>
+          <td>{{ candidate.name }}</td>
+          <td>{{ candidate.position }}</td>
+          <td>
+                <span class="status-badge" [class]="candidate.status.toLowerCase()">
+                  {{ candidate.status }}
+                </span>
+          </td>
+          <td>{{ candidate.date }}</td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
