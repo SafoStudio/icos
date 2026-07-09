@@ -19,7 +19,9 @@ import {
   tablerCheckbox,
   tablerUser,
   tablerChevronDown,
-  tablerLogout
+  tablerLogout,
+  tablerEye,
+  tablerEyeOff
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -42,5 +44,7 @@ export const APP_ICONS = provideIcons({
   tablerCheckbox,
   tablerUser,
   tablerChevronDown,
-  tablerLogout
+  tablerLogout,
+  tablerEye,
+  tablerEyeOff
 });
