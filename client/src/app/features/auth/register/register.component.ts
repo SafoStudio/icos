@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService, InviteResponse } from '../../../core/services/auth.service';
+import { NgIconComponent } from '@ng-icons/core';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, NgIconComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -25,6 +26,8 @@ export class RegisterComponent implements OnInit {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+  showCompanyPassword = signal(false);
+  showInvitePassword = signal(false)
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -72,6 +75,14 @@ export class RegisterComponent implements OnInit {
         this.errorMessage.set(err.error?.message || err.message || 'Invitation is invalid, canceled, or expired.');
       }
     });
+  }
+
+ toggleCompanyPassword(): void {
+    this.showCompanyPassword.update(value => !value);
+  }
+
+  toggleInvitePassword(): void {
+    this.showInvitePassword.update(value => !value);
   }
 
   onCompanySubmit(): void {
