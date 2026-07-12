@@ -5,8 +5,13 @@ import com.safo.icos.security.permission.PolicyResult;
 import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
 
+/**
+ * Policy rule for email change actions.
+ * Only OWNER and ADMIN roles are permitted; all others are explicitly denied.
+ */
 @Component
 public class EmailChangePolicyRule implements PolicyRule {
+
   @Override
   public boolean supports(String action) {
     return "email:change".equals(action);

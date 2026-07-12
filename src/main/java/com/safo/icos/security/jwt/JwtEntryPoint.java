@@ -14,6 +14,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+/**
+ * Handles unauthenticated requests by returning a JSON error response
+ * instead of the default Spring Security login redirect.
+ * <p>
+ * Responds with HTTP 401 and a JSON body containing the status,
+ * error message, and request path.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -21,6 +28,13 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
+  /**
+   * Commences an authentication scheme for unauthenticated requests.
+   *
+   * @param request       the HTTP request that resulted in an authentication failure
+   * @param response      the HTTP response to write the error to
+   * @param authException the exception that caused the failure
+   */
   @Override
   public void commence(
           HttpServletRequest request,

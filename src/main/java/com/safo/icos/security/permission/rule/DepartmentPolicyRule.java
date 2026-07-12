@@ -5,8 +5,13 @@ import com.safo.icos.security.permission.PolicyResult;
 import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
 
+/**
+ * Policy rule for department-related actions ({@code department:*}.
+ * Grants full access to OWNER role, abstains for all others.
+ */
 @Component
 public class DepartmentPolicyRule implements PolicyRule {
+
   @Override
   public boolean supports(String action) {
     return action.startsWith("department:");
@@ -17,7 +22,6 @@ public class DepartmentPolicyRule implements PolicyRule {
     if ("OWNER".equals(user.getRoleName())) {
       return PolicyResult.allow("Owner has full access to departments");
     }
-
     return PolicyResult.abstain();
   }
 

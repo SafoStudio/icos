@@ -7,8 +7,19 @@ import java.util.Objects;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
+/**
+ * Policy rule for profile editing ({@code profile:edit}).
+ * <p>
+ * Access is granted if:
+ * <ul>
+ *   <li>The user edits their own profile and has the {@code profile:edit.self} permission.</li>
+ *   <li>The user has the {@code profile:edit.all} permission (Admin/Owner/HR).</li>
+ *   <li>The user is an HR department HEAD.</li>
+ * </ul>
+ */
 @Component
 public class ProfilePolicyRule implements PolicyRule {
+
   @Override
   public boolean supports(String action) {
     return "profile:edit".equals(action);
@@ -16,23 +27,24 @@ public class ProfilePolicyRule implements PolicyRule {
 
   @Override
   public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
-    // resource is expected to be the target userId (UUID)
     if (!(resource instanceof UUID targetUserId)) {
       return PolicyResult.abstain();
     }
 
-    // 1. Check if editing own profile
+    // User editing their own profile
     if (user.getUserId().equals(targetUserId)
-            && user.getAuthorities().stream().anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.self"))) {
+            && user.getAuthorities().stream()
+            .anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.self"))) {
       return PolicyResult.allow("User can edit their own profile");
     }
 
-    // 2. Check if user has permission to edit all profiles (Admin/Owner/HR)
-    if (user.getAuthorities().stream().anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.all"))) {
+    // User has full profile editing permission
+    if (user.getAuthorities().stream()
+            .anyMatch(a -> Objects.equals(a.getAuthority(), "profile:edit.all"))) {
       return PolicyResult.allow("User has permission to edit all profiles");
     }
 
-    // 3. HR logic (if HR Head, they can edit profiles in the company)
+    // HR department head
     if ("HEAD".equals(user.getRoleName()) && isHrDepartment(user.getDepartmentName())) {
       return PolicyResult.allow("HR Head can edit employee profiles");
     }
@@ -41,7 +53,8 @@ public class ProfilePolicyRule implements PolicyRule {
   }
 
   private boolean isHrDepartment(String deptName) {
-    return deptName != null && (deptName.equalsIgnoreCase("HR") || deptName.toUpperCase().contains("HR"));
+    return deptName != null
+            && (deptName.equalsIgnoreCase("HR") || deptName.toUpperCase().contains("HR"));
   }
 
   @Override

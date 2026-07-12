@@ -19,6 +19,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+/**
+ * JWT authentication filter that runs once per request.
+ * Extracts the Bearer token from the {@code Authorization} header,
+ * validates it, and populates the Spring Security context
+ * with an {@link IcosUserPrincipal}.
+ * <p>
+ * Also sets the {@link TenantContext} for multi-tenant data scoping.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -27,6 +35,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final UserProvider userProvider;
 
+  /**
+   * Processes each incoming HTTP request:
+   * <ol>
+   *   <li>Extracts the Bearer token from the Authorization header.</li>
+   *   <li>Validates the token's signature and expiration.</li>
+   *   <li>Extracts userId and tenantId claims.</li>
+   *   <li>Sets the tenant context.</li>
+   *   <li>Loads the full principal from the database.</li>
+   *   <li>Sets the Spring Security authentication context.</li>
+   *   <li>Clears the tenant context in a {@code finally} block.</li>
+   * </ol>
+   * If the token is missing or invalid, the request continues unauthenticated.
+   *
+   * @param request     the HTTP request
+   * @param response    the HTTP response
+   * @param filterChain the filter chain
+   */
   @Override
   protected void doFilterInternal(
           HttpServletRequest request,
@@ -50,27 +75,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             TenantContext.setTenantId(tenantIdStr);
 
-            userProvider.findPrincipal(userId, tenantId).ifPresent(principalData -> {
-              List<SimpleGrantedAuthority> authorities = principalData.getPermissions().stream()
-                      .map(SimpleGrantedAuthority::new)
-                      .toList();
+            userProvider.findPrincipal(userId, tenantId)
+                    .ifPresent(principalData -> {
+                      List<SimpleGrantedAuthority> authorities =
+                              principalData.getPermissions().stream()
+                                      .map(SimpleGrantedAuthority::new)
+                                      .toList();
 
-              IcosUserPrincipal principal = IcosUserPrincipal.builder()
-                      .userId(principalData.getUserId())
-                      .email(principalData.getEmail())
-                      .membershipId(principalData.getMembershipId())
-                      .companyId(principalData.getCompanyId())
-                      .roleName(principalData.getRoleName())
-                      .departmentId(principalData.getDepartmentId())
-                      .departmentName(principalData.getDepartmentName())
-                      .authorities(authorities)
-                      .build();
+                      IcosUserPrincipal principal = IcosUserPrincipal.builder()
+                              .userId(principalData.getUserId())
+                              .email(principalData.getEmail())
+                              .membershipId(principalData.getMembershipId())
+                              .companyId(principalData.getCompanyId())
+                              .roleName(principalData.getRoleName())
+                              .departmentId(principalData.getDepartmentId())
+                              .departmentName(principalData.getDepartmentName())
+                              .authorities(authorities)
+                              .build();
 
-              UsernamePasswordAuthenticationToken authentication =
-                      new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                      UsernamePasswordAuthenticationToken authentication =
+                              new UsernamePasswordAuthenticationToken(
+                                      principal, null, principal.getAuthorities());
 
-              SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+                      SecurityContextHolder.getContext()
+                              .setAuthentication(authentication);
+                    });
           }
         }
       } catch (Exception e) {

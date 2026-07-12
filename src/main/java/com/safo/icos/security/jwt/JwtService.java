@@ -15,6 +15,11 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * JWT implementation of {@link AuthTokenProvider}.
+ * Generates and validates HMAC-SHA signed access tokens
+ * containing {@code sub} (userId) and {@code tenantId} claims.
+ */
 @Slf4j
 @Service
 public class JwtService implements AuthTokenProvider {
@@ -27,11 +32,19 @@ public class JwtService implements AuthTokenProvider {
 
   private SecretKey signingKey;
 
+  /** Initialises the HMAC signing key from the configured secret. */
   @PostConstruct
   public void init() {
     signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
   }
 
+  /**
+   * Generates a short-lived JWT access token for the given user and tenant.
+   *
+   * @param userId   the user's UUID
+   * @param tenantId the tenant (company) UUID
+   * @return DTO with the signed JWT, type, and TTL
+   */
   @Override
   public AuthTokenDto generateAccessToken(UUID userId, UUID tenantId) {
     String accessToken = generateAccessTokenValue(userId, tenantId);
@@ -42,19 +55,12 @@ public class JwtService implements AuthTokenProvider {
             .build();
   }
 
-  private String generateAccessTokenValue(UUID userId, UUID tenantId) {
-    Instant now = Instant.now();
-    Instant expiry = now.plusSeconds(accessTokenTtlSeconds);
-
-    return Jwts.builder()
-            .subject(userId.toString())
-            .claim("tenantId", tenantId.toString())
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiry))
-            .signWith(signingKey)
-            .compact();
-  }
-
+  /**
+   * Validates a JWT token's signature and expiration.
+   *
+   * @param token the JWT string
+   * @return {@code true} if the token is valid and not expired
+   */
   @Override
   public boolean validateToken(String token) {
     try {
@@ -69,6 +75,12 @@ public class JwtService implements AuthTokenProvider {
     }
   }
 
+  /**
+   * Extracts the user ID (subject) from a JWT.
+   *
+   * @param token a valid JWT
+   * @return the user UUID as a string
+   */
   @Override
   public String extractUserId(String token) {
     return Jwts.parser()
@@ -79,6 +91,12 @@ public class JwtService implements AuthTokenProvider {
             .getSubject();
   }
 
+  /**
+   * Extracts the tenant ID claim from a JWT.
+   *
+   * @param token a valid JWT
+   * @return the tenant UUID as a string
+   */
   @Override
   public String extractTenantId(String token) {
     return Jwts.parser()
@@ -87,5 +105,18 @@ public class JwtService implements AuthTokenProvider {
             .parseSignedClaims(token)
             .getPayload()
             .get("tenantId", String.class);
+  }
+
+  private String generateAccessTokenValue(UUID userId, UUID tenantId) {
+    Instant now = Instant.now();
+    Instant expiry = now.plusSeconds(accessTokenTtlSeconds);
+
+    return Jwts.builder()
+            .subject(userId.toString())
+            .claim("tenantId", tenantId.toString())
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expiry))
+            .signWith(signingKey)
+            .compact();
   }
 }

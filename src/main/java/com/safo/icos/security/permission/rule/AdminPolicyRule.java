@@ -5,8 +5,13 @@ import com.safo.icos.security.permission.PolicyResult;
 import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
 
+/**
+ * Policy rule that grants full access to users with the ADMIN role.
+ * Runs first (highest priority).
+ */
 @Component
 public class AdminPolicyRule implements PolicyRule {
+
   @Override
   public boolean supports(String action) {
     return true; // Admin can do anything

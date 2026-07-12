@@ -16,19 +16,40 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+/**
+ * AOP aspect that intercepts methods annotated with {@link RequirePermission}
+ * and enforces access control via {@link PermissionsService}.
+ * <p>
+ * If the method is also annotated with {@link Resource}, the corresponding
+ * entity is loaded from the database and passed as the "old state"
+ * in a {@link CompositeResource} for before/after policy evaluation.
+ */
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class SecurityAspect {
+
   private final ApplicationContext applicationContext;
   private final PermissionsService permissionsService;
 
+  /**
+   * Around advice for {@link RequirePermission}-annotated methods.
+   * Extracts the authenticated user, resolves the target resource,
+   * delegates to {@link PermissionsService#assertCan}, and proceeds
+   * if access is granted.
+   *
+   * @param joinPoint         the intercepted method invocation
+   * @param requirePermission the annotation instance
+   * @return the result of the intercepted method
+   * @throws Throwable if the method throws, or if access is denied
+   */
   @Around("@annotation(requirePermission)")
-  @SuppressWarnings("unused")
-  public Object handlePermission(ProceedingJoinPoint joinPoint, RequirePermission requirePermission) throws Throwable {
+  public Object handlePermission(ProceedingJoinPoint joinPoint,
+                                 RequirePermission requirePermission) throws Throwable {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal userPrincipal)) {
+    if (authentication == null
+            || !(authentication.getPrincipal() instanceof IcosUserPrincipal userPrincipal)) {
       throw new SecurityException("No authenticated user found");
     }
 
@@ -39,11 +60,8 @@ public class SecurityAspect {
 
     if (resourceAnno != null) {
       UUID id = findIdArgument(joinPoint, signature, resourceAnno.idSource());
-
       Repositories repositories = new Repositories(applicationContext);
-
       Object oldEntity = findEntityById(repositories, resourceAnno.type(), id);
-
       Object dto = findDtoArgument(joinPoint);
       finalResource = new CompositeResource<>(oldEntity, dto, id);
     } else {
@@ -64,7 +82,8 @@ public class SecurityAspect {
             .orElseThrow(() -> new EntityNotFoundException("Resource not found with ID: " + id));
   }
 
-  private UUID findIdArgument(ProceedingJoinPoint joinPoint, MethodSignature signature, String idSourceName) {
+  private UUID findIdArgument(ProceedingJoinPoint joinPoint, MethodSignature signature,
+                              String idSourceName) {
     String[] parameterNames = signature.getParameterNames();
     Object[] args = joinPoint.getArgs();
 
@@ -78,7 +97,8 @@ public class SecurityAspect {
             .filter(UUID.class::isInstance)
             .map(UUID.class::cast)
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Could not find ID argument: " + idSourceName));
+            .orElseThrow(() -> new IllegalArgumentException(
+                    "Could not find ID argument: " + idSourceName));
   }
 
   private Object findDtoArgument(ProceedingJoinPoint joinPoint) {
