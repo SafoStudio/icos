@@ -8,7 +8,7 @@ public interface StorageProvider {
      * Uploads a file to a specific path.
      * Path structure: companyId/emailSlug/folder/filename
      */
-    String uploadFile(String path, InputStream inputStream, String contentType);
+    void uploadFile(String path, InputStream inputStream, String contentType);
 
     /**
      * Deletes a file at the specific path.

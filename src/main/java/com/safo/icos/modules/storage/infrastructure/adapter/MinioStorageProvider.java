@@ -22,7 +22,7 @@ public class MinioStorageProvider implements StorageProvider {
 
     @Override
     @SneakyThrows
-    public String uploadFile(String path, InputStream inputStream, String contentType) {
+    public void uploadFile(String path, InputStream inputStream, String contentType) {
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucket)
@@ -31,7 +31,6 @@ public class MinioStorageProvider implements StorageProvider {
                         .contentType(contentType)
                         .build()
         );
-        return path;
     }
 
     @Override
