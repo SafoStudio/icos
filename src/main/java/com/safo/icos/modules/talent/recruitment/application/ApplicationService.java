@@ -22,128 +22,180 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Application service for managing job applications (candidate submissions to vacancies).
+ * Handles the recruitment pipeline: application creation, stage movement,
+ * Kanban board projection, and candidate hiring.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ApplicationService {
-    private static final String APPLICATION_NOT_FOUND_MESSAGE = "Application not found";
-    private final ApplicationRepository applicationRepository;
-    private final VacancyRepository vacancyRepository;
-    private final VacancyStageJpaRepository vacancyStageJpaRepository;
-    private final RecruitmentMapper mapper;
-    private final ApplicationEventPublisher eventPublisher;
 
-    public ApplicationDto createApplication(UUID candidateId, UUID vacancyId) {
-        // Find initial stage for the vacancy
-        VacancyStage initialStage = vacancyStageJpaRepository.findByVacancyIdOrderByOrderIndexAsc(vacancyId)
-                .stream()
-                .findFirst()
-                .map(mapper::toDomain)
-                .orElseThrow(() -> new BusinessException("No stages defined for vacancy", RecruitmentErrorCode.APPLICATION_NOT_FOUND));
+  private static final String APPLICATION_NOT_FOUND_MESSAGE = "Application not found";
 
-        Application application = Application.create(candidateId, vacancyId, initialStage.getId());
-        Application saved = applicationRepository.save(application);
+  private final ApplicationRepository applicationRepository;
+  private final VacancyRepository vacancyRepository;
+  private final VacancyStageJpaRepository vacancyStageJpaRepository;
+  private final RecruitmentMapper mapper;
+  private final ApplicationEventPublisher eventPublisher;
 
-        return toDto(saved);
-    }
+  /**
+   * Submits a new application for a candidate to a vacancy.
+   * The application starts at the first stage of the vacancy's pipeline.
+   *
+   * @param candidateId the candidate's UUID
+   * @param vacancyId   the vacancy's UUID
+   * @return the created application
+   * @throws BusinessException if no stages are defined for the vacancy
+   */
+  public ApplicationDto createApplication(UUID candidateId, UUID vacancyId) {
+    VacancyStage initialStage = vacancyStageJpaRepository
+            .findByVacancyIdOrderByOrderIndexAsc(vacancyId)
+            .stream()
+            .findFirst()
+            .map(mapper::toDomain)
+            .orElseThrow(() -> new BusinessException(
+                    "No stages defined for vacancy",
+                    RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
-    public KanbanBoardDto getKanbanBoard(UUID vacancyId) {
-        List<VacancyStage> stages = vacancyStageJpaRepository.findByVacancyIdOrderByOrderIndexAsc(vacancyId)
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
+    Application application = Application.create(candidateId, vacancyId, initialStage.getId());
+    Application saved = applicationRepository.save(application);
 
-        List<Application> applications = applicationRepository.findByVacancyId(vacancyId);
+    return toDto(saved);
+  }
 
-        List<KanbanColumnDto> columns = stages.stream()
-                .map(stage -> KanbanColumnDto.builder()
-                        .stage(stage)
-                        .applications(applications.stream()
-                                .filter(app -> stage.getId().equals(app.getCurrentStageId()))
-                                .toList())
-                        .build())
-                .toList();
+  /**
+   * Returns a Kanban board view of all applications for a vacancy,
+   * grouped by pipeline stages.
+   *
+   * @param vacancyId the vacancy's UUID
+   * @return the Kanban board with columns and applications
+   */
+  public KanbanBoardDto getKanbanBoard(UUID vacancyId) {
+    List<VacancyStage> stages = vacancyStageJpaRepository
+            .findByVacancyIdOrderByOrderIndexAsc(vacancyId)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
 
-        return KanbanBoardDto.builder()
-                .vacancyId(vacancyId)
-                .columns(columns)
-                .build();
-    }
+    List<Application> applications = applicationRepository.findByVacancyId(vacancyId);
 
-    public ApplicationDto getApplication(UUID applicationId) {
-        return applicationRepository.findById(applicationId)
-                .map(this::toDto)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
-    }
+    List<KanbanColumnDto> columns = stages.stream()
+            .map(stage -> KanbanColumnDto.builder()
+                    .stage(stage)
+                    .applications(applications.stream()
+                            .filter(app -> stage.getId().equals(app.getCurrentStageId()))
+                            .toList())
+                    .build())
+            .toList();
 
-    public void moveToStage(UUID applicationId, UUID stageId) {
-        Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
+    return KanbanBoardDto.builder()
+            .vacancyId(vacancyId)
+            .columns(columns)
+            .build();
+  }
 
-        // Logic to validate transition could be added here or in domain service
+  /**
+   * Retrieves a single application by ID.
+   *
+   * @param applicationId the application's UUID
+   * @return the application DTO
+   * @throws BusinessException if not found
+   */
+  public ApplicationDto getApplication(UUID applicationId) {
+    return applicationRepository.findById(applicationId)
+            .map(this::toDto)
+            .orElseThrow(() -> new BusinessException(
+                    APPLICATION_NOT_FOUND_MESSAGE,
+                    RecruitmentErrorCode.APPLICATION_NOT_FOUND));
+  }
 
-        Application updated = Application.builder()
-                .id(application.getId())
-                .candidateId(application.getCandidateId())
-                .vacancyId(application.getVacancyId())
-                .currentStageId(stageId)
-                .status(application.getStatus())
-                .rejectionReason(application.getRejectionReason())
-                .createdAt(application.getCreatedAt())
-                .updatedAt(java.time.LocalDateTime.now())
-                .build();
+  /**
+   * Moves an application to a different recruitment stage.
+   * Publishes a {@link CandidateStageChangedEvent} for notifications.
+   *
+   * @param applicationId the application's UUID
+   * @param stageId       the target stage's UUID
+   * @throws BusinessException if the application is not found
+   */
+  public void moveToStage(UUID applicationId, UUID stageId) {
+    Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new BusinessException(
+                    APPLICATION_NOT_FOUND_MESSAGE,
+                    RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
-        applicationRepository.save(updated);
+    Application updated = Application.builder()
+            .id(application.getId())
+            .candidateId(application.getCandidateId())
+            .vacancyId(application.getVacancyId())
+            .currentStageId(stageId)
+            .status(application.getStatus())
+            .rejectionReason(application.getRejectionReason())
+            .createdAt(application.getCreatedAt())
+            .updatedAt(java.time.LocalDateTime.now())
+            .build();
 
-        // Publish event for notifications
-        // In a real scenario, we'd get the actual user ID of the recruiter/manager
-        eventPublisher.publishEvent(new CandidateStageChangedEvent(
-                this,
-                application.getCandidateId(),
-                application.getId(),
-                stageId,
-                application.getCandidateId() // Just as an example, notify the candidate
-        ));
-    }
+    applicationRepository.save(updated);
 
-    public void hireCandidate(UUID applicationId, UUID userId) {
-        Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new BusinessException(APPLICATION_NOT_FOUND_MESSAGE, RecruitmentErrorCode.APPLICATION_NOT_FOUND));
+    eventPublisher.publishEvent(new CandidateStageChangedEvent(
+            this,
+            application.getCandidateId(),
+            application.getId(),
+            stageId,
+            application.getCandidateId()
+    ));
+  }
 
-        Vacancy vacancy = vacancyRepository.findById(application.getVacancyId())
-                .orElseThrow(() -> new BusinessException("Vacancy not found", RecruitmentErrorCode.APPLICATION_NOT_FOUND));
+  /**
+   * Marks an application as hired and publishes a {@link CandidateHiredEvent}
+   * to trigger downstream processes (e.g., onboarding, user creation).
+   *
+   * @param applicationId the application's UUID
+   * @param userId        the newly created user ID for the hired candidate
+   * @throws BusinessException if the application or vacancy is not found
+   */
+  public void hireCandidate(UUID applicationId, UUID userId) {
+    Application application = applicationRepository.findById(applicationId)
+            .orElseThrow(() -> new BusinessException(
+                    APPLICATION_NOT_FOUND_MESSAGE,
+                    RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
-        Application updated = Application.builder()
-                .id(application.getId())
-                .candidateId(application.getCandidateId())
-                .vacancyId(application.getVacancyId())
-                .currentStageId(application.getCurrentStageId())
-                .status(ApplicationStatus.HIRED)
-                .rejectionReason(application.getRejectionReason())
-                .createdAt(application.getCreatedAt())
-                .updatedAt(java.time.LocalDateTime.now())
-                .build();
+    Vacancy vacancy = vacancyRepository.findById(application.getVacancyId())
+            .orElseThrow(() -> new BusinessException(
+                    "Vacancy not found",
+                    RecruitmentErrorCode.APPLICATION_NOT_FOUND));
 
-        applicationRepository.save(updated);
+    Application updated = Application.builder()
+            .id(application.getId())
+            .candidateId(application.getCandidateId())
+            .vacancyId(application.getVacancyId())
+            .currentStageId(application.getCurrentStageId())
+            .status(ApplicationStatus.HIRED)
+            .rejectionReason(application.getRejectionReason())
+            .createdAt(application.getCreatedAt())
+            .updatedAt(java.time.LocalDateTime.now())
+            .build();
 
-        // Publish event for Onboarding module
-        eventPublisher.publishEvent(new CandidateHiredEvent(
-                this,
-                application.getCandidateId(),
-                application.getVacancyId(),
-                vacancy.getCompanyId(),
-                userId
-        ));
-    }
+    applicationRepository.save(updated);
 
-    private ApplicationDto toDto(Application application) {
-        return ApplicationDto.builder()
-                .id(application.getId())
-                .candidateId(application.getCandidateId())
-                .vacancyId(application.getVacancyId())
-                .currentStageId(application.getCurrentStageId())
-                .status(application.getStatus())
-                .createdAt(application.getCreatedAt())
-                .build();
-    }
+    eventPublisher.publishEvent(new CandidateHiredEvent(
+            this,
+            application.getCandidateId(),
+            application.getVacancyId(),
+            vacancy.getCompanyId(),
+            userId
+    ));
+  }
+
+  private ApplicationDto toDto(Application application) {
+    return ApplicationDto.builder()
+            .id(application.getId())
+            .candidateId(application.getCandidateId())
+            .vacancyId(application.getVacancyId())
+            .currentStageId(application.getCurrentStageId())
+            .status(application.getStatus())
+            .createdAt(application.getCreatedAt())
+            .build();
+  }
 }

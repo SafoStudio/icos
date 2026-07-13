@@ -6,9 +6,13 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing a single column (stage) on the Kanban board
+ * with all applications currently in that stage.
+ */
 @Getter
 @Builder
 public class KanbanColumnDto {
-    private final VacancyStage stage;
-    private final List<Application> applications;
+  private final VacancyStage stage;
+  private final List<Application> applications;
 }

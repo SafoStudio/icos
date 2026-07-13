@@ -6,13 +6,17 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing a candidate's application to a vacancy.
+ */
 @Getter
 @Builder
 public class ApplicationDto {
-    private UUID id;
-    private UUID candidateId;
-    private UUID vacancyId;
-    private UUID currentStageId;
-    private ApplicationStatus status;
-    private LocalDateTime createdAt;
+  private final UUID id;
+  private final UUID candidateId;
+  private final UUID vacancyId;
+  /** Current pipeline stage. */
+  private final UUID currentStageId;
+  private final ApplicationStatus status;
+  private final LocalDateTime createdAt;
 }

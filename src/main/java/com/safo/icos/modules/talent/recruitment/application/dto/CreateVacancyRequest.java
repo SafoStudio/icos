@@ -4,13 +4,17 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Request payload for creating a new vacancy.
+ */
 @Getter
 @Setter
 public class CreateVacancyRequest {
-    private UUID companyId;
-    private UUID departmentId;
-    private UUID positionId;
-    private String title;
-    private String description;
-    private String requirements;
+  private UUID companyId;
+  private UUID departmentId;
+  /** Position ID from the org module. */
+  private UUID positionId;
+  private String title;
+  private String description;
+  private String requirements;
 }
