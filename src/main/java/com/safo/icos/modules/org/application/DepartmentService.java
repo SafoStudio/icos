@@ -77,6 +77,21 @@ public class DepartmentService {
             .toList();
   }
 
+  /**
+   * Deletes an existing department. Requires {@code department:manage} permission.
+   *
+   * @param id department UUID
+   * @return true if deleted, false if not found
+   */
+  @RequirePermission("department:manage")
+  public boolean deleteDepartment(UUID id) {
+    if (departmentRepository.findById(id).isPresent()) {
+      departmentRepository.deleteById(id);
+      return true;
+    }
+    return false;
+  }
+
   private DepartmentDto toDto(Department domain) {
     return DepartmentDto.builder()
             .id(domain.getId())

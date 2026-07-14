@@ -1,5 +1,8 @@
 package com.safo.icos.security.context;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 /**
  * Thread-local holder for the current tenant (company) ID.
  * Set by {@link com.safo.icos.security.jwt.JwtAuthenticationFilter}
@@ -16,7 +19,16 @@ public final class TenantContext {
 
   /** Returns the current tenant ID, or {@code null} if not set. */
   public static String getTenantId() {
-    return currentTenant.get();
+    String tenant = currentTenant.get();
+    if (tenant == null) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      if (authentication != null && authentication.getPrincipal() instanceof IcosUserPrincipal principal) {
+        if (principal.getCompanyId() != null) {
+          return principal.getCompanyId().toString();
+        }
+      }
+    }
+    return tenant;
   }
 
   /** Sets the tenant ID for the current thread. */

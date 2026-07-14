@@ -27,8 +27,8 @@ export class PositionsService {
 
   createPosition(companyId: string, name: string, description: string): Observable<Position> {
     const mutation = `
-      mutation CreatePosition($companyId: ID!, $name: String!, $description: String) {
-        createPosition(companyId: $companyId, name: $name, description: $description) {
+      mutation CreatePosition($name: String!, $description: String) {
+        createPosition(name: $name, description: $description) {
           id
           name
           description
@@ -36,7 +36,7 @@ export class PositionsService {
       }
     `;
 
-    return this.api.graphql<{ createPosition: Position }>(mutation, { companyId, name, description }).pipe(
+    return this.api.graphql<{ createPosition: Position }>(mutation, { name, description }).pipe(
       map(response => response.createPosition)
     );
   }

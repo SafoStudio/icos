@@ -14,4 +14,5 @@ public interface DepartmentRepository {
   List<Department> findByCompanyId(UUID companyId);
   boolean existsByCompanyIdAndName(UUID companyId, String name);
   Department save(Department department);
+  void deleteById(UUID id);
 }

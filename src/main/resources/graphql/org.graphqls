@@ -30,6 +30,8 @@ extend type Mutation {
     updateDepartment(id: ID!, name: String, description: String): Department
     createPosition(name: String!, description: String): Position
     updatePosition(id: ID!, name: String, description: String): Position
+    deleteDepartment(id: ID!): Boolean!
+    deletePosition(id: ID!): Boolean!
 }
 
 

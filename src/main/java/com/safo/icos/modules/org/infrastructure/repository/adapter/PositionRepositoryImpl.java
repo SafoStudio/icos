@@ -41,4 +41,9 @@ public class PositionRepositoryImpl implements PositionRepository {
     PositionJpaEntity saved = jpaRepository.save(entity);
     return mapper.toDomain(saved);
   }
+
+  @Override
+  public void deleteById(UUID id) {
+    jpaRepository.deleteById(id);
+  }
 }

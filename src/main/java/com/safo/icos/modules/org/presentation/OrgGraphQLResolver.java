@@ -60,4 +60,14 @@ public class OrgGraphQLResolver {
   public PositionDto updatePosition(@Argument String id, @Argument String name, @Argument String description) {
     return positionService.updatePosition(UUID.fromString(id), name, description);
   }
+
+  @MutationMapping
+  public boolean deleteDepartment(@Argument String id) {
+    return departmentService.deleteDepartment(UUID.fromString(id));
+  }
+
+  @MutationMapping
+  public boolean deletePosition(@Argument String id) {
+    return positionService.deletePosition(UUID.fromString(id));
+  }
 }

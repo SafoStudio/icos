@@ -27,8 +27,8 @@ export class DepartmentsService {
 
   createDepartment(companyId: string, name: string, description: string): Observable<Department> {
     const mutation = `
-      mutation CreateDepartment($companyId: ID!, $name: String!, $description: String) {
-        createDepartment(companyId: $companyId, name: $name, description: $description) {
+      mutation CreateDepartment($name: String!, $description: String) {
+        createDepartment(name: $name, description: $description) {
           id
           name
           description
@@ -36,7 +36,7 @@ export class DepartmentsService {
       }
     `;
 
-    return this.api.graphql<{ createDepartment: Department }>(mutation, { companyId, name, description }).pipe(
+    return this.api.graphql<{ createDepartment: Department }>(mutation, { name, description }).pipe(
       map(response => response.createDepartment)
     );
   }

@@ -77,6 +77,21 @@ public class PositionService {
             .toList();
   }
 
+  /**
+   * Deletes an existing position. Requires {@code position:manage} permission.
+   *
+   * @param id position UUID
+   * @return true if deleted, false if not found
+   */
+  @RequirePermission("position:manage")
+  public boolean deletePosition(UUID id) {
+    if (positionRepository.findById(id).isPresent()) {
+      positionRepository.deleteById(id);
+      return true;
+    }
+    return false;
+  }
+
   private PositionDto toDto(Position domain) {
     return PositionDto.builder()
             .id(domain.getId())
