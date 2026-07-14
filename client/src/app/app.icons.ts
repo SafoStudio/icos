@@ -21,7 +21,9 @@ import {
   tablerChevronDown,
   tablerLogout,
   tablerEye,
-  tablerEyeOff
+  tablerEyeOff,
+  tablerBuilding,
+  tablerBuildingCommunity
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -46,5 +48,7 @@ export const APP_ICONS = provideIcons({
   tablerChevronDown,
   tablerLogout,
   tablerEye,
-  tablerEyeOff
+  tablerEyeOff,
+  tablerBuilding,
+  tablerBuildingCommunity
 });
