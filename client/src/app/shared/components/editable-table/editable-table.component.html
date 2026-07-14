@@ -11,23 +11,21 @@
       </thead>
 
       <tbody>
-      @for (item of data; track item.id || $index) {
-      <tr [class.editing]="isEditing($index)">
+      @for (item of data; track item._tempId || item.id || $index; let rowIndex = $index) {
+      <tr [class.editing]="editingIndex() === rowIndex">
         @for (col of columns; track col.key) {
         <td>
-          @if (isEditing($index) && col.editable !== false) {
-          <label>
-            <input
-              [type]="col.type === 'date' ? 'date' : 'text'"
-              [(ngModel)]="item[col.key]"
-              [placeholder]="'Enter ' + col.label"
-              class="edit-input"
-              [class.required]="col.required"
-              (keydown)="onKeydown($event, $index)"
-              [attr.aria-label]="'Edit ' + col.label"
-              autofocus
-            />
-          </label>
+          @if (editingIndex() === rowIndex && col.editable !== false) {
+          <input
+            [type]="col.type === 'date' ? 'date' : 'text'"
+            [(ngModel)]="item[col.key]"
+            [placeholder]="'Enter ' + col.label"
+            class="edit-input"
+            [class.required]="col.required"
+            (keydown)="onKeydown($event, rowIndex)"
+            [attr.aria-label]="'Edit ' + col.label"
+            autofocus
+          />
           } @else {
           <span class="cell-value">{{ item[col.key] || '-' }}</span>
           }
@@ -35,26 +33,39 @@
         }
 
         <td class="actions-cell">
-          @if (isEditing($index)) {
+          @if (editingIndex() === rowIndex) {
           <div class="edit-actions">
-            <button class="btn-save" (click)="saveRow($index)" title="Save">💾</button>
-            <button class="btn-cancel" (click)="cancelEdit()" title="Cancel">✖</button>
+            <button class="btn-save" (click)="saveRow(rowIndex)" title="Save">
+              <ng-icon name="tablerCheck"></ng-icon>
+            </button>
+            <button class="btn-cancel" (click)="cancelEdit()" title="Cancel">
+              <ng-icon name="tablerX"></ng-icon>
+            </button>
           </div>
           } @else {
           <div class="action-menu-container">
             <button
               class="btn-menu"
-              (click)="toggleMenu($index, $event)"
-              [class.active]="isMenuOpen($index)">
-              ⠿
+              (click)="toggleMenu(rowIndex, $event)"
+              [class.active]="menuOpenIndex() === rowIndex">
+              <ng-icon name="tablerDots"></ng-icon>
             </button>
 
-            @if (isMenuOpen($index)) {
+            @if (menuOpenIndex() === rowIndex) {
             <div class="dropdown-menu" role="menu">
-              <button class="menu-item" (click)="startEdit($index)" role="menuitem">Edit</button>
-              <button class="menu-item" (click)="addRow()" role="menuitem">Create</button>
+              <button class="menu-item" (click)="startEdit(rowIndex)" role="menuitem">
+                <ng-icon name="tablerEdit" class="menu-icon"></ng-icon>
+                Edit
+              </button>
+              <button class="menu-item" (click)="addRow()" role="menuitem">
+                <ng-icon name="tablerPlus" class="menu-icon"></ng-icon>
+                Create
+              </button>
               <hr class="menu-divider">
-              <button class="menu-item danger" (click)="deleteRow($index)" role="menuitem">Delete</button>
+              <button class="menu-item danger" (click)="deleteRow(rowIndex)" role="menuitem">
+                <ng-icon name="tablerTrash" class="menu-icon"></ng-icon>
+                Delete
+              </button>
             </div>
             }
           </div>
@@ -66,7 +77,7 @@
       @if (isEmpty() && !loading) {
       <tr class="empty-row">
         <td [attr.colspan]="columns.length + 1" class="empty-message">
-          No {{ title.toLowerCase() }} found. Click "Add New" to create one.
+          No {{ title.toLowerCase() }} found. Click "Create" to add one.
         </td>
       </tr>
       }

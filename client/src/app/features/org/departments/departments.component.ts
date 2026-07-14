@@ -4,6 +4,7 @@ import { EditableTableComponent, TableColumn } from '../../../shared/components/
 import { DepartmentsService } from './departments.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Department } from '../../../shared/models/department.model';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-departments',
@@ -15,6 +16,7 @@ import { Department } from '../../../shared/models/department.model';
 export class DepartmentsComponent {
   private readonly authService = inject(AuthService);
   private readonly departmentsService = inject(DepartmentsService);
+  private readonly toastService = inject(ToastService);
 
   readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
   readonly departments = signal<Department[]>([]);
@@ -53,6 +55,7 @@ export class DepartmentsComponent {
       },
       error: (error) => {
         console.error('Error loading departments:', error);
+        this.toastService.error('Failed to load departments.');
         this.loading.set(false);
       }
     });
@@ -61,7 +64,7 @@ export class DepartmentsComponent {
   onAddDepartment(item: Department): void {
     const companyId = this.companyId();
     if (!companyId) {
-      alert('No company selected');
+      this.toastService.error('No company selected.');
       return;
     }
 
@@ -71,11 +74,12 @@ export class DepartmentsComponent {
       next: (newDepartment) => {
         console.log('Department created:', newDepartment);
         this.departments.update(departments => [newDepartment, ...departments]);
+        this.toastService.success(`Department "${newDepartment.name}" created successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error creating department:', error);
-        alert('Failed to create department');
+        this.toastService.error('Failed to create department.');
         this.loading.set(false);
         this.loadDepartments();
       }
@@ -94,11 +98,12 @@ export class DepartmentsComponent {
           updated[index] = updatedDepartment;
           return updated;
         });
+        this.toastService.success(`Department "${updatedDepartment.name}" updated successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error updating department:', error);
-        alert('Failed to update department');
+        this.toastService.error('Failed to update department.');
         this.loading.set(false);
         this.loadDepartments();
       }
@@ -113,11 +118,12 @@ export class DepartmentsComponent {
       next: () => {
         console.log('Department deleted:', department.id);
         this.departments.update(departments => departments.filter((_, i) => i !== index));
+        this.toastService.success(`Department "${department.name}" deleted successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error deleting department:', error);
-        alert('Failed to delete department');
+        this.toastService.error('Failed to delete department. It might be in use.');
         this.loading.set(false);
       }
     });

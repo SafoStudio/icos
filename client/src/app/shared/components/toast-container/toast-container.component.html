@@ -1,0 +1,18 @@
+<div class="toast-container">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast-card" [class]="toast.type" role="alert" aria-live="assertive">
+      <div class="toast-icon-wrapper">
+        <ng-icon [name]="getIconName(toast.type)" class="toast-icon"></ng-icon>
+      </div>
+      <div class="toast-content">
+        @if (toast.title) {
+          <h4 class="toast-title">{{ toast.title }}</h4>
+        }
+        <p class="toast-message">{{ toast.message }}</p>
+      </div>
+      <button class="toast-close-btn" (click)="remove(toast.id)" aria-label="Close notification">
+        <ng-icon name="tablerX"></ng-icon>
+      </button>
+    </div>
+  }
+</div>

@@ -23,7 +23,15 @@ import {
   tablerEye,
   tablerEyeOff,
   tablerBuilding,
-  tablerBuildingCommunity
+  tablerBuildingCommunity,
+  tablerEdit,
+  tablerPlus,
+  tablerTrash,
+  tablerCheck,
+  tablerX,
+  tablerDots,
+  tablerAlertCircle,
+  tablerInfoCircle
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -50,5 +58,13 @@ export const APP_ICONS = provideIcons({
   tablerEye,
   tablerEyeOff,
   tablerBuilding,
-  tablerBuildingCommunity
+  tablerBuildingCommunity,
+  tablerEdit,
+  tablerPlus,
+  tablerTrash,
+  tablerCheck,
+  tablerX,
+  tablerDots,
+  tablerAlertCircle,
+  tablerInfoCircle
 });

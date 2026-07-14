@@ -4,6 +4,7 @@ import { EditableTableComponent, TableColumn } from '../../../shared/components/
 import { PositionsService } from './positions.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Position } from '../../../shared/models/position.model';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-positions',
@@ -15,6 +16,7 @@ import { Position } from '../../../shared/models/position.model';
 export class PositionsComponent {
   private readonly authService = inject(AuthService);
   private readonly positionsService = inject(PositionsService);
+  private readonly toastService = inject(ToastService);
 
   readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
   readonly positions = signal<Position[]>([]);
@@ -53,6 +55,7 @@ export class PositionsComponent {
       },
       error: (error) => {
         console.error('Error loading positions:', error);
+        this.toastService.error('Failed to load positions.');
         this.loading.set(false);
       }
     });
@@ -61,7 +64,7 @@ export class PositionsComponent {
   onAddPosition(item: Position): void {
     const companyId = this.companyId();
     if (!companyId) {
-      alert('No company selected');
+      this.toastService.error('No company selected.');
       return;
     }
 
@@ -71,11 +74,12 @@ export class PositionsComponent {
       next: (newPosition) => {
         console.log('Position created:', newPosition);
         this.positions.update(positions => [newPosition, ...positions]);
+        this.toastService.success(`Position "${newPosition.name}" created successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error creating position:', error);
-        alert('Failed to create position');
+        this.toastService.error('Failed to create position.');
         this.loading.set(false);
         this.loadPositions();
       }
@@ -94,11 +98,12 @@ export class PositionsComponent {
           updated[index] = updatedPosition;
           return updated;
         });
+        this.toastService.success(`Position "${updatedPosition.name}" updated successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error updating position:', error);
-        alert('Failed to update position');
+        this.toastService.error('Failed to update position.');
         this.loading.set(false);
         this.loadPositions();
       }
@@ -113,11 +118,12 @@ export class PositionsComponent {
       next: () => {
         console.log('Position deleted:', position.id);
         this.positions.update(positions => positions.filter((_, i) => i !== index));
+        this.toastService.success(`Position "${position.name}" deleted successfully.`);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error deleting position:', error);
-        alert('Failed to delete position');
+        this.toastService.error('Failed to delete position. It might be in use.');
         this.loading.set(false);
       }
     });
