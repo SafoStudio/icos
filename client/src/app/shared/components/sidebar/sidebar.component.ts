@@ -28,7 +28,7 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly isCollapsedSignal = signal(false);
-  
+
   isCollapsed = computed(() => this.isCollapsedSignal());
   collapsedChange = output<boolean>();
 
@@ -61,6 +61,7 @@ export class SidebarComponent {
     { label: 'Interviews', icon: 'tablerCalendarEvent', route: '/interviews' },
     { label: 'Reports', icon: 'tablerChartBar', route: '/reports' },
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
+    { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
     { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
   ];
 

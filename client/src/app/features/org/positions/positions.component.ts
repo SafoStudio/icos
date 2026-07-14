@@ -1,0 +1,125 @@
+import { Component, inject, computed, effect, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { EditableTableComponent, TableColumn } from '../../../shared/components/editable-table/editable-table.component';
+import { PositionsService } from './positions.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { Position } from '../../../shared/models/position.model';
+
+@Component({
+  selector: 'app-positions',
+  standalone: true,
+  imports: [CommonModule, EditableTableComponent],
+  templateUrl: './positions.component.html',
+  styleUrls: ['./positions.component.scss']
+})
+export class PositionsComponent {
+  private readonly authService = inject(AuthService);
+  private readonly positionsService = inject(PositionsService);
+
+  readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
+  readonly positions = signal<Position[]>([]);
+  readonly loading = signal<boolean>(false);
+
+  readonly columns: TableColumn[] = [
+    { key: 'name', label: 'Name', required: true },
+    { key: 'description', label: 'Description', required: false }
+  ];
+
+  constructor() {
+    effect(() => {
+      const id = this.companyId();
+      if (id) {
+        console.log('Company ID changed in Positions:', id);
+        this.loadPositions();
+      }
+    });
+  }
+
+  private loadPositions(): void {
+    const companyId = this.companyId();
+    if (!companyId) {
+      console.warn('No company ID available');
+      return;
+    }
+
+    console.log('Loading positions for company:', companyId);
+    this.loading.set(true);
+
+    this.positionsService.getPositions(companyId).subscribe({
+      next: (data) => {
+        console.log('Positions data received:', data);
+        this.positions.set(data);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading positions:', error);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  onAddPosition(item: Position): void {
+    const companyId = this.companyId();
+    if (!companyId) {
+      alert('No company selected');
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.positionsService.createPosition(companyId, item.name, item.description || '').subscribe({
+      next: (newPosition) => {
+        console.log('Position created:', newPosition);
+        this.positions.update(positions => [newPosition, ...positions]);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error creating position:', error);
+        alert('Failed to create position');
+        this.loading.set(false);
+        this.loadPositions();
+      }
+    });
+  }
+
+  onUpdatePosition(event: { index: number; item: Position }): void {
+    const { index, item } = event;
+    this.loading.set(true);
+
+    this.positionsService.updatePosition(item.id, item.name, item.description || '').subscribe({
+      next: (updatedPosition) => {
+        console.log('Position updated:', updatedPosition);
+        this.positions.update(positions => {
+          const updated = [...positions];
+          updated[index] = updatedPosition;
+          return updated;
+        });
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error updating position:', error);
+        alert('Failed to update position');
+        this.loading.set(false);
+        this.loadPositions();
+      }
+    });
+  }
+
+  onDeletePosition(index: number): void {
+    const position = this.positions()[index];
+    this.loading.set(true);
+
+    this.positionsService.deletePosition(position.id).subscribe({
+      next: () => {
+        console.log('Position deleted:', position.id);
+        this.positions.update(positions => positions.filter((_, i) => i !== index));
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error deleting position:', error);
+        alert('Failed to delete position');
+        this.loading.set(false);
+      }
+    });
+  }
+}

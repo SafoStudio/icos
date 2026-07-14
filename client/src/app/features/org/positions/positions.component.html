@@ -1,0 +1,11 @@
+@if (!companyId()) {
+<div class="loading-message">Loading company information...</div>
+} @else {
+<app-editable-table
+  [columns]="columns"
+  [data]="positions()"
+  [loading]="loading()"
+  (addItem)="onAddPosition($event)"
+  (updateItem)="onUpdatePosition($event)"
+  (deleteItem)="onDeletePosition($event)"></app-editable-table>
+}
