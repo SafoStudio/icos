@@ -1,0 +1,27 @@
+<div class="tabs-container">
+  <div class="tabs-header" role="tablist">
+    @for (tab of tabs; track tab.id) {
+    <button
+      class="tab-btn"
+      [class.active]="isActive(tab.id)"
+      [class.disabled]="isDisabled(tab)"
+      (click)="onTabClick(tab)"
+      role="tab"
+      [attr.aria-selected]="isActive(tab.id)"
+      [attr.aria-disabled]="isDisabled(tab)"
+      [attr.tabindex]="isDisabled(tab) ? -1 : 0"
+      type="button">
+
+      @if (tab.icon) {
+      <ng-icon [name]="tab.icon" class="tab-icon"></ng-icon>
+      }
+
+      <span class="tab-label">{{ tab.label }}</span>
+    </button>
+    }
+  </div>
+
+  <div class="tabs-content">
+    <ng-content></ng-content>
+  </div>
+</div>

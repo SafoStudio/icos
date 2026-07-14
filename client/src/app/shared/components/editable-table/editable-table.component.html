@@ -1,0 +1,84 @@
+<div class="editable-table-container">
+  <div class="table-wrapper" [class.loading]="loading">
+    <table>
+      <thead>
+      <tr>
+        @for (col of columns; track col.key) {
+        <th>{{ col.label }}</th>
+        }
+        <th class="actions-column"></th>
+      </tr>
+      </thead>
+
+      <tbody>
+      @for (item of data; track item.id || $index) {
+      <tr [class.editing]="isEditing($index)">
+        @for (col of columns; track col.key) {
+        <td>
+          @if (isEditing($index) && col.editable !== false) {
+          <label>
+            <input
+              [type]="col.type === 'date' ? 'date' : 'text'"
+              [(ngModel)]="item[col.key]"
+              [placeholder]="'Enter ' + col.label"
+              class="edit-input"
+              [class.required]="col.required"
+              (keydown)="onKeydown($event, $index)"
+              [attr.aria-label]="'Edit ' + col.label"
+              autofocus
+            />
+          </label>
+          } @else {
+          <span class="cell-value">{{ item[col.key] || '-' }}</span>
+          }
+        </td>
+        }
+
+        <td class="actions-cell">
+          @if (isEditing($index)) {
+          <div class="edit-actions">
+            <button class="btn-save" (click)="saveRow($index)" title="Save">💾</button>
+            <button class="btn-cancel" (click)="cancelEdit()" title="Cancel">✖</button>
+          </div>
+          } @else {
+          <div class="action-menu-container">
+            <button
+              class="btn-menu"
+              (click)="toggleMenu($index, $event)"
+              [class.active]="isMenuOpen($index)">
+              ⠿
+            </button>
+
+            @if (isMenuOpen($index)) {
+            <div class="dropdown-menu" role="menu">
+              <button class="menu-item" (click)="startEdit($index)" role="menuitem">Edit</button>
+              <button class="menu-item" (click)="addRow()" role="menuitem">Create</button>
+              <hr class="menu-divider">
+              <button class="menu-item danger" (click)="deleteRow($index)" role="menuitem">Delete</button>
+            </div>
+            }
+          </div>
+          }
+        </td>
+      </tr>
+      }
+
+      @if (isEmpty() && !loading) {
+      <tr class="empty-row">
+        <td [attr.colspan]="columns.length + 1" class="empty-message">
+          No {{ title.toLowerCase() }} found. Click "Add New" to create one.
+        </td>
+      </tr>
+      }
+
+      @if (loading) {
+      <tr class="loading-row">
+        <td [attr.colspan]="columns.length + 1">
+          <div class="spinner">Loading...</div>
+        </td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+</div>
