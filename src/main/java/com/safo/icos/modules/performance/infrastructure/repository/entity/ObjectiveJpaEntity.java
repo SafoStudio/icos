@@ -29,19 +29,19 @@ import lombok.Setter;
 public class ObjectiveJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id")
     private UUID userId;
-    
+
     private String title;
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal progress;
-    
+
     @Enumerated(EnumType.STRING)
     private ObjectiveStatus status;
-    
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

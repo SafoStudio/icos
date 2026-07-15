@@ -38,12 +38,12 @@ public class PerformanceService {
     public PerformanceReview finalizeReview(UUID reviewId, Integer rating, String summary) {
         PerformanceReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new NotFoundException("Review not found"));
-        
+
         PerformanceReview finalized = review.finalize(rating, summary);
         PerformanceReview saved = reviewRepository.save(finalized);
-        
+
         eventPublisher.publishEvent(new PerformanceReviewFinalizedEvent(this, saved));
-        
+
         return saved;
     }
 

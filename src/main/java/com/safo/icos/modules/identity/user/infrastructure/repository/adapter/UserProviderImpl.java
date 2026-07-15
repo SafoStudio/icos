@@ -11,7 +11,6 @@ import com.safo.icos.modules.identity.user.infrastructure.repository.entity.Perm
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.MembershipJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;

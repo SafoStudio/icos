@@ -35,10 +35,10 @@ public class ApprovalService {
 
         request.approve(approverId);
         ApprovalRequest saved = approvalRepository.save(request);
-        
+
         // Публикуем событие для интеграций
         eventPublisher.publishEvent(new ApprovalApprovedEvent(this, saved));
-        
+
         return saved;
     }
 

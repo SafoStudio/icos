@@ -35,7 +35,7 @@ public class PerformanceGraphQLResolver {
     }
 
     @MutationMapping
-    public ObjectiveDto createObjective(@AuthenticationPrincipal IcosUserPrincipal principal, 
+    public ObjectiveDto createObjective(@AuthenticationPrincipal IcosUserPrincipal principal,
                                      @Argument String title, @Argument String description, @Argument String startDate, @Argument String endDate) {
         return mapper.toDto(okrService.createObjective(principal.getUserId(), title, description, LocalDate.parse(startDate), LocalDate.parse(endDate)));
     }

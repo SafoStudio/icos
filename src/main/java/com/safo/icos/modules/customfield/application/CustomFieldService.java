@@ -56,9 +56,9 @@ public class CustomFieldService {
             throw new IllegalArgumentException("Field " + definition.getLabel() + " is required");
         }
 
-        if (definition.getFieldType() == com.safo.icos.modules.customfield.domain.model.enums.FieldType.ENUM 
-            && request.getValue() != null 
-            && definition.getOptions() != null 
+        if (definition.getFieldType() == com.safo.icos.modules.customfield.domain.model.enums.FieldType.ENUM
+            && request.getValue() != null
+            && definition.getOptions() != null
             && !definition.getOptions().contains(request.getValue().toString())) {
             throw new IllegalArgumentException("Invalid value for field " + definition.getLabel() + ". Allowed: " + definition.getOptions());
         }

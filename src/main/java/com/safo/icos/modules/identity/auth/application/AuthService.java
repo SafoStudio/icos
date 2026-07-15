@@ -16,7 +16,6 @@ import com.safo.icos.modules.identity.auth.infrastructure.repository.entity.Auth
 import com.safo.icos.modules.identity.auth.infrastructure.repository.jpa.AuthCredentialsJpaRepository;
 import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
 import com.safo.icos.modules.identity.invite.domain.model.Invite;
-import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;

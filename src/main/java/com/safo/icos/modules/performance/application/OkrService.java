@@ -31,12 +31,12 @@ public class OkrService {
     public KeyResult addKeyResult(UUID objectiveId, String title, BigDecimal target, String unit, BigDecimal weight) {
         Objective objective = objectiveRepository.findById(objectiveId)
                 .orElseThrow(() -> new NotFoundException("Objective not found"));
-        
+
         KeyResult keyResult = KeyResult.create(objectiveId, title, target, unit, weight);
         KeyResult saved = keyResultRepository.save(keyResult);
-        
+
         recalculateProgress(objectiveId);
-        
+
         return saved;
     }
 
@@ -44,24 +44,24 @@ public class OkrService {
     public KeyResult updateKeyResultProgress(UUID keyResultId, BigDecimal newValue) {
         KeyResult keyResult = keyResultRepository.findById(keyResultId)
                 .orElseThrow(() -> new NotFoundException("Key result not found"));
-        
+
         KeyResult updated = keyResult.toBuilder()
                 .currentValue(newValue)
                 .build();
-        
+
         KeyResult saved = keyResultRepository.save(updated);
-        
+
         recalculateProgress(saved.getObjectiveId());
-        
+
         return saved;
     }
 
     private void recalculateProgress(UUID objectiveId) {
         Objective objective = objectiveRepository.findById(objectiveId)
                 .orElseThrow(() -> new NotFoundException("Objective not found"));
-        
+
         List<KeyResult> keyResults = keyResultRepository.findByObjectiveId(objectiveId);
-        
+
         if (keyResults.isEmpty()) {
             objectiveRepository.save(objective.toBuilder().progress(BigDecimal.ZERO).build());
             return;
@@ -70,7 +70,7 @@ public class OkrService {
         BigDecimal totalWeight = keyResults.stream()
                 .map(KeyResult::getWeight)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
+
         BigDecimal weightedProgressSum = keyResults.stream()
                 .map(kr -> {
                     BigDecimal krProgress = kr.getCurrentValue()
@@ -79,9 +79,9 @@ public class OkrService {
                     return krProgress.multiply(kr.getWeight());
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
+
         BigDecimal totalProgress = weightedProgressSum.divide(totalWeight, 2, RoundingMode.HALF_UP);
-        
+
         objectiveRepository.save(objective.toBuilder().progress(totalProgress).build());
     }
 

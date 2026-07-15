@@ -31,11 +31,11 @@ public class CompensationService {
                 .orElseThrow(() -> new NotFoundException("Compensation record not found"));
 
         SalaryRevision revision = SalaryRevision.create(
-                userId, 
-                current.getBaseSalary(), 
-                newSalary, 
-                reason, 
-                effectiveDate, 
+                userId,
+                current.getBaseSalary(),
+                newSalary,
+                reason,
+                effectiveDate,
                 approvedBy
         );
         compensationRepository.saveRevision(revision);
@@ -44,7 +44,7 @@ public class CompensationService {
                 .baseSalary(newSalary)
                 .effectiveDate(effectiveDate)
                 .build();
-        
+
         return compensationRepository.save(updated);
     }
 

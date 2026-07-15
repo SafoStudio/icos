@@ -51,7 +51,7 @@ public class TimeOffMapper {
                 .cancelledAt(domain.getCancelledAt())
                 .build();
     }
-    
+
     public LeaveBalance toDomain(LeaveBalanceJpaEntity entity) {
         if (entity == null) return null;
         return LeaveBalance.builder()

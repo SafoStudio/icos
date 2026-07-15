@@ -31,11 +31,11 @@ public class CalendarService {
                 .startAt(start)
                 .endAt(end)
                 .build();
-        
+
         Event saved = eventRepository.save(event);
-        
+
         eventPublisher.publishEvent(new CalendarEventCreatedEvent(this, saved.getId(), userId, title, start));
-        
+
         return saved;
     }
 }

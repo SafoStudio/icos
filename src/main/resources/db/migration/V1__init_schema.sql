@@ -1,4 +1,3 @@
--- Final Consolidated Initial Schema
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Common functions
@@ -65,7 +64,7 @@ CREATE TABLE user_profiles (
 
 CREATE TABLE roles (
     id UUID PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE, -- ADMIN, OWNER, HEAD, SPECIALIST, EMPLOYEE
+    name VARCHAR(50) NOT NULL UNIQUE, -- ADMIN, OWNER, HEAD, SPECIALIST
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -84,6 +83,16 @@ CREATE TABLE roles_permissions (
     role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
     permission_id UUID NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
     PRIMARY KEY (role_id, permission_id)
+);
+
+CREATE TABLE department_permissions (
+    id UUID PRIMARY KEY,
+    department_id UUID NOT NULL REFERENCES departments(id) ON DELETE CASCADE,
+    role_name VARCHAR(50) NOT NULL, -- 'HEAD' or 'SPECIALIST'
+    permission_id UUID NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (department_id, role_name, permission_id)
 );
 
 CREATE TABLE memberships (
@@ -316,36 +325,4 @@ INSERT INTO roles (id, name, description, created_at, updated_at)
 VALUES (gen_random_uuid(), 'ADMIN', 'System Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (gen_random_uuid(), 'OWNER', 'Company Owner', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (gen_random_uuid(), 'HEAD', 'Department Head', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (gen_random_uuid(), 'SPECIALIST', 'Specialist', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (gen_random_uuid(), 'EMPLOYEE', 'Regular Employee', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO permissions (id, name, description, version, created_at, updated_at)
-VALUES 
-    -- Recruitment
-    (gen_random_uuid(), 'recruitment:read', 'Read recruitment data', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'recruitment:manage', 'Manage vacancies and pipelines', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'application:manage', 'Manage candidate applications', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'interview:manage', 'Manage interviews', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    -- Onboarding
-    (gen_random_uuid(), 'onboarding:read', 'Read onboarding processes', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'onboarding:manage', 'Manage onboarding templates and processes', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'onboarding:task.complete', 'Complete assigned onboarding tasks', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    -- Profile
-    (gen_random_uuid(), 'profile:edit.self', 'Ability to edit own profile', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'profile:edit.all', 'Ability to edit any user profile', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
--- Assign basic permissions
-DO $$
-DECLARE
-    admin_id UUID;
-    owner_id UUID;
-BEGIN
-    SELECT id INTO admin_id FROM roles WHERE name = 'ADMIN';
-    SELECT id INTO owner_id FROM roles WHERE name = 'OWNER';
-
-    INSERT INTO roles_permissions (role_id, permission_id)
-    SELECT admin_id, id FROM permissions;
-    
-    INSERT INTO roles_permissions (role_id, permission_id)
-    SELECT owner_id, id FROM permissions;
-END $$;
+       (gen_random_uuid(), 'SPECIALIST', 'Specialist', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

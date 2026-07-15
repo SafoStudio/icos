@@ -24,10 +24,10 @@ import lombok.Setter;
 public class SalaryRevisionJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id")
     private UUID userId;
-    
+
     private BigDecimal previousSalary;
     private BigDecimal newSalary;
     private String reason;

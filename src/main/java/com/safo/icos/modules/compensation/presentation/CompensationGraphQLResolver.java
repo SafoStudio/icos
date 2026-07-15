@@ -34,7 +34,7 @@ public class CompensationGraphQLResolver {
     }
 
     @MutationMapping
-    public CompensationDto updateSalary(@AuthenticationPrincipal IcosUserPrincipal principal, 
+    public CompensationDto updateSalary(@AuthenticationPrincipal IcosUserPrincipal principal,
                                           @Argument UUID userId, @Argument BigDecimal newSalary, @Argument String reason, @Argument String effectiveDate) {
         return mapper.toDto(compensationService.updateSalary(userId, newSalary, reason, LocalDate.parse(effectiveDate), principal.getUserId()));
     }

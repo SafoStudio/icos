@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface PayrollRepository {
     Bonus saveBonus(Bonus bonus);
     List<Bonus> findBonusesToPay(UUID userId, LocalDate startDate, LocalDate endDate);
-    
+
     PayrollPeriod savePeriod(PayrollPeriod period);
     List<PayrollPeriod> findAllPeriods();
 }

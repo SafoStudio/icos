@@ -22,13 +22,13 @@ import lombok.Setter;
 public class LeaveAuditLogJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "leave_request_id")
     private UUID leaveRequestId;
-    
+
     @Column(name = "actor_id")
     private UUID actorId;
-    
+
     private String eventType;
     private String metadata;
     private LocalDateTime createdAt;

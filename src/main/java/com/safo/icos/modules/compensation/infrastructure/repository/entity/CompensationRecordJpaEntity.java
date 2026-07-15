@@ -24,15 +24,15 @@ import lombok.Setter;
 public class CompensationRecordJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id", unique = true)
     private UUID userId;
-    
+
     private BigDecimal baseSalary;
     private String currency;
     private String payFrequency;
     private LocalDate effectiveDate;
-    
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

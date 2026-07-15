@@ -27,21 +27,21 @@ import lombok.Setter;
 public class LeaveRequestJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id")
     private UUID userId;
-    
+
     @Column(name = "leave_type_id")
     private UUID leaveTypeId;
-    
+
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal totalDays;
     private String reason;
-    
+
     @Enumerated(EnumType.STRING)
     private LeaveRequestStatus status;
-    
+
     private LocalDateTime approvedAt;
     private LocalDateTime rejectedAt;
     private LocalDateTime cancelledAt;

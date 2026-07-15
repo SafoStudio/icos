@@ -94,7 +94,7 @@ public class OnboardingService {
                 .build();
 
         taskRepository.save(updatedTask);
-        
+
         // Check if all tasks are done to complete the process
         checkAndCompleteProcess(task.getProcessId());
     }

@@ -24,10 +24,10 @@ import lombok.Setter;
 public class BonusJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id")
     private UUID userId;
-    
+
     private BigDecimal amount;
     private String type;
     private String description;

@@ -23,13 +23,13 @@ import lombok.Setter;
 public class LeaveBalanceJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "user_id")
     private UUID userId;
-    
+
     @Column(name = "leave_type_id")
     private UUID leaveTypeId;
-    
+
     private BigDecimal totalDays;
     private BigDecimal usedDays;
     private BigDecimal remainingDays;

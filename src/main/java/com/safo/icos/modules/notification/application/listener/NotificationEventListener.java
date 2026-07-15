@@ -31,7 +31,7 @@ public class NotificationEventListener {
     @EventListener
     public void handleCandidateHired(CandidateHiredEvent event) {
         log.info("Handling CandidateHiredEvent for candidate: {}", event.getCandidateId());
-        
+
         notificationService.createNotification(
                 event.getUserId(),
                 NotificationType.CANDIDATE_HIRED,
@@ -177,4 +177,3 @@ public class NotificationEventListener {
         );
     }
 }
-

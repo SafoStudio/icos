@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface CompensationRepository {
     CompensationRecord save(CompensationRecord record);
     Optional<CompensationRecord> findByUserId(UUID userId);
-    
+
     SalaryRevision saveRevision(SalaryRevision revision);
     List<SalaryRevision> findRevisionsByUserId(UUID userId);
 }

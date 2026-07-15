@@ -24,16 +24,16 @@ import lombok.Setter;
 public class PerformanceReviewJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "cycle_id")
     private UUID cycleId;
-    
+
     @Column(name = "employee_id")
     private UUID employeeId;
-    
+
     @Column(name = "manager_id")
     private UUID managerId;
-    
+
     private Integer rating;
     private String summary;
     private String status;

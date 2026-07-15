@@ -33,7 +33,7 @@ public class LeaveGraphQLResolver {
     }
 
     @MutationMapping
-    public LeaveRequestDto createLeaveRequest(@AuthenticationPrincipal IcosUserPrincipal principal, 
+    public LeaveRequestDto createLeaveRequest(@AuthenticationPrincipal IcosUserPrincipal principal,
                                            @Argument UUID leaveTypeId, @Argument String startDate, @Argument String endDate, @Argument String reason) {
         return mapper.toDto(leaveService.createRequest(principal.getUserId(), leaveTypeId, LocalDate.parse(startDate), LocalDate.parse(endDate), reason));
     }

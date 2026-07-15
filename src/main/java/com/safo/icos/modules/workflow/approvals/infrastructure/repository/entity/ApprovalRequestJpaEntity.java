@@ -30,7 +30,7 @@ public class ApprovalRequestJpaEntity {
     private String targetEntityType;
     private UUID requesterId;
     private UUID approverId;
-    
+
     @Enumerated(EnumType.STRING)
     private ApprovalStatus status;
 

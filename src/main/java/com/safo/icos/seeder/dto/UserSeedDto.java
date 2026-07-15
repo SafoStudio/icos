@@ -12,14 +12,14 @@ public class UserSeedDto {
   private String status;
   private UUID createdBy;
   private String password;
-  
+
   // Profile fields
   private String phoneNumber;
   private String address;
   private String hireDate;
   private String birthDate;
   private String avatarPath;
-  
+
   private String createdAt;
   private String updatedAt;
 }

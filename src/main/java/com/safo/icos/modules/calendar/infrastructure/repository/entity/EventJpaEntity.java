@@ -39,21 +39,21 @@ public class EventJpaEntity {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventType type;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SourceType source;
-    
+
     @Column(name = "start_at", nullable = false)
     private OffsetDateTime startAt;
 
     @Column(name = "end_at", nullable = false)
     private OffsetDateTime endAt;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Visibility visibility;

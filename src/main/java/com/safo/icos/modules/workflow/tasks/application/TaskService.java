@@ -38,10 +38,10 @@ public class TaskService {
     public Task moveTask(UUID taskId, TaskStatus newStatus) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found"));
-        
+
         // Logic for state transition validation can be added here
         task.moveTo(newStatus);
-        
+
         // Update task status and persist
         Task updatedTask = Task.builder()
                 .id(task.getId())
@@ -52,7 +52,7 @@ public class TaskService {
                 .departmentId(task.getDepartmentId())
                 .metadata(task.getMetadata())
                 .build();
-                
+
         Task savedTask = taskRepository.save(updatedTask);
 
         eventPublisher.publishEvent(new TaskStatusChangedEvent(this, savedTask.getId(), savedTask.getAssigneeId(), savedTask.getTitle(), newStatus));

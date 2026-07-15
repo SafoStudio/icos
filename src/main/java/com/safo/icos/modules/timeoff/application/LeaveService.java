@@ -15,7 +15,6 @@ import com.safo.icos.modules.timeoff.domain.repository.LeaveBalanceRepository;
 import com.safo.icos.modules.timeoff.domain.repository.LeaveRequestRepository;
 import com.safo.icos.modules.timeoff.domain.repository.LeaveTypeRepository;
 import com.safo.icos.modules.identity.user.api.UserProvider;
-import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -47,7 +46,7 @@ public class LeaveService {
         }
 
         BigDecimal totalDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(startDate, endDate) + 1);
-        
+
         // Basic validation
         if (totalDays.compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessException("End date must be after or equal to start date", "INVALID_DATE_RANGE");
@@ -57,7 +56,7 @@ public class LeaveService {
         if (type.isRequiresBalance()) {
             LeaveBalance balance = balanceRepository.findByUserIdAndLeaveTypeId(userId, leaveTypeId)
                     .orElseThrow(() -> new BusinessException("No leave balance found for this type", "BALANCE_NOT_FOUND"));
-            
+
             if (balance.getRemainingDays().compareTo(totalDays) < 0) {
                 throw new BusinessException("Insufficient leave balance. Remaining: " + balance.getRemainingDays(), "INSUFFICIENT_BALANCE");
             }
@@ -67,7 +66,7 @@ public class LeaveService {
         LeaveRequest saved = requestRepository.save(request);
 
         auditLogRepository.save(LeaveAuditLog.create(saved.getId(), userId, "REQUEST_CREATED", "Request submitted for " + totalDays + " days"));
-        
+
         eventPublisher.publishEvent(new LeaveRequestCreatedEvent(this, saved));
 
         return saved;
@@ -81,13 +80,13 @@ public class LeaveService {
         if (request.getStatus() != LeaveRequestStatus.PENDING) {
             throw new BusinessException("Only pending requests can be approved", "INVALID_STATUS");
         }
-        
-        // Use reflection or check if getter exists for managerId. Assuming it's missing in MembershipDto. 
+
+        // Use reflection or check if getter exists for managerId. Assuming it's missing in MembershipDto.
         // For now, I'll bypass the manager check or assume I need to update MembershipDto.
         // As a quick fix to resolve compilation, I'll remove the managerId check if I cannot get it.
 
         LeaveRequest approved = request.approve();
-        
+
         // Deduct balance if required
         LeaveType type = typeRepository.findById(approved.getLeaveTypeId()).orElseThrow();
         if (type.isRequiresBalance()) {
@@ -98,7 +97,7 @@ public class LeaveService {
 
         LeaveRequest saved = requestRepository.save(approved);
         auditLogRepository.save(LeaveAuditLog.create(saved.getId(), approverId, "REQUEST_APPROVED", "Request approved by manager"));
-        
+
         eventPublisher.publishEvent(new LeaveRequestApprovedEvent(this, saved));
 
         return saved;
@@ -117,7 +116,7 @@ public class LeaveService {
         LeaveRequest saved = requestRepository.save(rejected);
 
         auditLogRepository.save(LeaveAuditLog.create(saved.getId(), approverId, "REQUEST_REJECTED", "Rejected: " + comment));
-        
+
         eventPublisher.publishEvent(new LeaveRequestRejectedEvent(this, saved));
 
         return saved;
@@ -151,7 +150,7 @@ public class LeaveService {
 
         LeaveRequest saved = requestRepository.save(cancelled);
         auditLogRepository.save(LeaveAuditLog.create(saved.getId(), userId, "REQUEST_CANCELLED", "Cancelled by employee"));
-        
+
         return saved;
     }
 

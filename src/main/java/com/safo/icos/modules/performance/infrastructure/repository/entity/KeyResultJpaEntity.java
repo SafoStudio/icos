@@ -25,16 +25,16 @@ import lombok.Setter;
 public class KeyResultJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(name = "objective_id")
     private UUID objectiveId;
-    
+
     private String title;
     private BigDecimal targetValue;
     private BigDecimal currentValue;
     private String unit;
     private BigDecimal weight;
-    
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

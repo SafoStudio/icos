@@ -32,10 +32,10 @@ import lombok.Setter;
 public class TaskJpaEntity {
     @Id
     private UUID id;
-    
+
     @Column(nullable = false)
     private String title;
-    
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -45,7 +45,7 @@ public class TaskJpaEntity {
 
     @Column(name = "assignee_id")
     private UUID assigneeId;
-    
+
     @Column(name = "department_id")
     private UUID departmentId;
 
