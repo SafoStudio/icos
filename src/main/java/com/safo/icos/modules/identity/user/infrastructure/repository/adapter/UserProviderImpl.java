@@ -7,11 +7,15 @@ import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
 import com.safo.icos.modules.identity.user.application.service.UserService;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.MembershipJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.MembershipJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -82,8 +86,25 @@ public class UserProviderImpl implements UserProvider {
         return userService.findMembershipById(membershipId);
     }
 
-    @Override
-    public Optional<UserPrincipalDto> findPrincipal(UUID userId, UUID companyId) {
-        return Optional.empty(); // Placeholder
-    }
+  @Override
+  public Optional<UserPrincipalDto> findPrincipal(UUID userId, UUID companyId) {
+    return membershipJpaRepository.findActiveByUserIdAndCompanyId(userId, companyId)
+            .map(membership -> {
+              var user = userJpaRepository.findById(userId).orElseThrow();
+
+              Set<String> permissions = roleJpaRepository.findById(membership.getRoleId())
+                      .map(role -> role.getPermissions().stream()
+                              .map(PermissionJpaEntity::getName)
+                              .collect(Collectors.toSet()))
+                      .orElse(Set.of());
+
+              return UserPrincipalDto.builder()
+                      .userId(user.getId())
+                      .email(user.getEmail())
+                      .membershipId(membership.getId())
+                      .companyId(membership.getCompanyId())
+                      .permissions(permissions)
+                      .build();
+            });
+  }
 }

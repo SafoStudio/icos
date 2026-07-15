@@ -75,31 +75,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             TenantContext.setTenantId(tenantIdStr);
 
-            userProvider.findPrincipal(userId, tenantId)
-                    .ifPresent(principalData -> {
-                      List<SimpleGrantedAuthority> authorities =
-                              principalData.getPermissions().stream()
-                                      .map(SimpleGrantedAuthority::new)
-                                      .toList();
+            var principalData = userProvider.findPrincipal(userId, tenantId);
 
-                      IcosUserPrincipal principal = IcosUserPrincipal.builder()
-                              .userId(principalData.getUserId())
-                              .email(principalData.getEmail())
-                              .membershipId(principalData.getMembershipId())
-                              .companyId(principalData.getCompanyId())
-                              .roleName(principalData.getRoleName())
-                              .departmentId(principalData.getDepartmentId())
-                              .departmentName(principalData.getDepartmentName())
-                              .authorities(authorities)
-                              .build();
+            if (principalData.isPresent()) {
+              var data = principalData.get();
+              List<SimpleGrantedAuthority> authorities =
+                      data.getPermissions().stream()
+                              .map(SimpleGrantedAuthority::new)
+                              .toList();
 
-                      UsernamePasswordAuthenticationToken authentication =
-                              new UsernamePasswordAuthenticationToken(
-                                      principal, null, principal.getAuthorities());
+              IcosUserPrincipal principal = IcosUserPrincipal.builder()
+                      .userId(data.getUserId())
+                      .email(data.getEmail())
+                      .membershipId(data.getMembershipId())
+                      .companyId(data.getCompanyId())
+                      .roleName(data.getRoleName())
+                      .departmentId(data.getDepartmentId())
+                      .departmentName(data.getDepartmentName())
+                      .authorities(authorities)
+                      .build();
 
-                      SecurityContextHolder.getContext()
-                              .setAuthentication(authentication);
-                    });
+              UsernamePasswordAuthenticationToken authentication =
+                      new UsernamePasswordAuthenticationToken(
+                              principal, null, principal.getAuthorities());
+
+              SecurityContextHolder.getContext()
+                      .setAuthentication(authentication);
+            }
           }
         }
       } catch (Exception e) {
