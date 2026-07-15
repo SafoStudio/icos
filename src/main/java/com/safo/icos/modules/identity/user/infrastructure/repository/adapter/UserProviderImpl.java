@@ -8,9 +8,13 @@ import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
 import com.safo.icos.modules.identity.user.application.service.UserService;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.MembershipJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.MembershipJpaRepository;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentPermissionJpaRepository;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -23,6 +27,8 @@ import org.springframework.stereotype.Component;
 public class UserProviderImpl implements UserProvider {
     private final UserService userService;
     private final MembershipJpaRepository membershipJpaRepository;
+  private final PermissionJpaRepository permissionJpaRepository;
+  private final DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
     private final RoleJpaRepository roleJpaRepository;
     private final UserJpaRepository userJpaRepository;
 
@@ -91,17 +97,36 @@ public class UserProviderImpl implements UserProvider {
             .map(membership -> {
               var user = userJpaRepository.findById(userId).orElseThrow();
 
-              Set<String> permissions = roleJpaRepository.findById(membership.getRoleId())
-                      .map(role -> role.getPermissions().stream()
-                              .map(PermissionJpaEntity::getName)
-                              .collect(Collectors.toSet()))
-                      .orElse(Set.of());
+              String roleName = roleJpaRepository.findById(membership.getRoleId())
+                      .map(RoleJpaEntity::getName)
+                      .orElse("");
+
+              Set<String> permissions = new HashSet<>();
+
+              // OWNER or ADMIN — all permissions
+              if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
+                permissions = permissionJpaRepository.findAll().stream()
+                        .map(PermissionJpaEntity::getName)
+                        .collect(Collectors.toSet());
+              }
+              // other role have local department_permissions
+              else if (membership.getDepartmentId() != null) {
+                permissions = departmentPermissionJpaRepository
+                        .findByDepartmentIdAndRoleName(
+                                membership.getDepartmentId(),
+                                roleName
+                        )
+                        .stream()
+                        .map(dp -> dp.getPermission().getName())
+                        .collect(Collectors.toSet());
+              }
 
               return UserPrincipalDto.builder()
                       .userId(user.getId())
                       .email(user.getEmail())
                       .membershipId(membership.getId())
                       .companyId(membership.getCompanyId())
+                      .departmentId(membership.getDepartmentId())
                       .permissions(permissions)
                       .build();
             });

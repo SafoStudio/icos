@@ -17,6 +17,7 @@ import com.safo.icos.modules.identity.auth.infrastructure.repository.jpa.AuthCre
 import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
 import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.identity.user.api.UserProvider;
@@ -27,6 +28,11 @@ import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentPermissionJpaRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +66,8 @@ public class AuthService {
   private final CompanyService companyService;
   private final RoleJpaRepository roleJpaRepository;
   private final InviteRepository inviteRepository;
+  private final DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
+  private final PermissionJpaRepository permissionJpaRepository;
 
   @Value("${app.auth.refresh-token-ttl:30d}")
   private Duration refreshTokenTtl;
@@ -278,11 +286,26 @@ public class AuthService {
   }
 
   private UserDto enrichUserWithCompany(UserDto user, MembershipDto membership) {
-    List<String> permissions = roleJpaRepository.findById(membership.getRoleId())
-            .map(role -> role.getPermissions().stream()
-                    .map(PermissionJpaEntity::getName)
-                    .toList())
-            .orElse(List.of());
+    String roleName = roleJpaRepository.findById(membership.getRoleId())
+            .map(RoleJpaEntity::getName)
+            .orElse("");
+
+    Set<String> permissions = new HashSet<>();
+
+    // OWNER or ADMIN - all permissions
+    if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
+      permissions = permissionJpaRepository.findAll().stream()
+              .map(PermissionJpaEntity::getName)
+              .collect(Collectors.toSet());
+    }
+    // other roles - permissions from department_permissions
+    else if (membership.getDepartmentId() != null) {
+      permissions = departmentPermissionJpaRepository
+              .findByDepartmentIdAndRoleName(membership.getDepartmentId(), roleName)
+              .stream()
+              .map(dp -> dp.getPermission().getName())
+              .collect(Collectors.toSet());
+    }
 
     return UserDto.builder()
             .id(user.getId())
@@ -290,9 +313,9 @@ public class AuthService {
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
             .companyId(membership.getCompanyId().toString())
-            .role(membership.getRole())
+            .role(roleName)
             .departmentId(membership.getDepartmentId())
-            .permissions(permissions)
+            .permissions(new ArrayList<>(permissions))
             .status(user.getStatus())
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())

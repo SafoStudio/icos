@@ -5,6 +5,7 @@ import com.safo.icos.modules.org.application.DepartmentService;
 import com.safo.icos.modules.org.application.PositionService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
+import com.safo.icos.modules.org.application.dto.PermissionDto;
 import com.safo.icos.modules.org.application.dto.PositionDto;
 import java.util.List;
 import java.util.UUID;
@@ -69,5 +70,22 @@ public class OrgGraphQLResolver {
   @MutationMapping
   public boolean deletePosition(@Argument String id) {
     return positionService.deletePosition(UUID.fromString(id));
+  }
+
+  @QueryMapping
+  public List<PermissionDto> departmentPermissions(@Argument String departmentId, @Argument String roleName) {
+    return departmentService.getDepartmentPermissions(UUID.fromString(departmentId), roleName);
+  }
+
+  @MutationMapping
+  public boolean assignDepartmentPermission(@Argument String departmentId, @Argument String roleName, @Argument String permissionId) {
+    departmentService.assignPermission(UUID.fromString(departmentId), roleName, UUID.fromString(permissionId));
+    return true;
+  }
+
+  @MutationMapping
+  public boolean revokeDepartmentPermission(@Argument String departmentId, @Argument String roleName, @Argument String permissionId) {
+    departmentService.revokePermission(UUID.fromString(departmentId), roleName, UUID.fromString(permissionId));
+    return true;
   }
 }

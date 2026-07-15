@@ -3,9 +3,11 @@ package com.safo.icos.modules.org.infrastructure.mapper;
 import com.safo.icos.modules.org.domain.model.Company;
 import com.safo.icos.modules.org.domain.model.Department;
 import com.safo.icos.modules.org.domain.model.Position;
+import com.safo.icos.modules.org.domain.model.DepartmentPermission;
 import com.safo.icos.modules.org.infrastructure.repository.entity.CompanyJpaEntity;
 import com.safo.icos.modules.org.infrastructure.repository.entity.PositionJpaEntity;
 import com.safo.icos.modules.org.infrastructure.repository.entity.DepartmentJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.entity.DepartmentPermissionJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -72,6 +74,28 @@ public class OrgMapper {
             .companyId(domain.getCompanyId())
             .name(domain.getName())
             .description(domain.getDescription())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
+
+  public DepartmentPermission toDomain(DepartmentPermissionJpaEntity entity) {
+    return DepartmentPermission.builder()
+            .id(entity.getId())
+            .departmentId(entity.getDepartmentId())
+            .roleName(entity.getRoleName())
+            .permissionId(entity.getPermissionId())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+  }
+
+  public DepartmentPermissionJpaEntity toJpa(DepartmentPermission domain) {
+    return DepartmentPermissionJpaEntity.builder()
+            .id(domain.getId())
+            .departmentId(domain.getDepartmentId())
+            .roleName(domain.getRoleName())
+            .permissionId(domain.getPermissionId())
             .createdAt(domain.getCreatedAt())
             .updatedAt(domain.getUpdatedAt())
             .build();

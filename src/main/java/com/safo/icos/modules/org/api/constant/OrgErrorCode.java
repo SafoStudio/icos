@@ -12,6 +12,8 @@ public final class OrgErrorCode {
   public static final String POSITION_ALREADY_EXISTS = "ORG_003";
   /** Position not found by ID. */
   public static final String POSITION_NOT_FOUND = "ORG_004";
+  /** Permission not found by ID. */
+  public static final String PERMISSION_NOT_FOUND = "ORG_005";
 
   private OrgErrorCode() {
   }

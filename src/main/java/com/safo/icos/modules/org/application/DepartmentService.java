@@ -3,8 +3,13 @@ package com.safo.icos.modules.org.application;
 import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
+import com.safo.icos.modules.org.application.dto.PermissionDto;
 import com.safo.icos.modules.org.domain.model.Department;
+import com.safo.icos.modules.org.domain.model.DepartmentPermission;
+import com.safo.icos.modules.org.domain.repository.DepartmentPermissionRepository;
 import com.safo.icos.modules.org.domain.repository.DepartmentRepository;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
 import com.safo.icos.security.context.TenantContext;
 import com.safo.icos.security.permission.RequirePermission;
 import java.util.Collections;
@@ -22,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DepartmentService {
   private final DepartmentRepository departmentRepository;
+  private final DepartmentPermissionRepository departmentPermissionRepository;
+  private final PermissionJpaRepository permissionJpaRepository;
 
   /**
    * Updates an existing department. Requires {@code department:manage} permission.
@@ -90,6 +97,35 @@ public class DepartmentService {
       return true;
     }
     return false;
+  }
+
+  @RequirePermission("department:manage")
+  public void assignPermission(UUID departmentId, String roleName, UUID permissionId) {
+    if (!permissionJpaRepository.existsById(permissionId)) {
+      throw new BusinessException("Permission not found", OrgErrorCode.PERMISSION_NOT_FOUND);
+    }
+    DepartmentPermission permission = DepartmentPermission.create(departmentId, roleName, permissionId);
+    departmentPermissionRepository.save(permission);
+  }
+
+  @RequirePermission("department:manage")
+  public void revokePermission(UUID departmentId, String roleName, UUID permissionId) {
+    departmentPermissionRepository.deleteByDepartmentIdAndRoleNameAndPermissionId(departmentId, roleName, permissionId);
+  }
+
+  public List<PermissionDto> getDepartmentPermissions(UUID departmentId, String roleName) {
+    return departmentPermissionRepository.findByDepartmentIdAndRoleName(departmentId, roleName)
+            .stream()
+            .map(dp -> {
+              String permissionName = permissionJpaRepository.findById(dp.getPermissionId())
+                      .map(PermissionJpaEntity::getName)
+                      .orElse(null);
+              return PermissionDto.builder()
+                      .id(dp.getPermissionId())
+                      .name(permissionName)
+                      .build();
+            })
+            .toList();
   }
 
   private DepartmentDto toDto(Department domain) {

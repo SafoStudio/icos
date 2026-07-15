@@ -18,10 +18,16 @@ type Position {
     description: String
 }
 
+type Permission {
+    id: ID!
+    name: String!
+}
+
 extend type Query {
     company(id: ID!): Company
     departments(companyId: ID!): [Department!]!
     positions(companyId: ID!): [Position!]!
+    departmentPermissions(departmentId: ID!, roleName: String!): [Permission!]!
 }
 
 extend type Mutation {
@@ -32,6 +38,8 @@ extend type Mutation {
     updatePosition(id: ID!, name: String, description: String): Position
     deleteDepartment(id: ID!): Boolean!
     deletePosition(id: ID!): Boolean!
+    assignDepartmentPermission(departmentId: ID!, roleName: String!, permissionId: ID!): Boolean!
+    revokeDepartmentPermission(departmentId: ID!, roleName: String!, permissionId: ID!): Boolean!
 }
 
 
