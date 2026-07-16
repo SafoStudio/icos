@@ -127,6 +127,7 @@ public class UserProviderImpl implements UserProvider {
                       .membershipId(membership.getId())
                       .companyId(membership.getCompanyId())
                       .departmentId(membership.getDepartmentId())
+                      .roleName(roleName)
                       .permissions(permissions)
                       .build();
             });

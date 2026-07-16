@@ -39,7 +39,7 @@ public class SecurityConfig {
    * @return the configured security filter chain
    */
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) {
     http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session ->
