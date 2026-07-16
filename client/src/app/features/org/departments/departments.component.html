@@ -7,5 +7,7 @@
   [loading]="loading()"
   (addItem)="onAddDepartment($event)"
   (updateItem)="onUpdateDepartment($event)"
-  (deleteItem)="onDeleteDepartment($event)"></app-editable-table>
+  (deleteItem)="onDeleteDepartment($event)"
+  (rowClick)="onRowClick($event)"
+></app-editable-table>
 }

@@ -1,0 +1,42 @@
+.department-detail {
+  padding: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.description {
+  margin: 0 0 24px 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+}

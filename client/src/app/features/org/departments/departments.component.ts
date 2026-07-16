@@ -1,4 +1,5 @@
 import { Component, inject, computed, effect, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EditableTableComponent, TableColumn } from '../../../shared/components/editable-table/editable-table.component';
 import { DepartmentsService } from './departments.service';
@@ -17,6 +18,7 @@ export class DepartmentsComponent {
   private readonly authService = inject(AuthService);
   private readonly departmentsService = inject(DepartmentsService);
   private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
   readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
   readonly departments = signal<Department[]>([]);
@@ -31,7 +33,6 @@ export class DepartmentsComponent {
     effect(() => {
       const id = this.companyId();
       if (id) {
-        console.log('Company ID changed in Departments:', id);
         this.loadDepartments();
       }
     });
@@ -40,16 +41,13 @@ export class DepartmentsComponent {
   private loadDepartments(): void {
     const companyId = this.companyId();
     if (!companyId) {
-      console.warn('No company ID available');
       return;
     }
 
-    console.log('Loading departments for company:', companyId);
     this.loading.set(true);
 
     this.departmentsService.getDepartments(companyId).subscribe({
       next: (data) => {
-        console.log('Departments data received:', data);
         this.departments.set(data);
         this.loading.set(false);
       },
@@ -59,6 +57,10 @@ export class DepartmentsComponent {
         this.loading.set(false);
       }
     });
+  }
+
+  onRowClick(department: Department): void {
+    this.router.navigate(['/organization/departments', department.id]);
   }
 
   onAddDepartment(item: Department): void {
@@ -72,7 +74,6 @@ export class DepartmentsComponent {
 
     this.departmentsService.createDepartment(companyId, item.name, item.description || '').subscribe({
       next: (newDepartment) => {
-        console.log('Department created:', newDepartment);
         this.departments.update(departments => [newDepartment, ...departments]);
         this.toastService.success(`Department "${newDepartment.name}" created successfully.`);
         this.loading.set(false);
@@ -92,7 +93,6 @@ export class DepartmentsComponent {
 
     this.departmentsService.updateDepartment(item.id, item.name, item.description || '').subscribe({
       next: (updatedDepartment) => {
-        console.log('Department updated:', updatedDepartment);
         this.departments.update(departments => {
           const updated = [...departments];
           updated[index] = updatedDepartment;
@@ -116,12 +116,11 @@ export class DepartmentsComponent {
 
     this.departmentsService.deleteDepartment(department.id).subscribe({
       next: () => {
-        console.log('Department deleted:', department.id);
         this.departments.update(departments => departments.filter((_, i) => i !== index));
         this.toastService.success(`Department "${department.name}" deleted successfully.`);
         this.loading.set(false);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error deleting department:', error);
         this.toastService.error('Failed to delete department. It might be in use.');
         this.loading.set(false);

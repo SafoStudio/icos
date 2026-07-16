@@ -1,0 +1,46 @@
+<div class="permissions-container">
+  <h3>Permissions</h3>
+
+  @if (!canEdit) {
+  <p class="info">You have view-only access.</p>
+  }
+
+  <table class="permissions-table">
+    <thead>
+    <tr>
+      <th>Permission</th>
+      <th class="center">Specialist</th>
+      <th class="center">Head</th>
+    </tr>
+    </thead>
+    <tbody>
+    @for (perm of allPermissions; track perm.id) {
+    <tr>
+      <td>{{ perm.name }}</td>
+      <td class="center">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isPermissionAssigned(perm, 'SPECIALIST')"
+            [disabled]="!canEdit || saving"
+            (change)="onToggle(perm, 'SPECIALIST')"
+          />
+          <span class="sr-only">Assign {{ perm.name }} to Specialist</span>
+        </label>
+      </td>
+      <td class="center">
+        <label>
+          <input
+            type="checkbox"
+            [checked]="isPermissionAssigned(perm, 'HEAD')"
+            [disabled]="!canEdit || saving"
+            (change)="onToggle(perm, 'HEAD')"
+          />
+          <span class="sr-only">Assign {{ perm.name }} to Head</span>
+        </label>
+      </td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>

@@ -4,17 +4,28 @@
     <p class="subtitle">Manage your company departments and positions</p>
   </div>
 
-  <app-tabs
-    [tabs]="tabs"
-    [activeTabId]="activeTabId()"
-    (tabChange)="onTabChange($event)">
-
-    @if (activeTabId() === 'departments') {
-    <app-departments></app-departments>
-    }
-
-    @if (activeTabId() === 'positions') {
-    <app-positions></app-positions>
-    }
-  </app-tabs>
+  @if (showTabs()) {
+  <div class="tabs-container">
+    <div class="tabs-header">
+      @for (tab of tabs; track tab.id) {
+      <a
+        class="tab-btn"
+        [routerLink]="['./' + tab.id]"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        <ng-icon [name]="tab.icon" class="tab-icon"></ng-icon>
+        <span class="tab-label">{{ tab.label }}</span>
+      </a>
+      }
+    </div>
+    <div class="tabs-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  } @else {
+  <div class="detail-container">
+    <router-outlet></router-outlet>
+  </div>
+  }
 </div>
