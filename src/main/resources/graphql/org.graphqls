@@ -21,13 +21,16 @@ type Position {
 type Permission {
     id: ID!
     name: String!
+    description: String
 }
 
 extend type Query {
     company(id: ID!): Company
     departments(companyId: ID!): [Department!]!
+    department(id: ID!): Department!
     positions(companyId: ID!): [Position!]!
     departmentPermissions(departmentId: ID!, roleName: String!): [Permission!]!
+    permissions: [Permission!]!
 }
 
 extend type Mutation {

@@ -1,6 +1,8 @@
 <div class="department-detail">
   <div class="header">
-    <button class="btn-back" (click)="goBack()">← Back</button>
+    <button class="btn-back" (click)="goBack()">
+      <ng-icon name="tablerChevronLeft"></ng-icon>
+    </button>
     <h1>{{ department()?.name || 'Loading...' }}</h1>
   </div>
 

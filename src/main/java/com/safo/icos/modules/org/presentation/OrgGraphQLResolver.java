@@ -2,6 +2,7 @@ package com.safo.icos.modules.org.presentation;
 
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.DepartmentService;
+import com.safo.icos.modules.org.application.PermissionService;
 import com.safo.icos.modules.org.application.PositionService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
@@ -21,6 +22,7 @@ public class OrgGraphQLResolver {
   private final CompanyService companyService;
   private final DepartmentService departmentService;
   private final PositionService positionService;
+  private final PermissionService permissionService;
 
   @QueryMapping
   public CompanyDto getCompany(@Argument String id) {
@@ -87,5 +89,15 @@ public class OrgGraphQLResolver {
   public boolean revokeDepartmentPermission(@Argument String departmentId, @Argument String roleName, @Argument String permissionId) {
     departmentService.revokePermission(UUID.fromString(departmentId), roleName, UUID.fromString(permissionId));
     return true;
+  }
+
+  @QueryMapping
+  public List<PermissionDto> permissions() {
+    return permissionService.getAllPermissions();
+  }
+
+  @QueryMapping
+  public DepartmentDto department(@Argument String id) {
+    return departmentService.getDepartment(UUID.fromString(id));
   }
 }

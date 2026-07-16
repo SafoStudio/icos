@@ -7,13 +7,14 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { Department } from '../../../../shared/models/department.model';
 import { User } from '../../../../shared/models/user.model';
 import { Permission } from '../../../../shared/models/permission.model';
+import { NgIconComponent } from '@ng-icons/core';
 import { DepartmentPermissionsComponent } from './components/department-permissions/department-permissions.component';
 import { DepartmentMembersComponent } from './components/department-members/department-members.component';
 
 @Component({
   selector: 'app-department-detail',
   standalone: true,
-  imports: [CommonModule, DepartmentPermissionsComponent, DepartmentMembersComponent],
+  imports: [CommonModule, DepartmentPermissionsComponent, DepartmentMembersComponent, NgIconComponent],
   templateUrl: './department-detail.component.html',
   styleUrls: ['./department-detail.component.scss']
 })

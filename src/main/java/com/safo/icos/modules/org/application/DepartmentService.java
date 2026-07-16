@@ -128,6 +128,19 @@ public class DepartmentService {
             .toList();
   }
 
+  /**
+   * Returns a department by its ID.
+   *
+   * @param id department UUID
+   * @return the department DTO
+   * @throws BusinessException if the department is not found
+   */
+  public DepartmentDto getDepartment(UUID id) {
+    Department department = departmentRepository.findById(id)
+            .orElseThrow(() -> new BusinessException("Department not found", OrgErrorCode.DEPT_NOT_FOUND));
+    return toDto(department);
+  }
+
   private DepartmentDto toDto(Department domain) {
     return DepartmentDto.builder()
             .id(domain.getId())

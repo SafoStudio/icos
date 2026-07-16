@@ -1,37 +1,35 @@
-<div class="members-container">
-  <h3>Members</h3>
-
+<table class="members-table">
+  <thead>
+  <tr>
+    <th>Position</th>
+    <th>Name</th>
+  </tr>
+  </thead>
+  <tbody>
   @if (members.length === 0) {
-  <p class="empty">No members assigned to this department.</p>
+  <tr>
+    <td colspan="2" class="empty-message">No members assigned to this department.</td>
+  </tr>
   } @else {
-  <table class="members-table">
-    <thead>
-    <tr>
-      <th>Position</th>
-      <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    @for (user of members; track user.id) {
-    <tr
-      (click)="onRowClick(user)"
-      (keydown.enter)="onRowClick(user)"
-      (keydown.space)="onRowClick(user)"
-      tabindex="0"
-    >
-      <td>
-              <span class="role-badge" [class.head]="getRole(user) === 'HEAD'">
-                {{ getRole(user) }}
-              </span>
-      </td>
-      <td>
-        <button class="member-link" (click)="onRowClick(user)">
-          {{ user.firstName }} {{ user.lastName }}
-        </button>
-      </td>
-    </tr>
-    }
-    </tbody>
-  </table>
+  @for (user of members; track user.id) {
+  <tr
+    (click)="onRowClick(user)"
+    (keydown.enter)="onRowClick(user)"
+    (keydown.space)="onRowClick(user)"
+    tabindex="0"
+  >
+    <td>
+            <span class="role-badge" [class.head]="getRole(user) === 'HEAD'">
+              {{ getRole(user) }}
+            </span>
+    </td>
+    <td>
+      <button class="member-link" (click)="onRowClick(user)">
+        {{ user.firstName }} {{ user.lastName }}
+      </button>
+    </td>
+  </tr>
   }
-</div>
+  }
+  </tbody>
+</table>

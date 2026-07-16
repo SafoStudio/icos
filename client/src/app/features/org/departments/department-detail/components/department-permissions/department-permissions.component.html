@@ -1,6 +1,4 @@
-<div class="permissions-container">
-  <h3>Permissions</h3>
-
+<div>
   @if (!canEdit) {
   <p class="info">You have view-only access.</p>
   }
@@ -16,7 +14,7 @@
     <tbody>
     @for (perm of allPermissions; track perm.id) {
     <tr>
-      <td>{{ perm.name }}</td>
+      <td>{{ perm.description }}</td>
       <td class="center">
         <label>
           <input
@@ -25,7 +23,6 @@
             [disabled]="!canEdit || saving"
             (change)="onToggle(perm, 'SPECIALIST')"
           />
-          <span class="sr-only">Assign {{ perm.name }} to Specialist</span>
         </label>
       </td>
       <td class="center">
@@ -36,7 +33,6 @@
             [disabled]="!canEdit || saving"
             (change)="onToggle(perm, 'HEAD')"
           />
-          <span class="sr-only">Assign {{ perm.name }} to Head</span>
         </label>
       </td>
     </tr>
