@@ -32,6 +32,7 @@ export class EditableTableComponent implements OnInit {
   @Output() addItem = new EventEmitter<any>();
   @Output() updateItem = new EventEmitter<{ index: number; item: any }>();
   @Output() deleteItem = new EventEmitter<number>();
+  @Output() rowClick = new EventEmitter<any>();
 
   @ViewChild('menuContainer') menuContainer!: ElementRef;
 
@@ -60,6 +61,13 @@ export class EditableTableComponent implements OnInit {
   isEmpty(): boolean {
     return this.data.length === 0;
   }
+
+  onRowClick(item: any, event: MouseEvent): void {
+      if (this.editingIndex() !== null) {
+        return;
+      }
+      this.rowClick.emit(item);
+    }
 
   addRow(): void {
     this.closeAllMenus();

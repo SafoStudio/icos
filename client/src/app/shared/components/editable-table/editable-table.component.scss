@@ -96,20 +96,20 @@ tr {
   }
 
   .btn-save {
-    background: #4CAF50;
-    color: white;
+    background: #f9fafb;
+    color: #111827;
 
     &:hover {
-      background: #388e3c;
+      background: #e5e7eb;
     }
   }
 
   .btn-cancel {
-    background: #f44336;
-    color: white;
+    background: #f9fafb;
+    color: #111827;
 
     &:hover {
-      background: #d32f2f;
+       background: #e5e7eb;
     }
   }
 }

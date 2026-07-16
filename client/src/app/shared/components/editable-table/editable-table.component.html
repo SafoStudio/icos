@@ -12,27 +12,39 @@
 
       <tbody>
       @for (item of data; track item._tempId || item.id || $index; let rowIndex = $index) {
-      <tr [class.editing]="editingIndex() === rowIndex">
+      <tr
+        [class.editing]="editingIndex() === rowIndex"
+        (click)="onRowClick(item, $event)"
+        (keydown)="onKeydown($event, rowIndex)"
+        tabindex="0"
+      >
         @for (col of columns; track col.key) {
         <td>
           @if (editingIndex() === rowIndex && col.editable !== false) {
-          <input
-            [type]="col.type === 'date' ? 'date' : 'text'"
-            [(ngModel)]="item[col.key]"
-            [placeholder]="'Enter ' + col.label"
-            class="edit-input"
-            [class.required]="col.required"
-            (keydown)="onKeydown($event, rowIndex)"
-            [attr.aria-label]="'Edit ' + col.label"
-            autofocus
-          />
+          <label>
+            <input
+              [type]="col.type === 'date' ? 'date' : 'text'"
+              [(ngModel)]="item[col.key]"
+              [placeholder]="'Enter ' + col.label"
+              class="edit-input"
+              [class.required]="col.required"
+              (keydown)="onKeydown($event, rowIndex)"
+              [attr.aria-label]="'Edit ' + col.label"
+              autofocus
+            />
+          </label>
           } @else {
           <span class="cell-value">{{ item[col.key] || '-' }}</span>
           }
         </td>
         }
 
-        <td class="actions-cell">
+        <td
+        class="actions-cell"
+        (click)="$event.stopPropagation()"
+        (keydown)="$event.stopPropagation()"
+        tabindex="-1"
+      >
           @if (editingIndex() === rowIndex) {
           <div class="edit-actions">
             <button class="btn-save" (click)="saveRow(rowIndex)" title="Save">
@@ -47,23 +59,21 @@
             <button
               class="btn-menu"
               (click)="toggleMenu(rowIndex, $event)"
-              [class.active]="menuOpenIndex() === rowIndex">
+              [class.active]="menuOpenIndex() === rowIndex"
+            >
               <ng-icon name="tablerDots"></ng-icon>
             </button>
 
             @if (menuOpenIndex() === rowIndex) {
             <div class="dropdown-menu" role="menu">
               <button class="menu-item" (click)="startEdit(rowIndex)" role="menuitem">
-                <ng-icon name="tablerEdit" class="menu-icon"></ng-icon>
                 Edit
               </button>
               <button class="menu-item" (click)="addRow()" role="menuitem">
-                <ng-icon name="tablerPlus" class="menu-icon"></ng-icon>
                 Create
               </button>
               <hr class="menu-divider">
               <button class="menu-item danger" (click)="deleteRow(rowIndex)" role="menuitem">
-                <ng-icon name="tablerTrash" class="menu-icon"></ng-icon>
                 Delete
               </button>
             </div>
