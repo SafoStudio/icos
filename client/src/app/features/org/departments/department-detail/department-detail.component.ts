@@ -5,8 +5,8 @@ import { DepartmentsService } from '../departments.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Department } from '../../../../shared/models/department.model';
-import { User } from '../../../../shared/models/user.model';
 import { Permission } from '../../../../shared/models/permission.model';
+import { DepartmentMember } from '../../../../shared/models/department-member.model';
 import { NgIconComponent } from '@ng-icons/core';
 import { DepartmentPermissionsComponent } from './components/department-permissions/department-permissions.component';
 import { DepartmentMembersComponent } from './components/department-members/department-members.component';
@@ -28,8 +28,7 @@ export class DepartmentDetailComponent implements OnInit {
   departmentId = signal<string | null>(null);
   department = signal<Department | null>(null);
   loading = signal(false);
-  headUser = signal<User | null>(null);
-  members = signal<User[]>([]);
+  members = signal<DepartmentMember[]>([]);
   allPermissions = signal<Permission[]>([]);
   headPermissions = signal<Permission[]>([]);
   specialistPermissions = signal<Permission[]>([]);
@@ -53,7 +52,6 @@ export class DepartmentDetailComponent implements OnInit {
     try {
       await Promise.all([
         this.loadDepartment(departmentId),
-        this.loadHead(departmentId),
         this.loadMembers(departmentId),
         this.loadAllPermissions(),
         this.loadDepartmentPermissions(departmentId)
@@ -70,15 +68,6 @@ export class DepartmentDetailComponent implements OnInit {
     return new Promise((resolve) => {
       this.departmentsService.getDepartment(id).subscribe({
         next: (dept) => { this.department.set(dept); resolve(); },
-        error: () => resolve()
-      });
-    });
-  }
-
-  private loadHead(departmentId: string): Promise<void> {
-    return new Promise((resolve) => {
-      this.departmentsService.getDepartmentHead(departmentId).subscribe({
-        next: (user) => { this.headUser.set(user); resolve(); },
         error: () => resolve()
       });
     });
@@ -160,10 +149,8 @@ export class DepartmentDetailComponent implements OnInit {
     });
   }
 
-  onMemberClick(user: User): void {
-    // TODO: redirect to department member profile
-    console.log('Navigate to user profile:', user.id);
-    // this.router.navigate(['/profile', user.id]);
+  onMemberClick(user: DepartmentMember): void {
+    console.log('Navigate to user profile:', user.userId);
   }
 
   goBack() {

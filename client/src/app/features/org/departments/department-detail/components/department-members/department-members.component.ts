@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { User } from '../../../../../../shared/models/user.model';
+import { DepartmentMember } from '../../../../../../shared/models/department-member.model';
 
 @Component({
   selector: 'app-department-members',
@@ -10,18 +10,10 @@ import { User } from '../../../../../../shared/models/user.model';
   styleUrls: ['./department-members.component.scss']
 })
 export class DepartmentMembersComponent {
-  @Input() members: User[] = [];
-  @Input() headUser: User | null = null;
-  @Output() memberClick = new EventEmitter<User>();
+  @Input() members: DepartmentMember[] = [];
+  @Output() memberClick = new EventEmitter<DepartmentMember>();
 
-  getRole(user: User): string {
-    if (this.headUser?.id === user.id) {
-      return 'HEAD';
-    }
-    return 'SPECIALIST';
-  }
-
-  onRowClick(user: User): void {
+  onRowClick(user: DepartmentMember): void {
     this.memberClick.emit(user);
   }
 }

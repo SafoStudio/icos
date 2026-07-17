@@ -4,6 +4,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { Department } from '../../../shared/models/department.model';
 import { Permission } from '../../../shared/models/permission.model';
 import { User } from '../../../shared/models/user.model';
+import { DepartmentMember } from '../../../shared/models/department-member.model';
 
 @Injectable({
   providedIn: 'root'
@@ -98,18 +99,18 @@ export class DepartmentsService {
     );
   }
 
-  getDepartmentMembers(departmentId: string): Observable<User[]> {
+  getDepartmentMembers(departmentId: string): Observable<DepartmentMember[]> {
     const query = `
       query GetDepartmentMembers($departmentId: ID!) {
         departmentMembers(departmentId: $departmentId) {
-          id
+          userId
           firstName
           lastName
-          email
+          positionName
         }
       }
     `;
-    return this.api.graphql<{ departmentMembers: User[] }>(query, { departmentId }).pipe(
+    return this.api.graphql<{ departmentMembers: DepartmentMember[] }>(query, { departmentId }).pipe(
       map(res => res.departmentMembers)
     );
   }

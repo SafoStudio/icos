@@ -23,18 +23,23 @@
     }
   }
 
-  .role-badge {
+  .position-name {
     display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    background: #e9ecef;
-    color: #495057;
+    font-size: 14px;
+    color: #212529;
+  }
 
-    &.head {
-      background: #667eea;
-      color: white;
+  .member-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    color: #667eea;
+    padding: 0;
+    text-align: left;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
@@ -43,19 +48,5 @@
     color: #999;
     font-size: 14px;
     padding: 20px 0;
-  }
-}
-
-.member-link {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: inherit;
-  color: #667eea;
-  padding: 0;
-  text-align: left;
-
-  &:hover {
-    text-decoration: underline;
   }
 }

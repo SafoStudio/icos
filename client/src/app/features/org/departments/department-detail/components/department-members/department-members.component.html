@@ -11,7 +11,7 @@
     <td colspan="2" class="empty-message">No members assigned to this department.</td>
   </tr>
   } @else {
-  @for (user of members; track user.id) {
+  @for (user of members; track user.userId) {
   <tr
     (click)="onRowClick(user)"
     (keydown.enter)="onRowClick(user)"
@@ -19,9 +19,7 @@
     tabindex="0"
   >
     <td>
-            <span class="role-badge" [class.head]="getRole(user) === 'HEAD'">
-              {{ getRole(user) }}
-            </span>
+      <span class="position-name">{{ user.positionName || '-' }}</span>
     </td>
     <td>
       <button class="member-link" (click)="onRowClick(user)">
