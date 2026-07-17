@@ -12,7 +12,14 @@
     </tr>
     </thead>
     <tbody>
-    @for (perm of allPermissions; track perm.id) {
+    @for (group of groupedPermissions(); track group.name) {
+    <tr class="group-header-row">
+      <td colspan="3" class="group-header">
+        <span class="group-title">{{ getGroupLabel(group.name) }}</span>
+        <span class="group-count">{{ group.permissions.length }}</span>
+      </td>
+    </tr>
+    @for (perm of group.permissions; track perm.id) {
     <tr>
       <td>{{ perm.description }}</td>
       <td class="center">
@@ -36,6 +43,7 @@
         </label>
       </td>
     </tr>
+    }
     }
     </tbody>
   </table>

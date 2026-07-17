@@ -3,18 +3,31 @@
   border-collapse: collapse;
 
   th {
-    text-align: left;
-    padding: 10px 12px;
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #495057;
-    border-bottom: 2px solid #e9ecef;
-  }
+      text-align: left;
+      padding: 10px 12px;
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #495057;
+      border-bottom: 2px solid #e9ecef;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &.center {
+        text-align: center;
+        width: 100px;
+      }
+    }
 
   td {
-    padding: 8px 12px;
-    border-bottom: 1px solid #f1f3f5;
-  }
+      padding: 8px 12px;
+      border-bottom: 1px solid #f1f3f5;
+      font-size: 14px;
+
+      &.center {
+        text-align: center;
+      }
+    }
 
   tr {
     cursor: pointer;

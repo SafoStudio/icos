@@ -15,16 +15,62 @@
     font-weight: 600;
     color: #495057;
     border-bottom: 2px solid #e9ecef;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.center {
+      text-align: center;
+      width: 100px;
+    }
   }
 
   td {
     padding: 8px 12px;
     border-bottom: 1px solid #f1f3f5;
+    font-size: 14px;
+
+    &.center {
+      text-align: center;
+    }
   }
 
-  .center {
-    text-align: center;
-    width: 100px;
+  tbody tr:hover:not(.group-header-row) {
+    background: #f8f9fa;
+  }
+
+  .group-header-row {
+    td {
+      padding: 0;
+      border-bottom: none;
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #f5f6f8;
+      border-bottom: 2px solid #e9ecef;
+      border-top: 2px solid #e9ecef;
+      font-weight: 600;
+      color: #495057;
+
+      .group-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .group-count {
+        background: #e9ecef;
+        color: #6c757d;
+        font-size: 11px;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+      }
+    }
   }
 
   input[type="checkbox"] {
