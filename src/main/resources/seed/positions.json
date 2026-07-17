@@ -54,5 +54,45 @@
     "description": "Responsible for CI/CD, infrastructure, and deployment",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "a3b4c5d6-e7f8-9a0b-1c2d-3e4f5a6b7c8d",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Engineering Manager",
+    "description": "Leads the engineering team and technical direction",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "HR Director",
+    "description": "Leads the HR department and people strategy",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "c5d6e7f8-a9b0-1c2d-3e4f-5a6b7c8d9e0f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Marketing Director",
+    "description": "Leads the marketing team and brand strategy",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "d6e7f8a9-b0c1-2d3e-4f5a-6b7c8d9e0f1a",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Finance Manager",
+    "description": "Leads the finance team and financial strategy",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "e7f8a9b0-c1d2-3e4f-5a6b-7c8d9e0f1a2b",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Support Manager",
+    "description": "Leads the customer support team",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
   }
 ]
