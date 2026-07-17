@@ -14,5 +14,45 @@
     "description": "Responsible for HR operations and recruitment",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Marketing Specialist",
+    "description": "Responsible for marketing campaigns and brand management",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "f9bac1d2-e3f4-5a6b-7c8d-9e0f1a2b3c4f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Financial Analyst",
+    "description": "Responsible for financial analysis and reporting",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "f0bcd2e3-f4a5-6b7c-8d9e-0f1a2b3c4d5f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Customer Support Agent",
+    "description": "Responsible for customer service and technical support",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "f1cde3f4-a5b6-7c8d-9e0f-1a2b3c4d5e6f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "QA Engineer",
+    "description": "Responsible for quality assurance and testing",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "f2def4a5-b6c7-8d9e-0f1a-2b3c4d5e6f7f",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "DevOps Engineer",
+    "description": "Responsible for CI/CD, infrastructure, and deployment",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
   }
 ]

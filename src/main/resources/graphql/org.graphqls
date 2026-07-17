@@ -24,10 +24,18 @@ type Permission {
     description: String
 }
 
+type DepartmentMember {
+    userId: ID!
+    firstName: String!
+    lastName: String!
+    positionName: String
+}
+
 extend type Query {
     company(id: ID!): Company
     departments(companyId: ID!): [Department!]!
     department(id: ID!): Department!
+    departmentMembers(departmentId: ID!): [DepartmentMember!]!
     positions(companyId: ID!): [Position!]!
     departmentPermissions(departmentId: ID!, roleName: String!): [Permission!]!
     permissions: [Permission!]!

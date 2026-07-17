@@ -6,6 +6,7 @@ import com.safo.icos.modules.org.application.PermissionService;
 import com.safo.icos.modules.org.application.PositionService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
+import com.safo.icos.modules.org.application.dto.DepartmentMemberDto;
 import com.safo.icos.modules.org.application.dto.PermissionDto;
 import com.safo.icos.modules.org.application.dto.PositionDto;
 import java.util.List;
@@ -99,5 +100,10 @@ public class OrgGraphQLResolver {
   @QueryMapping
   public DepartmentDto department(@Argument String id) {
     return departmentService.getDepartment(UUID.fromString(id));
+  }
+
+  @QueryMapping
+  public List<DepartmentMemberDto> departmentMembers(@Argument String departmentId) {
+    return departmentService.getDepartmentMembers(UUID.fromString(departmentId));
   }
 }

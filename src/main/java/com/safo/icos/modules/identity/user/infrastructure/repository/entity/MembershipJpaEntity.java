@@ -33,6 +33,9 @@ public class MembershipJpaEntity {
   @Column(name = "department_id")
   private UUID departmentId;
 
+  @Column(name = "position_id")
+  private UUID positionId;
+
   @Column(name = "manager_id")
   private UUID managerId;
 

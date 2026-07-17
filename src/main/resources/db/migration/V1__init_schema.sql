@@ -32,7 +32,6 @@ CREATE TABLE departments (
 CREATE TABLE positions (
     id UUID PRIMARY KEY,
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    department_id UUID REFERENCES departments(id) ON DELETE SET NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -102,6 +101,7 @@ CREATE TABLE memberships (
     role_id UUID NOT NULL REFERENCES roles(id),
     department_id UUID REFERENCES departments(id) ON DELETE SET NULL,
     manager_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    position_id UUID REFERENCES positions(id) ON DELETE SET NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

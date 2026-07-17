@@ -48,6 +48,7 @@ public class MembershipSeeder extends AbstractJsonSeeder<MembershipSeedDto> {
                       .companyId(parseUuid(String.valueOf(dto.getCompanyId())))
                       .roleId(roleId)
                       .departmentId(dto.getDepartmentId() != null ? parseUuid(String.valueOf(dto.getDepartmentId())) : null)
+                      .positionId(dto.getPositionId() != null ? parseUuid(String.valueOf(dto.getPositionId())) : null) // 👈 Добавлено
                       .managerId(dto.getManagerId() != null ? parseUuid(String.valueOf(dto.getManagerId())) : null)
                       .active(dto.isActive())
                       .createdAt(parseDateTime(dto.getCreatedAt()))

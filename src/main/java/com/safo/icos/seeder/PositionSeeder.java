@@ -33,7 +33,6 @@ public class PositionSeeder extends AbstractJsonSeeder<PositionSeedDto> {
             .map(dto -> PositionJpaEntity.builder()
                     .id(parseUuid(String.valueOf(dto.getId())))
                     .companyId(parseUuid(String.valueOf(dto.getCompanyId())))
-                    .departmentId(dto.getDepartmentId() != null ? parseUuid(String.valueOf(dto.getDepartmentId())) : null)
                     .name(dto.getName())
                     .description(dto.getDescription())
                     .createdAt(parseDateTime(dto.getCreatedAt()))

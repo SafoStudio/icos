@@ -14,5 +14,29 @@
     "description": "Talent acquisition, employee welfare, and relations",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "c2f8e1b5-ec6e-4b68-b78f-ef816a3a936c",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Marketing",
+    "description": "Brand management, digital marketing, and communications",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "d3f9e1b5-ec6e-4b68-b78f-ef816a3a936d",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Finance",
+    "description": "Financial planning, accounting, and budgeting",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
+  },
+  {
+    "id": "e4fae1b5-ec6e-4b68-b78f-ef816a3a936e",
+    "companyId": "e4b10b0e-3fa1-4a4e-98ee-5fb9d2a3ea61",
+    "name": "Customer Support",
+    "description": "Customer service, technical support, and client relations",
+    "createdAt": "2026-07-07T12:00:00",
+    "updatedAt": "2026-07-07T12:00:00"
   }
 ]

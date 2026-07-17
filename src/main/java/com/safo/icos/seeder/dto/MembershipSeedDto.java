@@ -10,6 +10,7 @@ public class MembershipSeedDto {
   private UUID companyId;
   private String roleName;
   private UUID departmentId;
+  private UUID positionId;
   private UUID managerId;
   private boolean active;
   private String createdAt;

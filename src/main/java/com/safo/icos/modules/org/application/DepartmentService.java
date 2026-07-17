@@ -1,8 +1,14 @@
 package com.safo.icos.modules.org.application;
 
 import com.safo.icos.common.exception.BusinessException;
+import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.MembershipJpaRepository;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.entity.PositionJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.PositionJpaRepository;
 import com.safo.icos.modules.org.api.constant.OrgErrorCode;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
+import com.safo.icos.modules.org.application.dto.DepartmentMemberDto;
 import com.safo.icos.modules.org.application.dto.PermissionDto;
 import com.safo.icos.modules.org.domain.model.Department;
 import com.safo.icos.modules.org.domain.model.DepartmentPermission;
@@ -15,6 +21,7 @@ import com.safo.icos.security.permission.RequirePermission;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +36,9 @@ public class DepartmentService {
   private final DepartmentRepository departmentRepository;
   private final DepartmentPermissionRepository departmentPermissionRepository;
   private final PermissionJpaRepository permissionJpaRepository;
+  private final MembershipJpaRepository membershipJpaRepository;
+  private final UserJpaRepository userJpaRepository;
+  private final PositionJpaRepository positionJpaRepository;
 
   /**
    * Updates an existing department. Requires {@code department:manage} permission.
@@ -148,5 +158,30 @@ public class DepartmentService {
             .name(domain.getName())
             .description(domain.getDescription())
             .build();
+  }
+
+  public List<DepartmentMemberDto> getDepartmentMembers(UUID departmentId) {
+    var memberships = membershipJpaRepository.findByDepartmentIdAndActiveTrue(departmentId);
+
+    return memberships.stream()
+            .map(membership -> {
+              UserJpaEntity user = userJpaRepository.findById(membership.getUserId())
+                      .orElseThrow();
+
+              String positionName = null;
+              if (membership.getPositionId() != null) {
+                positionName = positionJpaRepository.findById(membership.getPositionId())
+                        .map(PositionJpaEntity::getName)
+                        .orElse(null);
+              }
+
+              return DepartmentMemberDto.builder()
+                      .userId(user.getId())
+                      .firstName(user.getFirstName())
+                      .lastName(user.getLastName())
+                      .positionName(positionName)
+                      .build();
+            })
+            .collect(Collectors.toList());
   }
 }

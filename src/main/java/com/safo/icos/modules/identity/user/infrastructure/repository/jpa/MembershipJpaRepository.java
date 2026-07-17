@@ -22,4 +22,6 @@ public interface MembershipJpaRepository extends JpaRepository<MembershipJpaEnti
   List<MembershipJpaEntity> findByUserId(UUID userId);
 
   Optional<MembershipJpaEntity> findFirstByDepartmentIdAndRoleIdAndActiveTrue(UUID departmentId, UUID roleId);
+
+  List<MembershipJpaEntity> findByDepartmentIdAndActiveTrue(UUID departmentId);
 }
