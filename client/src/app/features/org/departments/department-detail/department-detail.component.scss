@@ -5,17 +5,19 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   color: #667eea;
   cursor: pointer;
   font-size: 16px;
-  padding: 0;
+  padding: 5px 10px;
 }
 
 h1 {
@@ -24,7 +26,7 @@ h1 {
 }
 
 .description {
-  margin: 0 0 24px 0;
+  margin: 0 0 24px 36px;
   color: #6c757d;
   font-size: 14px;
 }
