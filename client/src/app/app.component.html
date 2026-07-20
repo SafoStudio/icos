@@ -1,14 +1,19 @@
 @if (isLoggedIn()) {
-  <div class="app-layout">
-    <app-sidebar (collapsedChange)="isCollapsed = $event"></app-sidebar>
-    <main class="content" [class.sidebar-collapsed]="isCollapsed">
+<div class="app-layout">
+  <app-sidebar #sidebar (collapsedChange)="isCollapsed = $event"></app-sidebar>
+  <div class="content-wrapper" [class.open]="!isCollapsed" [class.blurred]="!isCollapsed">
+    <main class="content">
       <router-outlet></router-outlet>
     </main>
   </div>
+  @if (!isCollapsed) {
+  <div class="sidebar-overlay" (click)="onOverlayClick()"></div>
+  }
+</div>
 } @else {
-  <div class="auth-layout">
-    <router-outlet></router-outlet>
-  </div>
+<div class="auth-layout">
+  <router-outlet></router-outlet>
+</div>
 }
 
 <app-toast-container></app-toast-container>

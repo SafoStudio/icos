@@ -27,7 +27,7 @@ interface MenuItem {
 export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-  private readonly isCollapsedSignal = signal(false);
+  private readonly isCollapsedSignal = signal(true);
 
   isCollapsed = computed(() => this.isCollapsedSignal());
   collapsedChange = output<boolean>();
@@ -68,6 +68,13 @@ export class SidebarComponent {
   toggleSidebar(): void {
     this.isCollapsedSignal.set(!this.isCollapsed());
     this.collapsedChange.emit(this.isCollapsed());
+  }
+
+  closeSidebar(): void {
+    if (!this.isCollapsed()) {
+      this.isCollapsedSignal.set(true);
+      this.collapsedChange.emit(this.isCollapsed());
+    }
   }
 
   isActive(route: string): boolean {

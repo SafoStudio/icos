@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { AuthService } from './core/services/auth.service';
@@ -14,5 +14,13 @@ import { ToastContainerComponent } from './shared/components/toast-container/toa
 export class AppComponent {
   private readonly authService = inject(AuthService);
   isLoggedIn = computed(() => this.authService.isLoggedIn());
-  isCollapsed = false;
+  isCollapsed = true;
+
+  @ViewChild(SidebarComponent) sidebar!: SidebarComponent;
+
+  onOverlayClick(): void {
+    if (this.sidebar) {
+      this.sidebar.closeSidebar();
+    }
+  }
 }

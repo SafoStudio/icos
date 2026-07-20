@@ -32,15 +32,19 @@
 
   <div class="main-links">
     @for (link of mainLinks; track link.label) {
-    <button class="main-link">
+    <button class="main-link" (click)="closeSidebar()">
       <div class="main-link-inner">
         <ng-icon [name]="link.icon" class="main-link-icon" size="20"></ng-icon>
         @if (!isCollapsed()) {
         <span>{{ link.label }}</span>
         }
       </div>
-      @if (link.notifications && !isCollapsed()) {
+      @if (link.notifications) {
+      @if (!isCollapsed()) {
       <span class="badge">{{ link.notifications }}</span>
+      } @else {
+      <span class="badge collapsed-badge">{{ link.notifications }}</span>
+      }
       }
     </button>
     }
@@ -61,12 +65,17 @@
         routerLinkActive="active"
         class="collection-link"
         [class.active]="isActive(item.route)"
+        (click)="closeSidebar()"
       >
         <ng-icon [name]="item.icon" class="collection-icon" size="20"></ng-icon>
         @if (!isCollapsed()) {
         <span class="collection-label">{{ item.label }}</span>
         @if (item.badge) {
         <span class="badge">{{ item.badge }}</span>
+        }
+        } @else {
+        @if (item.badge) {
+        <span class="badge collapsed-badge">{{ item.badge }}</span>
         }
         }
       </a>
