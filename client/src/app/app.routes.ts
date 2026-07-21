@@ -7,12 +7,14 @@ import { OrganizationComponent } from './features/org/organization.component';
 import { DepartmentsComponent } from './features/org/departments/departments.component';
 import { DepartmentDetailComponent } from './features/org/departments/department-detail/department-detail.component';
 import { PositionsComponent } from './features/org/positions/positions.component';
+import { ProfileComponent } from './features/profile/profile.component';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [publicGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   {
     path: 'organization',

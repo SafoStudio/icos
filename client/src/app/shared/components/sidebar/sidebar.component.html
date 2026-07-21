@@ -1,6 +1,6 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()">
   <div class="user-section">
-    <button class="user-profile" (click)="logout()">
+    <div class="user-profile" (click)="goToProfile()">
       <div class="avatar">
         <span class="avatar-letter">{{ userAvatar() }}</span>
         <span class="status-dot online"></span>
@@ -18,7 +18,7 @@
         <ng-icon name="tablerChevronRight" size="16"></ng-icon>
       </button>
       }
-    </button>
+    </div>
   </div>
 
   <div class="divider"></div>
