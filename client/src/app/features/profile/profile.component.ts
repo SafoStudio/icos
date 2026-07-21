@@ -2,17 +2,18 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ProfileService, ProfileUpdateInput, UserUpdateInput} from './profile.service';
+import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { User } from '../../shared/models/user.model';
 import { UserProfile } from '../../shared/models/user-profile.model';
 import { NgIconComponent } from '@ng-icons/core';
+import { TabsComponent, TabItem } from '../../shared/components/tabs/tabs.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -26,6 +27,13 @@ export class ProfileComponent implements OnInit {
   readonly saving = signal<boolean>(false);
   readonly user = signal<User | null>(null);
   readonly isEditing = signal<boolean>(false);
+  readonly activeTabId = signal<string>('personal');
+
+  readonly tabs: TabItem[] = [
+    { id: 'personal', label: 'Personal Information', icon: 'tablerUser' },
+    { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
+    { id: 'documents', label: 'Documents', icon: 'tablerFile' }
+  ];
 
   readonly fullName = computed(() => {
     const user = this.user();
@@ -80,7 +88,6 @@ export class ProfileComponent implements OnInit {
     this.editProfile = {
       phoneNumber: user.profile?.phoneNumber || '',
       address: user.profile?.address || '',
-      hireDate: user.profile?.hireDate || '',
       birthDate: user.profile?.birthDate || ''
     };
 
@@ -117,9 +124,6 @@ export class ProfileComponent implements OnInit {
     if (this.editProfile.address !== user.profile?.address) {
       profileUpdate.address = this.editProfile.address;
     }
-    if (this.editProfile.hireDate !== user.profile?.hireDate) {
-      profileUpdate.hireDate = this.editProfile.hireDate;
-    }
     if (this.editProfile.birthDate !== user.profile?.birthDate) {
       profileUpdate.birthDate = this.editProfile.birthDate;
     }
@@ -150,10 +154,6 @@ export class ProfileComponent implements OnInit {
         this.toastService.error('Failed to update profile');
         this.saving.set(false);
       });
-  }
-
-  goBack() {
-    this.router.navigate(['/dashboard']);
   }
 
   formatDate(date?: string): string {

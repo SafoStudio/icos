@@ -5,24 +5,13 @@
   </div>
 
   @if (showTabs()) {
-  <div class="tabs-container">
-    <div class="tabs-header">
-      @for (tab of tabs; track tab.id) {
-      <a
-        class="tab-btn"
-        [routerLink]="['./' + tab.id]"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: false }"
-      >
-        <ng-icon [name]="tab.icon" class="tab-icon"></ng-icon>
-        <span class="tab-label">{{ tab.label }}</span>
-      </a>
-      }
-    </div>
-    <div class="tabs-content">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
+  <app-tabs
+    [tabs]="tabs"
+    [activeTabId]="activeTabId()"
+    (tabChange)="onTabChange($event)"
+  >
+    <router-outlet></router-outlet>
+  </app-tabs>
   } @else {
   <div class="detail-container">
     <router-outlet></router-outlet>

@@ -31,6 +31,8 @@ import {
   tablerX,
   tablerDots,
   tablerAlertCircle,
+  tablerFile,
+  tablerCoin,
   tablerInfoCircle
 } from '@ng-icons/tabler-icons';
 
@@ -66,5 +68,7 @@ export const APP_ICONS = provideIcons({
   tablerX,
   tablerDots,
   tablerAlertCircle,
+  tablerFile,
+  tablerCoin,
   tablerInfoCircle
 });
