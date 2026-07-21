@@ -5,12 +5,14 @@ import com.safo.icos.modules.identity.user.application.dto.ProfileResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.ProfileUpdateDto;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.UserUpdateDto;
+import com.safo.icos.security.context.IcosUserPrincipal;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -18,6 +20,14 @@ import org.springframework.stereotype.Controller;
 public class UserGraphQLResolver {
 
   private final UserService userService;
+
+  @QueryMapping
+  public UserResponseDto me(@AuthenticationPrincipal IcosUserPrincipal principal) {
+    if (principal == null) {
+      throw new SecurityException("Not authenticated");
+    }
+    return userService.getUserById(principal.getUserId());
+  }
 
   @QueryMapping
   public UserResponseDto user(@Argument UUID id) {

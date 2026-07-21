@@ -8,17 +8,14 @@ import com.safo.icos.modules.identity.auth.application.dto.RegisterRequestDto;
 import com.safo.icos.modules.identity.auth.presentation.dto.AuthResponseView;
 import com.safo.icos.modules.identity.auth.presentation.dto.RefreshResponseView;
 import com.safo.icos.modules.identity.user.api.UserProvider;
-import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Duration;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
@@ -162,11 +159,5 @@ public class AuthGraphQLResolver {
       response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
     return true;
-  }
-
-  @QueryMapping
-  public UserDto me(@ContextValue(name = "userId") String userId) {
-    return userProvider.findById(UUID.fromString(userId))
-            .orElseThrow(() -> new RuntimeException("User not found"));
   }
 }
