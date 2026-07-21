@@ -1,11 +1,11 @@
 import { Component, inject, computed, effect, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EditableTableComponent, TableColumn } from '../../../shared/components/editable-table/editable-table.component';
+import { EditableTableComponent, TableColumn } from '@shared/components/editable-table/editable-table.component';
 import { DepartmentsService } from './departments.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { Department } from '../../../shared/models/department.model';
-import { ToastService } from '../../../core/services/toast.service';
+import { AuthService } from '@services/auth.service';
+import { Department } from '@models';
+import { ToastService } from '@services/toast.service';
 
 @Component({
   selector: 'app-departments',

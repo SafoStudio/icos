@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Permission } from '../../../../../../shared/models/permission.model';
+import { Permission } from '@models';
 
 export interface PermissionGroup {
   name: string;

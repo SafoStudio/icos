@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiService } from '../../core/services/api.service';
-import { User } from '../../shared/models/user.model';
-import { UserProfile } from '../../shared/models/user-profile.model';
+import { ApiService } from '@services/api.service';
+import { User, UserProfile } from '@models';
 
 export interface ProfileUpdateInput {
   userId: string;

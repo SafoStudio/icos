@@ -1,10 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiService } from '../../../core/services/api.service';
-import { Department } from '../../../shared/models/department.model';
-import { Permission } from '../../../shared/models/permission.model';
-import { User } from '../../../shared/models/user.model';
-import { DepartmentMember } from '../../../shared/models/department-member.model';
+import { ApiService } from '@services/api.service';
+import { Department, Permission, User, DepartmentMember } from '@models';
 
 @Injectable({
   providedIn: 'root'

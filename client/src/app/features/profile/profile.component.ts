@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ToastService } from '../../core/services/toast.service';
-import { User } from '../../shared/models/user.model';
-import { UserProfile } from '../../shared/models/user-profile.model';
+import { AuthService } from '@services/auth.service';
+import { ToastService } from '@services/toast.service';
+import { User, UserProfile} from '@models';
 import { NgIconComponent } from '@ng-icons/core';
-import { TabsComponent, TabItem } from '../../shared/components/tabs/tabs.component';
+import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
 
 @Component({
   selector: 'app-profile',

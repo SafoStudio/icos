@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DepartmentMember } from '../../../../../../shared/models/department-member.model';
+import { DepartmentMember } from '@models';
 
 @Component({
   selector: 'app-department-members',
