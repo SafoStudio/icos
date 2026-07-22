@@ -33,7 +33,15 @@ import {
   tablerAlertCircle,
   tablerFile,
   tablerCoin,
-  tablerInfoCircle
+  tablerInfoCircle,
+  tablerLayoutGrid,
+  tablerList,
+  tablerFilter,
+  tablerArrowUp,
+  tablerArrowDown,
+  tablerArrowLeft,
+  tablerId,
+  tablerBuildingStore
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -70,5 +78,13 @@ export const APP_ICONS = provideIcons({
   tablerAlertCircle,
   tablerFile,
   tablerCoin,
-  tablerInfoCircle
+  tablerInfoCircle,
+  tablerLayoutGrid,
+  tablerList,
+  tablerFilter,
+  tablerArrowUp,
+  tablerArrowDown,
+  tablerArrowLeft,
+  tablerId,
+  tablerBuildingStore
 });

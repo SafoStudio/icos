@@ -14,6 +14,8 @@ export interface ProfileUpdateInput {
 export interface UserUpdateInput {
   firstName?: string;
   lastName?: string;
+  role?: string;
+  departmentId?: string;
 }
 
 @Injectable({
@@ -33,6 +35,7 @@ export class ProfileService {
           companyId
           role
           departmentId
+          status
           permissions
           profile {
             userId
@@ -46,6 +49,34 @@ export class ProfileService {
     `;
     return this.api.graphql<{ me: User }>(query).pipe(
       map((res: any) => res.me)
+    );
+  }
+
+  getUserById(id: string): Observable<User> {
+    const query = `
+      query GetUser($id: ID!) {
+        user(id: $id) {
+          id
+          email
+          firstName
+          lastName
+          companyId
+          role
+          departmentId
+          status
+          permissions
+          profile {
+            userId
+            phoneNumber
+            address
+            hireDate
+            birthDate
+          }
+        }
+      }
+    `;
+    return this.api.graphql<{ user: User }>(query, { id }).pipe(
+      map((res: any) => res.user)
     );
   }
 
@@ -80,6 +111,7 @@ export class ProfileService {
           companyId
           role
           departmentId
+          status
           permissions
           profile {
             userId
