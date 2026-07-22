@@ -216,6 +216,25 @@ public class UserService {
       user.updateName(user.getFirstName(), input.getLastName());
     }
 
+    if (input.getRole() != null || input.getDepartmentId() != null) {
+      membershipRepository.findFirstByUserIdAndActiveTrue(userId).ifPresent(membership -> {
+        boolean updated = false;
+        if (input.getRole() != null && !input.getRole().isBlank()) {
+          roleJpaRepository.findByName(input.getRole()).ifPresent(roleEntity -> {
+            membership.changeRole(roleEntity.getId());
+          });
+          updated = true;
+        }
+        if (input.getDepartmentId() != null) {
+          membership.changeDepartment(input.getDepartmentId());
+          updated = true;
+        }
+        if (updated) {
+          membershipRepository.save(membership);
+        }
+      });
+    }
+
     User saved = userRepository.save(user);
     return toResponseDto(saved);
   }

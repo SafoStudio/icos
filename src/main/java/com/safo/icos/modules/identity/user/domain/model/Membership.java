@@ -17,7 +17,7 @@ public class Membership {
   private final UUID id;
   private final UUID userId;
   private final UUID companyId;
-  private final UUID departmentId;
+  private UUID departmentId;
   private final UUID managerId;
   private final LocalDateTime createdAt;
   private UUID roleId;
@@ -58,6 +58,12 @@ public class Membership {
   /** Changes the role assigned to this membership. */
   public void changeRole(UUID newRoleId) {
     this.roleId = newRoleId;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  /** Changes the department assigned to this membership. */
+  public void changeDepartment(UUID newDepartmentId) {
+    this.departmentId = newDepartmentId;
     this.updatedAt = LocalDateTime.now();
   }
 }

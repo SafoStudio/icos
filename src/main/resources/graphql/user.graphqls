@@ -20,6 +20,7 @@ type User {
     companyId: ID!
     role: String!
     departmentId: ID
+    status: String
     permissions: [String!]!
     profile: UserProfile
 }
@@ -42,6 +43,8 @@ input UserCreateInput {
 input UserUpdateInput {
     firstName: String
     lastName: String
+    role: String
+    departmentId: ID
 }
 
 input ProfileUpdateInput {
