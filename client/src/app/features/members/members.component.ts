@@ -1,8 +1,11 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
+import { ToastService } from '../../core/services/toast.service';
+import { NgIconComponent } from '@ng-icons/core';
 
 interface Department {
   id: string;
@@ -21,10 +24,13 @@ interface Member {
   status: string;
 }
 
+export type ViewMode = 'grid' | 'list';
+export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
+
 @Component({
   selector: 'app-members',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgIconComponent],
   templateUrl: './members.component.html',
   styleUrls: ['./members.component.scss']
 })
@@ -32,11 +38,19 @@ export class MembersComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   readonly authService = inject(AuthService);
   private readonly api = inject(ApiService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   members = signal<Member[]>([]);
   departments = signal<Department[]>([]);
   isLoading = signal(false);
-
+  viewMode = signal<ViewMode>('grid');
+  // Filter & Search controls
+  searchQuery = signal<string>('');
+  selectedDepartmentFilter = signal<string>('');
+  selectedRoleFilter = signal<string>('');
+  sortBy = signal<SortOption>('name-asc');
+  // Invite modal states
   showInviteModal = signal(false);
   isInviting = signal(false);
   inviteError = signal<string | null>(null);
@@ -58,9 +72,55 @@ export class MembersComponent implements OnInit {
     if (user?.role === 'ADMIN' || user?.role === 'OWNER') {
       return ['ADMIN', 'OWNER', 'HEAD', 'SPECIALIST'];
     }
-    // HR can invite anyone except ADMIN
     return ['OWNER', 'HEAD', 'SPECIALIST'];
   });
+
+  // Filtered & Sorted members calculation
+  filteredMembers = computed(() => {
+    let list = this.members();
+    const query = this.searchQuery().trim().toLowerCase();
+    const deptId = this.selectedDepartmentFilter();
+    const role = this.selectedRoleFilter();
+    const sort = this.sortBy();
+
+    if (query) {
+      list = list.filter(m => {
+        const fullName = `${m.firstName} ${m.lastName}`.toLowerCase();
+        const email = m.email.toLowerCase();
+        return fullName.includes(query) || email.includes(query);
+      });
+    }
+
+    if (deptId) {
+      if (deptId === 'unassigned') {
+        list = list.filter(m => !m.departmentId);
+      } else {
+        list = list.filter(m => m.departmentId === deptId);
+      }
+    }
+
+    if (role) {
+      list = list.filter(m => m.role === role);
+    }
+
+    // Sorting
+    return [...list].sort((a, b) => {
+      if (sort === 'name-asc') {
+        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+      } else if (sort === 'name-desc') {
+        return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
+      } else if (sort === 'role') {
+        return a.role.localeCompare(b.role);
+      } else if (sort === 'dept') {
+        return (a.departmentName || '').localeCompare(b.departmentName || '');
+      }
+      return 0;
+    });
+  });
+
+  // Statistics counters
+  totalCount = computed(() => this.members().length);
+  activeCount = computed(() => this.members().filter(m => m.status === 'ACTIVE' || !m.status).length);
 
   ngOnInit(): void {
     this.initInviteForm();
@@ -83,7 +143,6 @@ export class MembersComponent implements OnInit {
     this.isLoading.set(true);
     const companyId = user.companyId;
 
-    // Load departments
     const deptQuery = `
       query GetDepartments($companyId: ID!) {
         departments(companyId: $companyId) {
@@ -94,7 +153,6 @@ export class MembersComponent implements OnInit {
       }
     `;
 
-    // Load members
     const membersQuery = `
       query UsersByCompany($companyId: ID!) {
         usersByCompany(companyId: $companyId) {
@@ -111,24 +169,43 @@ export class MembersComponent implements OnInit {
 
     this.api.graphql<{ departments: Department[] }>(deptQuery, { companyId }).subscribe({
       next: (deptData) => {
-        this.departments.set(deptData.departments);
+        this.departments.set(deptData.departments || []);
 
-        // Once departments are loaded, load members
         this.api.graphql<{ usersByCompany: Member[] }>(membersQuery, { companyId }).subscribe({
           next: (membersData) => {
             this.isLoading.set(false);
-            // Map department names
-            const mappedMembers = membersData.usersByCompany.map(m => ({
+            const mappedMembers = (membersData.usersByCompany || []).map(m => ({
               ...m,
-              departmentName: this.departments().find(d => d.id === m.departmentId)?.name || 'N/A'
+              departmentName: this.departments().find(d => d.id === m.departmentId)?.name || 'Unassigned'
             }));
             this.members.set(mappedMembers);
           },
-          error: () => this.isLoading.set(false)
+          error: (err) => {
+            console.error('Failed to load members:', err);
+            this.isLoading.set(false);
+          }
         });
       },
-      error: () => this.isLoading.set(false)
+      error: (err) => {
+        console.error('Failed to load departments:', err);
+        this.isLoading.set(false);
+      }
     });
+  }
+
+  setViewMode(mode: ViewMode): void {
+    this.viewMode.set(mode);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedDepartmentFilter.set('');
+    this.selectedRoleFilter.set('');
+    this.sortBy.set('name-asc');
+  }
+
+  navigateToProfile(memberId: string): void {
+    this.router.navigate(['/members', memberId]);
   }
 
   openInviteModal(): void {
@@ -181,7 +258,8 @@ export class MembersComponent implements OnInit {
       next: () => {
         this.isInviting.set(false);
         this.inviteSuccess.set('Invitation sent successfully!');
-        this.loadData(); // reload list
+        this.toastService.success('Invitation sent successfully!');
+        this.loadData();
         setTimeout(() => {
           this.closeInviteModal();
         }, 1500);
@@ -194,7 +272,40 @@ export class MembersComponent implements OnInit {
   }
 
   getDepartmentName(deptId: string | undefined): string {
-    if (!deptId) return 'N/A';
-    return this.departments().find(d => d.id === deptId)?.name || 'N/A';
+    if (!deptId) return 'Unassigned';
+    return this.departments().find(d => d.id === deptId)?.name || 'Unassigned';
+  }
+
+  getRoleLabel(role: string): string {
+    const labels: Record<string, string> = {
+      'OWNER': 'Owner',
+      'ADMIN': 'Admin',
+      'HEAD': 'Dept Head',
+      'SPECIALIST': 'Specialist'
+    };
+    return labels[role] || role;
+  }
+
+  getMemberPhotoUrl(member: Member): string {
+    const photos = [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80'
+    ];
+
+    let hash = 0;
+    const str = member.id || member.email || member.firstName;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % photos.length;
+    return photos[index];
   }
 }
