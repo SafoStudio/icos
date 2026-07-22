@@ -1,0 +1,341 @@
+<div class="employee-profile-page">
+  <div class="top-nav">
+    <a routerLink="/members" class="btn-back">
+      <ng-icon name="tablerChevronLeft" size="18"></ng-icon>
+      <span>Back to Members List</span>
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading employee profile...</p>
+    </div>
+  } @else if (member()) {
+    <div class="profile-layout">
+      <div class="profile-sidebar">
+        <div class="photo-container">
+          <div class="avatar">
+            <span class="avatar-letter">{{ fullName().charAt(0).toUpperCase() }}</span>
+          </div>
+          <h2 class="photo-name">{{ fullName() }}</h2>
+          <div class="badges-row">
+            <span class="badge badge-role" [class]="'role-' + member()?.role?.toLowerCase()">
+              {{ roleLabel() }}
+            </span>
+            <span class="badge badge-dept">
+              <ng-icon name="tablerBuilding" size="14"></ng-icon>
+              {{ departmentName() }}
+            </span>
+          </div>
+
+          <div class="sidebar-contact-info">
+            <div class="contact-item">
+              <ng-icon name="tablerMail" size="16"></ng-icon>
+              <a [href]="'mailto:' + member()?.email" class="contact-link">{{ member()?.email }}</a>
+            </div>
+            @if (member()?.profile?.phoneNumber) {
+              <div class="contact-item">
+                <ng-icon name="tablerUser" size="16"></ng-icon>
+                <span>{{ member()?.profile?.phoneNumber }}</span>
+              </div>
+            }
+          </div>
+
+          @if (canManage()) {
+            <div class="sidebar-actions">
+              <button class="btn btn-secondary btn-sm" (click)="activeTabId.set('hr_management')">
+                <ng-icon name="tablerEdit" size="16"></ng-icon>
+                <span>Manage Role & Dept</span>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="profile-details">
+        <app-tabs
+          [tabs]="tabs"
+          [activeTabId]="activeTabId()"
+          (tabChange)="activeTabId.set($event)"
+        >
+          @if (activeTabId() === 'personal') {
+            <div class="tab-content">
+              <div class="section-header">
+                <h3>Employee Details</h3>
+                @if (canManage()) {
+                  @if (!isEditing()) {
+                    <button class="btn-edit" (click)="startEdit()" title="Edit Personal Information">
+                      <ng-icon name="tablerEdit" size="18"></ng-icon>
+                    </button>
+                  } @else {
+                    <button class="btn-close-edit" (click)="cancelEdit()" title="Cancel Edit">
+                      <ng-icon name="tablerX" size="18"></ng-icon>
+                    </button>
+                  }
+                }
+              </div>
+
+              <div class="profile-fields">
+                @if (isEditing()) {
+                  <!-- Edit Mode -->
+                  <div class="edit-form">
+                    <div class="form-grid">
+                      <div class="form-group">
+                        <label for="firstName-input">First Name</label>
+                        <input
+                          id="firstName-input"
+                          type="text"
+                          [(ngModel)]="editUser.firstName"
+                          placeholder="First Name"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="lastName-input">Last Name</label>
+                        <input
+                          id="lastName-input"
+                          type="text"
+                          [(ngModel)]="editUser.lastName"
+                          placeholder="Last Name"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="email-input">Email Address</label>
+                        <input
+                          id="email-input"
+                          type="email"
+                          [value]="member()?.email"
+                          disabled
+                          class="disabled-input"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="phone-input">Phone Number</label>
+                        <input
+                          id="phone-input"
+                          type="text"
+                          [(ngModel)]="editProfile.phoneNumber"
+                          placeholder="+1 (555) 000-0000"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="address-input">Address</label>
+                        <input
+                          id="address-input"
+                          type="text"
+                          [(ngModel)]="editProfile.address"
+                          placeholder="Full residential address"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="hire-date-input">Hire Date</label>
+                        <input
+                          id="hire-date-input"
+                          type="date"
+                          [(ngModel)]="editProfile.hireDate"
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="birth-date-input">Birth Date</label>
+                        <input
+                          id="birth-date-input"
+                          type="date"
+                          [(ngModel)]="editProfile.birthDate"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="edit-actions">
+                      <button class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
+                        Cancel
+                      </button>
+                      <button class="btn-save" (click)="saveProfile()" [disabled]="saving()">
+                        @if (saving()) {
+                          Saving...
+                        } @else {
+                          Save Changes
+                        }
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="label">First Name</span>
+                      <span class="value">{{ member()?.firstName }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Last Name</span>
+                      <span class="value">{{ member()?.lastName }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Email Address</span>
+                      <span class="value">{{ member()?.email }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Assigned Role</span>
+                      <span class="value">{{ roleLabel() }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Department</span>
+                      <span class="value">{{ departmentName() }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Phone Number</span>
+                      <span class="value">{{ member()?.profile?.phoneNumber || '-' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Address</span>
+                      <span class="value">{{ member()?.profile?.address || '-' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Hire Date</span>
+                      <span class="value">{{ formatDate(member()?.profile?.hireDate) }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="label">Birth Date</span>
+                      <span class="value">{{ formatDate(member()?.profile?.birthDate) }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- HR Actions & Roles -->
+          @if (activeTabId() === 'hr_management') {
+            <div class="tab-content">
+              <div class="section-header">
+                <h3>HR Management & Actions</h3>
+                <p class="section-desc">Assign system roles or transfer employee to a different department.</p>
+              </div>
+
+              @if (canManage()) {
+                <div class="hr-actions-grid">
+                  <!-- Assign/Change Role Card -->
+                  <div class="hr-action-card">
+                    <div class="card-header">
+                      <ng-icon name="tablerUserCheck" size="20"></ng-icon>
+                      <h4>Assign System Role</h4>
+                    </div>
+                    <p class="card-desc">
+                      Current Role: <strong>{{ roleLabel() }}</strong>
+                    </p>
+                    <div class="form-group">
+                      <label for="role-select">Select New Role</label>
+                      <select id="role-select" [(ngModel)]="selectedRole" class="form-control">
+                        @for (role of rolesList; track role) {
+                          <option [value]="role">{{ role }}</option>
+                        }
+                      </select>
+                    </div>
+                    <button
+                      class="btn btn-primary btn-action"
+                      (click)="applyRoleChange()"
+                      [disabled]="saving() || selectedRole === member()?.role"
+                    >
+                      @if (saving()) {
+                        Applying...
+                      } @else {
+                        Update Role
+                      }
+                    </button>
+                  </div>
+
+                  <!-- Reassign/Change Department Card -->
+                  <div class="hr-action-card">
+                    <div class="card-header">
+                      <ng-icon name="tablerBuilding" size="20"></ng-icon>
+                      <h4>Transfer Department</h4>
+                    </div>
+                    <p class="card-desc">
+                      Current Department: <strong>{{ departmentName() }}</strong>
+                    </p>
+                    <div class="form-group">
+                      <label for="dept-select">Select Target Department</label>
+                      <select id="dept-select" [(ngModel)]="selectedDepartmentId" class="form-control">
+                        <option value="">-- Unassigned / General --</option>
+                        @for (dept of departments(); track dept.id) {
+                          <option [value]="dept.id">{{ dept.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <button
+                      class="btn btn-primary btn-action"
+                      (click)="applyDepartmentChange()"
+                      [disabled]="saving() || selectedDepartmentId === (member()?.departmentId || '')"
+                    >
+                      @if (saving()) {
+                        Applying...
+                      } @else {
+                        Transfer Employee
+                      }
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div class="restricted-notice">
+                  <ng-icon name="tablerAlertCircle" size="24"></ng-icon>
+                  <p>You do not have HR/Admin permissions to modify employee roles or departments.</p>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Compensation -->
+          @if (activeTabId() === 'compensation') {
+            <div class="tab-content">
+              <div class="section-header">
+                <h3>Compensation & Benefits</h3>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Base Salary</span>
+                  <span class="value">$95,000 / year</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Performance Bonus</span>
+                  <span class="value">$8,000 / year</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Currency</span>
+                  <span class="value">USD</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Pay Frequency</span>
+                  <span class="value">Semi-Monthly</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Documents -->
+          @if (activeTabId() === 'documents') {
+            <div class="tab-content">
+              <div class="section-header">
+                <h3>Employee Documents</h3>
+              </div>
+              <div class="documents-list">
+                <p class="empty-message">No uploaded documents available for this employee.</p>
+              </div>
+            </div>
+          }
+        </app-tabs>
+      </div>
+    </div>
+  }
+</div>
