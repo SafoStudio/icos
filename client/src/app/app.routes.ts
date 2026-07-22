@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { MembersComponent } from './features/members/members.component';
+import { MemberProfileComponent } from './features/members/member-profile/member-profile.component';
 import { OrganizationComponent } from './features/org/organization.component';
 import { DepartmentsComponent } from './features/org/departments/departments.component';
 import { DepartmentDetailComponent } from './features/org/departments/department-detail/department-detail.component';
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
+  { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
   {
     path: 'organization',
     component: OrganizationComponent,
