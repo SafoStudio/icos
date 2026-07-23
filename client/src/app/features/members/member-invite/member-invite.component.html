@@ -1,0 +1,106 @@
+<dialog class="invite-dialog"
+        #inviteDialog
+        (click)="onClose()"
+        (keydown)="onDialogKeydown($event)"
+        aria-modal="true"
+        [attr.aria-label]="'Invite new team member dialog'">
+  <div class="dialog-content"
+       (click)="$event.stopPropagation()"
+       (keydown)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h2 id="invite-modal-title">Invite New Team Member</h2>
+      <button class="close-btn"
+              (click)="onClose()"
+              (keydown.enter)="onClose()"
+              (keydown.space)="onClose()"
+              aria-label="Close modal">
+        &times;
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (error) {
+      <output class="alert alert-danger" aria-live="assertive">{{ error }}</output>
+      }
+      @if (success) {
+      <output class="alert alert-success" aria-live="polite">{{ success }}</output>
+      }
+
+      <form [formGroup]="inviteForm" (ngSubmit)="onSubmit()" class="invite-form"
+            [attr.aria-labelledby]="'invite-modal-title'">
+        <div class="form-group">
+          <label for="invite-email" class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="invite-email"
+            formControlName="email"
+            placeholder="colleague@company.com"
+            [class.error]="inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid"
+            [attr.aria-describedby]="(inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid) ? 'email-error' : null"
+            [attr.aria-invalid]="inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid"
+          />
+          @if (inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid) {
+          <span class="error-text" id="email-error" role="alert">Please enter a valid email address</span>
+          }
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label for="invite-role" class="form-label">Role</label>
+            <select id="invite-role" formControlName="role"
+                    (keydown.enter)="$event.preventDefault()">
+              @for (role of availableRoles; track role) {
+              <option [value]="role">{{ role }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="invite-dept" class="form-label">Department</label>
+            <select id="invite-dept" formControlName="departmentId"
+                    (keydown.enter)="$event.preventDefault()"
+                    [attr.aria-describedby]="inviteForm.get('departmentId')?.touched && inviteForm.get('departmentId')?.invalid ? 'dept-error' : null"
+                    [attr.aria-invalid]="inviteForm.get('departmentId')?.touched && inviteForm.get('departmentId')?.invalid">
+              @for (dept of departments; track dept.id) {
+              <option [value]="dept.id">{{ dept.name }}</option>
+              }
+            </select>
+            @if (inviteForm.get('departmentId')?.touched && inviteForm.get('departmentId')?.invalid) {
+            <span class="error-text" id="dept-error" role="alert">Department is required</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="invite-manager" class="form-label">Head of Department / Manager</label>
+          <select id="invite-manager" formControlName="managerId"
+                  (keydown.enter)="$event.preventDefault()">
+            <option value="">None</option>
+            @for (m of members; track m.id) {
+            <option [value]="m.id">{{ m.firstName }} {{ m.lastName }} ({{ m.role }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary"
+                  (click)="onClose()"
+                  (keydown.enter)="onClose()"
+                  (keydown.space)="onClose()"
+                  [disabled]="isInviting">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary"
+                  [disabled]="isInviting || inviteForm.invalid"
+                  [attr.aria-label]="isInviting ? 'Sending invitation...' : 'Send invitation'">
+            @if (isInviting) {
+            <span class="spinner"></span> Sending…
+            } @else {
+            Send Invitation
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</dialog>
