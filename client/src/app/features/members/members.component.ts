@@ -1,28 +1,13 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { NgIconComponent } from '@ng-icons/core';
-
-interface Department {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-interface Member {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  departmentId?: string;
-  departmentName?: string;
-  status: string;
-}
+import { MemberInviteComponent } from './member-invite/member-invite.component';
+import { MemberService, Department, Member } from './member.service';
+import { MembersStateService } from './members-state.service';
 
 export type ViewMode = 'grid' | 'list';
 export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
@@ -30,39 +15,71 @@ export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
 @Component({
   selector: 'app-members',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, NgIconComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    NgIconComponent,
+    MemberInviteComponent
+  ],
   templateUrl: './members.component.html',
   styleUrls: ['./members.component.scss']
 })
 export class MembersComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  readonly authService = inject(AuthService);
-  private readonly api = inject(ApiService);
+  private readonly authService = inject(AuthService);
+  private readonly memberService = inject(MemberService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  private readonly stateService = inject(MembersStateService);
 
   members = signal<Member[]>([]);
   departments = signal<Department[]>([]);
   isLoading = signal(false);
+
   viewMode = signal<ViewMode>('grid');
-  // Filter & Search controls
   searchQuery = signal<string>('');
   selectedDepartmentFilter = signal<string>('');
   selectedRoleFilter = signal<string>('');
   sortBy = signal<SortOption>('name-asc');
-  // Invite modal states
+
   showInviteModal = signal(false);
   isInviting = signal(false);
   inviteError = signal<string | null>(null);
   inviteSuccess = signal<string | null>(null);
-  inviteForm!: FormGroup;
+
+  constructor() {
+    const savedState = this.stateService.getState();
+    this.viewMode.set(savedState().viewMode);
+    this.searchQuery.set(savedState().searchQuery);
+    this.selectedDepartmentFilter.set(savedState().selectedDepartmentFilter);
+    this.selectedRoleFilter.set(savedState().selectedRoleFilter);
+    this.sortBy.set(savedState().sortBy);
+
+    effect(() => {
+      this.stateService.setViewMode(this.viewMode());
+    });
+
+    effect(() => {
+      this.stateService.setSearchQuery(this.searchQuery());
+    });
+
+    effect(() => {
+      this.stateService.setDepartmentFilter(this.selectedDepartmentFilter());
+    });
+
+    effect(() => {
+      this.stateService.setRoleFilter(this.selectedRoleFilter());
+    });
+
+    effect(() => {
+      this.stateService.setSortBy(this.sortBy());
+    });
+  }
 
   canInvite = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return false;
     if (user.role === 'ADMIN' || user.role === 'OWNER') return true;
-
-    // Check if user is in HR department
     const userDept = this.departments().find(d => d.id === user.departmentId);
     return userDept?.name?.toUpperCase() === 'HR';
   });
@@ -75,16 +92,63 @@ export class MembersComponent implements OnInit {
     return ['OWNER', 'HEAD', 'SPECIALIST'];
   });
 
-  // Filtered & Sorted members calculation
   filteredMembers = computed(() => {
-    let list = this.members();
+    const list = this.applyFilters(this.members());
+    return this.applySorting(list);
+  });
+
+  totalCount = computed(() => this.members().length);
+  activeCount = computed(() => this.members().filter(m => m.status === 'ACTIVE' || !m.status).length);
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    const user = this.authService.currentUser();
+    if (!user) return;
+
+    this.isLoading.set(true);
+    const companyId = user.companyId;
+
+    this.memberService.getDepartments(companyId).subscribe({
+      next: (depts) => {
+        this.departments.set(depts);
+        this.loadMembers(companyId);
+      },
+      error: (err) => {
+        console.error('Failed to load departments:', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  private loadMembers(companyId: string): void {
+    this.memberService.getMembers(companyId).subscribe({
+      next: (members) => {
+        this.isLoading.set(false);
+        const mapped = members.map(m => ({
+          ...m,
+          departmentName: this.getDepartmentName(m.departmentId)
+        }));
+        this.members.set(mapped);
+      },
+      error: (err) => {
+        console.error('Failed to load members:', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  private applyFilters(list: Member[]): Member[] {
     const query = this.searchQuery().trim().toLowerCase();
     const deptId = this.selectedDepartmentFilter();
     const role = this.selectedRoleFilter();
-    const sort = this.sortBy();
+
+    let filtered = list;
 
     if (query) {
-      list = list.filter(m => {
+      filtered = filtered.filter(m => {
         const fullName = `${m.firstName} ${m.lastName}`.toLowerCase();
         const email = m.email.toLowerCase();
         return fullName.includes(query) || email.includes(query);
@@ -93,104 +157,40 @@ export class MembersComponent implements OnInit {
 
     if (deptId) {
       if (deptId === 'unassigned') {
-        list = list.filter(m => !m.departmentId);
+        filtered = filtered.filter(m => !m.departmentId);
       } else {
-        list = list.filter(m => m.departmentId === deptId);
+        filtered = filtered.filter(m => m.departmentId === deptId);
       }
     }
 
     if (role) {
-      list = list.filter(m => m.role === role);
+      filtered = filtered.filter(m => m.role === role);
     }
 
-    // Sorting
+    return filtered;
+  }
+
+  private applySorting(list: Member[]): Member[] {
+    const sort = this.sortBy();
     return [...list].sort((a, b) => {
-      if (sort === 'name-asc') {
-        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
-      } else if (sort === 'name-desc') {
-        return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
-      } else if (sort === 'role') {
-        return a.role.localeCompare(b.role);
-      } else if (sort === 'dept') {
-        return (a.departmentName || '').localeCompare(b.departmentName || '');
+      switch (sort) {
+        case 'name-asc':
+          return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        case 'name-desc':
+          return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
+        case 'role':
+          return a.role.localeCompare(b.role);
+        case 'dept':
+          return (a.departmentName || '').localeCompare(b.departmentName || '');
+        default:
+          return 0;
       }
-      return 0;
-    });
-  });
-
-  // Statistics counters
-  totalCount = computed(() => this.members().length);
-  activeCount = computed(() => this.members().filter(m => m.status === 'ACTIVE' || !m.status).length);
-
-  ngOnInit(): void {
-    this.initInviteForm();
-    this.loadData();
-  }
-
-  private initInviteForm(): void {
-    this.inviteForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      role: ['SPECIALIST', [Validators.required]],
-      departmentId: ['', [Validators.required]],
-      managerId: ['']
     });
   }
 
-  loadData(): void {
-    const user = this.authService.currentUser();
-    if (!user) return;
-
-    this.isLoading.set(true);
-    const companyId = user.companyId;
-
-    const deptQuery = `
-      query GetDepartments($companyId: ID!) {
-        departments(companyId: $companyId) {
-          id
-          name
-          description
-        }
-      }
-    `;
-
-    const membersQuery = `
-      query UsersByCompany($companyId: ID!) {
-        usersByCompany(companyId: $companyId) {
-          id
-          firstName
-          lastName
-          email
-          role
-          departmentId
-          status
-        }
-      }
-    `;
-
-    this.api.graphql<{ departments: Department[] }>(deptQuery, { companyId }).subscribe({
-      next: (deptData) => {
-        this.departments.set(deptData.departments || []);
-
-        this.api.graphql<{ usersByCompany: Member[] }>(membersQuery, { companyId }).subscribe({
-          next: (membersData) => {
-            this.isLoading.set(false);
-            const mappedMembers = (membersData.usersByCompany || []).map(m => ({
-              ...m,
-              departmentName: this.departments().find(d => d.id === m.departmentId)?.name || 'Unassigned'
-            }));
-            this.members.set(mappedMembers);
-          },
-          error: (err) => {
-            console.error('Failed to load members:', err);
-            this.isLoading.set(false);
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Failed to load departments:', err);
-        this.isLoading.set(false);
-      }
-    });
+  private getDepartmentName(deptId: string | undefined): string {
+    if (!deptId) return 'Unassigned';
+    return this.departments().find(d => d.id === deptId)?.name || 'Unassigned';
   }
 
   setViewMode(mode: ViewMode): void {
@@ -210,12 +210,6 @@ export class MembersComponent implements OnInit {
 
   openInviteModal(): void {
     if (!this.canInvite()) return;
-    this.inviteForm.reset({
-      email: '',
-      role: 'SPECIALIST',
-      departmentId: this.departments().length > 0 ? this.departments()[0].id : '',
-      managerId: ''
-    });
     this.inviteError.set(null);
     this.inviteSuccess.set(null);
     this.showInviteModal.set(true);
@@ -225,17 +219,11 @@ export class MembersComponent implements OnInit {
     this.showInviteModal.set(false);
   }
 
-  submitInvite(): void {
-    if (this.inviteForm.invalid) {
-      this.inviteForm.markAllAsTouched();
-      return;
-    }
-
+  handleInviteSubmit(formValue: any): void {
     this.isInviting.set(true);
     this.inviteError.set(null);
     this.inviteSuccess.set(null);
 
-    const formValue = this.inviteForm.value;
     const input = {
       email: formValue.email,
       role: formValue.role,
@@ -243,26 +231,13 @@ export class MembersComponent implements OnInit {
       managerId: formValue.managerId || null
     };
 
-    const mutation = `
-      mutation CreateInvite($input: InviteRequestInput!) {
-        createInvite(input: $input) {
-          id
-          email
-          role
-          status
-        }
-      }
-    `;
-
-    this.api.graphql<{ createInvite: any }>(mutation, { input }).subscribe({
+    this.memberService.createInvite(input).subscribe({
       next: () => {
         this.isInviting.set(false);
         this.inviteSuccess.set('Invitation sent successfully!');
         this.toastService.success('Invitation sent successfully!');
         this.loadData();
-        setTimeout(() => {
-          this.closeInviteModal();
-        }, 1500);
+        setTimeout(() => this.closeInviteModal(), 1500);
       },
       error: (err) => {
         this.isInviting.set(false);
@@ -271,16 +246,11 @@ export class MembersComponent implements OnInit {
     });
   }
 
-  getDepartmentName(deptId: string | undefined): string {
-    if (!deptId) return 'Unassigned';
-    return this.departments().find(d => d.id === deptId)?.name || 'Unassigned';
-  }
-
   getRoleLabel(role: string): string {
     const labels: Record<string, string> = {
       'OWNER': 'Owner',
       'ADMIN': 'Admin',
-      'HEAD': 'Dept Head',
+      'HEAD': 'Head',
       'SPECIALIST': 'Specialist'
     };
     return labels[role] || role;
@@ -303,7 +273,8 @@ export class MembersComponent implements OnInit {
     let hash = 0;
     const str = member.id || member.email || member.firstName;
     for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      const codePoint = str.codePointAt(i) || 0;
+      hash = codePoint + ((hash << 5) - hash);
     }
     const index = Math.abs(hash) % photos.length;
     return photos[index];

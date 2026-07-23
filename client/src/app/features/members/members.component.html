@@ -1,10 +1,10 @@
 <div class="members-container">
+  <!-- HEADER -->
   <div class="header">
     <div class="header-text">
       <h1>Company Members</h1>
       <p class="subtitle">Manage your company team, employee cards, department assignments, and system roles</p>
     </div>
-
     <div class="header-right">
       <div class="stats-pills">
         <div class="stat-pill">
@@ -16,12 +16,14 @@
           <span class="stat-lbl">Active</span>
         </div>
       </div>
-
       @if (canInvite()) {
-        <button class="btn btn-primary btn-invite" (click)="openInviteModal()">
-          <ng-icon name="tablerPlus" size="18"></ng-icon>
-          <span>Invite Member</span>
-        </button>
+      <button class="btn btn-primary btn-invite"
+              (click)="openInviteModal()"
+              (keydown.enter)="openInviteModal()"
+              (keydown.space)="openInviteModal()">
+        <ng-icon name="tablerPlus" size="18"></ng-icon>
+        <span>Invite Member</span>
+      </button>
       }
     </div>
   </div>
@@ -30,41 +32,52 @@
   <div class="filter-bar">
     <div class="search-box">
       <ng-icon name="tablerSearch" size="18" class="search-icon"></ng-icon>
-      <label>
-        <input
-          type="text"
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)"
-          placeholder="Search member by name or email..."
-        />
-      </label>
+      <label for="search-input" class="sr-only">Search members</label>
+      <input
+        id="search-input"
+        type="text"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        placeholder="Search member by name or email..."
+        (keydown.enter)="$event.preventDefault()"
+      />
       @if (searchQuery()) {
-        <button class="btn-clear-search" (click)="searchQuery.set('')">
-          <ng-icon name="tablerX" size="16"></ng-icon>
-        </button>
+      <button class="btn-clear-search"
+              (click)="searchQuery.set('')"
+              (keydown.enter)="searchQuery.set('')"
+              (keydown.space)="searchQuery.set('')"
+              aria-label="Clear search">
+        <ng-icon name="tablerX" size="16"></ng-icon>
+      </button>
       }
     </div>
 
     <div class="filters-group">
       <div class="filter-select-wrapper">
         <ng-icon name="tablerBuilding" size="16" class="select-icon"></ng-icon>
+        <label for="department-filter" class="sr-only">Filter by department</label>
         <select
+          id="department-filter"
           [ngModel]="selectedDepartmentFilter()"
           (ngModelChange)="selectedDepartmentFilter.set($event)"
+          (keydown.enter)="$event.preventDefault()"
         >
           <option value="">All Departments</option>
           <option value="unassigned">Unassigned</option>
           @for (dept of departments(); track dept.id) {
-            <option [value]="dept.id">{{ dept.name }}</option>
+          <option [value]="dept.id">{{ dept.name }}</option>
           }
         </select>
       </div>
 
       <div class="filter-select-wrapper">
         <ng-icon name="tablerUser" size="16" class="select-icon"></ng-icon>
+        <label for="role-filter" class="sr-only">Filter by role</label>
         <select
+          id="role-filter"
           [ngModel]="selectedRoleFilter()"
           (ngModelChange)="selectedRoleFilter.set($event)"
+          (keydown.enter)="$event.preventDefault()"
         >
           <option value="">All Roles</option>
           <option value="OWNER">Owner</option>
@@ -75,32 +88,45 @@
       </div>
 
       <div class="filter-select-wrapper sort-wrapper">
+        <label for="sort-select" class="sr-only">Sort members</label>
         <select
+          id="sort-select"
           [ngModel]="sortBy()"
           (ngModelChange)="sortBy.set($event)"
+          (keydown.enter)="$event.preventDefault()"
         >
-          <option value="name-asc">Sort: Name (A - Z)</option>
-          <option value="name-desc">Sort: Name (Z - A)</option>
+          <option value="name-asc">Sort: Name (A – Z)</option>
+          <option value="name-desc">Sort: Name (Z – A)</option>
           <option value="role">Sort: Role</option>
           <option value="dept">Sort: Department</option>
         </select>
       </div>
 
       @if (searchQuery() || selectedDepartmentFilter() || selectedRoleFilter()) {
-        <button class="btn-reset-filters" (click)="clearFilters()" title="Reset Filters">
-          <ng-icon name="tablerX" size="16"></ng-icon>
-          <span>Reset</span>
-        </button>
+      <button class="btn-reset-filters"
+              (click)="clearFilters()"
+              (keydown.enter)="clearFilters()"
+              (keydown.space)="clearFilters()"
+              title="Reset Filters"
+              aria-label="Reset all filters">
+        <ng-icon name="tablerX" size="16"></ng-icon>
+        <span>Reset</span>
+      </button>
       }
     </div>
 
-    <!-- GRID VS LIST -->
-    <div class="view-toggle-bar">
+    <!-- VIEW TOGGLE -->
+    <fieldset class="view-toggle-bar" aria-label="View mode toggle">
+      <legend class="sr-only">View mode toggle</legend>
       <button
         class="toggle-btn"
         [class.active]="viewMode() === 'grid'"
         (click)="setViewMode('grid')"
+        (keydown.enter)="setViewMode('grid')"
+        (keydown.space)="setViewMode('grid')"
         title="Cards (Grid) View"
+        [attr.aria-pressed]="viewMode() === 'grid'"
+        [attr.aria-label]="'Switch to grid view'"
       >
         <ng-icon name="tablerLayoutGrid" size="18"></ng-icon>
         <span>Cards</span>
@@ -109,219 +135,166 @@
         class="toggle-btn"
         [class.active]="viewMode() === 'list'"
         (click)="setViewMode('list')"
+        (keydown.enter)="setViewMode('list')"
+        (keydown.space)="setViewMode('list')"
         title="List (Table) View"
+        [attr.aria-pressed]="viewMode() === 'list'"
+        [attr.aria-label]="'Switch to list view'"
       >
         <ng-icon name="tablerList" size="18"></ng-icon>
         <span>List</span>
       </button>
-    </div>
+    </fieldset>
   </div>
 
+  <!-- CONTENT -->
   @if (isLoading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading company members...</p>
-    </div>
+  <output class="loading-state" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Loading company members…</p>
+  </output>
   } @else {
-    @if (filteredMembers().length === 0) {
-      <div class="empty-state">
-        <ng-icon name="tablerUser" size="48" class="empty-icon"></ng-icon>
-        @if (members().length === 0) {
-          <h3>No members found</h3>
-          <p>Get started by inviting team members to your organization.</p>
-          @if (canInvite()) {
-            <button class="btn btn-secondary" (click)="openInviteModal()">Invite the first member</button>
-          }
-        } @else {
-          <h3>No members match your criteria</h3>
-          <p>Try adjusting your search query or filter options.</p>
-          <button class="btn btn-secondary" (click)="clearFilters()">Clear Filters</button>
-        }
-      </div>
+  @if (filteredMembers().length === 0) {
+  <output class="empty-state" aria-live="polite">
+    <ng-icon name="tablerUser" size="48" class="empty-icon"></ng-icon>
+    @if (members().length === 0) {
+    <h3>No members found</h3>
+    <p>Get started by inviting team members to your organization.</p>
+    @if (canInvite()) {
+    <button class="btn btn-secondary"
+            (click)="openInviteModal()"
+            (keydown.enter)="openInviteModal()"
+            (keydown.space)="openInviteModal()">
+      Invite the first member
+    </button>
+    }
     } @else {
-  <!-- GRID / CARDS VIEW -->
+    <h3>No members match your criteria</h3>
+    <p>Try adjusting your search query or filter options.</p>
+    <button class="btn btn-secondary"
+            (click)="clearFilters()"
+            (keydown.enter)="clearFilters()"
+            (keydown.space)="clearFilters()">
+      Clear Filters
+    </button>
+    }
+  </output>
+  } @else {
+  <!-- GRID VIEW -->
   @if (viewMode() === 'grid') {
-  <div class="members-grid">
+  <ul class="members-grid" aria-label="Members in grid view">
     @for (member of filteredMembers(); track member.id) {
-    <div class="member-card" (click)="navigateToProfile(member.id)"
-         [style.background-image]="'url(' + getMemberPhotoUrl(member) + ')'">
-      <div class="card-overlay">
-        <div class="card-top">
-            <span class="badge badge-status" [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')">
+    <li class="member-card">
+      <button class="card-button"
+              (click)="navigateToProfile(member.id)"
+              (keydown.enter)="navigateToProfile(member.id)"
+              (keydown.space)="$event.preventDefault(); navigateToProfile(member.id)"
+              [style.background-image]="'url(' + getMemberPhotoUrl(member) + ')'"
+              [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
+        <div class="card-overlay">
+          <div class="card-top">
+            <output class="badge badge-status"
+                    [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')"
+                    [attr.aria-label]="'Status: ' + (member.status || 'ACTIVE')">
               {{ member.status || 'ACTIVE' }}
-            </span>
-        </div>
-
-        <div class="card-info">
-          <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
-          <p class="member-email">{{ member.email }}</p>
-
-          <div class="card-tags">
-              <span class="badge badge-role" [class]="'role-' + member.role.toLowerCase()">
-                {{ getRoleLabel(member.role) }}
-              </span>
-            <span class="tag-dept">
-                <ng-icon name="tablerBuilding" size="14"></ng-icon>
-                {{ member.departmentName }}
-              </span>
+            </output>
+          </div>
+          <div class="card-info">
+            <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
+            <p class="member-email">{{ member.email }}</p>
+            <div class="card-tags">
+                      <span class="badge badge-role"
+                            [class]="'role-' + member.role.toLowerCase()"
+                            [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
+                        {{ getRoleLabel(member.role) }}
+                      </span>
+              <span class="tag-dept"
+                    [attr.aria-label]="'Department: ' + member.departmentName">
+                        <ng-icon name="tablerBuilding" size="14"></ng-icon>
+                        {{ member.departmentName }}
+                      </span>
+            </div>
+          </div>
+          <div class="card-footer">
+                    <span class="btn-profile-link">
+                      <span>View Profile</span>
+                      <ng-icon name="tablerChevronRight" size="16"></ng-icon>
+                    </span>
           </div>
         </div>
-
-        <div class="card-footer">
-          <button class="btn-profile-link" (click)="$event.stopPropagation(); navigateToProfile(member.id)">
-            <span>View Profile</span>
-            <ng-icon name="tablerChevronRight" size="16"></ng-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+      </button>
+    </li>
     }
-  </div>
+  </ul>
   }
 
-      <!-- LIST / TABLE VIEW -->
-      @if (viewMode() === 'list') {
-        <div class="table-container">
-          <table class="members-table">
-            <thead>
-              <tr>
-                <th>Member / Employee</th>
-                <th>Email Address</th>
-                <th>Role</th>
-                <th>Department</th>
-                <th>Status</th>
-                <th class="text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (member of filteredMembers(); track member.id) {
-                <tr class="clickable-row" (click)="navigateToProfile(member.id)">
-                  <td>
-                    <div class="member-name-cell">
-                      <div class="avatar-circle">
-                        {{ member.firstName.charAt(0).toUpperCase() }}
-                      </div>
-                      <div class="name-wrapper">
-                        <span class="full-name">{{ member.firstName }} {{ member.lastName }}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td><span class="email-cell">{{ member.email }}</span></td>
-                  <td>
-                    <span class="badge badge-role" [class]="'role-' + member.role.toLowerCase()">
-                      {{ getRoleLabel(member.role) }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="dept-cell">
-                      <ng-icon name="tablerBuilding" size="14"></ng-icon>
-                      {{ member.departmentName }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge badge-status" [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')">
-                      {{ member.status || 'ACTIVE' }}
-                    </span>
-                  </td>
-                  <td class="text-right">
-                    <button class="btn-table-action" (click)="$event.stopPropagation(); navigateToProfile(member.id)">
-                      <span>Profile</span>
-                      <ng-icon name="tablerChevronRight" size="14"></ng-icon>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+  <!-- LIST VIEW -->
+  @if (viewMode() === 'list') {
+  <div class="table-container">
+    <table class="members-table" aria-label="Members list">
+      <thead>
+      <tr>
+        <th scope="col" class="col-member">Member</th>
+        <th scope="col" class="col-email">Email Address</th>
+        <th scope="col" class="col-role">Role</th>
+        <th scope="col" class="col-department">Department</th>
+        <th scope="col" class="col-status">Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      @for (member of filteredMembers(); track member.id) {
+      <tr class="clickable-row">
+        <td colspan="5" class="clickable-cell">
+          <button class="row-button"
+                  (click)="navigateToProfile(member.id)"
+                  (keydown.enter)="navigateToProfile(member.id)"
+                  (keydown.space)="$event.preventDefault(); navigateToProfile(member.id)"
+                  [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
+                <span class="col-member">
+                  <span class="full-name">{{ member.firstName }} {{ member.lastName }}</span>
+                </span>
+            <span class="col-email">{{ member.email }}</span>
+            <span class="col-role">
+                  <span class="badge badge-role"
+                        [class]="'role-' + member.role.toLowerCase()"
+                        [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
+                    {{ getRoleLabel(member.role) }}
+                  </span>
+                </span>
+            <span class="col-department">
+                  <span class="dept-cell" [attr.aria-label]="'Department: ' + member.departmentName">
+                    {{ member.departmentName }}
+                  </span>
+                </span>
+            <span class="col-status">
+                  <output class="badge badge-status"
+                          [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')"
+                          [attr.aria-label]="'Status: ' + (member.status || 'ACTIVE')">
+                    {{ member.status || 'ACTIVE' }}
+                  </output>
+                </span>
+          </button>
+        </td>
+      </tr>
       }
-    }
+      </tbody>
+    </table>
+  </div>
+  }
+  }
   }
 
   <!-- INVITE MODAL -->
   @if (showInviteModal()) {
-    <div class="modal-overlay" (click)="closeInviteModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>Invite New Team Member</h2>
-          <button class="close-btn" (click)="closeInviteModal()">&times;</button>
-        </div>
-
-        <div class="modal-body">
-          @if (inviteError()) {
-            <div class="alert alert-danger">
-              {{ inviteError() }}
-            </div>
-          }
-          @if (inviteSuccess()) {
-            <div class="alert alert-success">
-              {{ inviteSuccess() }}
-            </div>
-          }
-
-          <form [formGroup]="inviteForm" (ngSubmit)="submitInvite()" class="invite-form">
-            <div class="form-group">
-              <label for="invite-email">Email Address</label>
-              <input
-                type="email"
-                id="invite-email"
-                formControlName="email"
-                placeholder="colleague@company.com"
-                [class.error]="inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid"
-              />
-              @if (inviteForm.get('email')?.touched && inviteForm.get('email')?.invalid) {
-                <span class="error-text">Please enter a valid email address</span>
-              }
-            </div>
-
-            <div class="row">
-              <div class="form-group">
-                <label for="invite-role">Role</label>
-                <select id="invite-role" formControlName="role">
-                  @for (role of availableRoles(); track role) {
-                    <option [value]="role">{{ role }}</option>
-                  }
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="invite-dept">Department</label>
-                <select id="invite-dept" formControlName="departmentId">
-                  @for (dept of departments(); track dept.id) {
-                    <option [value]="dept.id">{{ dept.name }}</option>
-                  }
-                </select>
-                @if (inviteForm.get('departmentId')?.touched && inviteForm.get('departmentId')?.invalid) {
-                  <span class="error-text">Department is required</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="invite-manager">Head of Department / Manager</label>
-              <select id="invite-manager" formControlName="managerId">
-                <option value="">None</option>
-                @for (m of members(); track m.id) {
-                  <option [value]="m.id">{{ m.firstName }} {{ m.lastName }} ({{ m.role }})</option>
-                }
-              </select>
-            </div>
-
-            <div class="modal-actions">
-              <button type="button" class="btn btn-secondary" (click)="closeInviteModal()" [disabled]="isInviting()">
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="isInviting() || inviteForm.invalid">
-                @if (isInviting()) {
-                  <span class="spinner"></span> Sending...
-                } @else {
-                  Send Invitation
-                }
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+  <app-member-invite
+    [departments]="departments()"
+    [members]="members()"
+    [availableRoles]="availableRoles()"
+    [isInviting]="isInviting()"
+    [error]="inviteError()"
+    [success]="inviteSuccess()"
+    (closeModal)="closeInviteModal()"
+    (submitInvite)="handleInviteSubmit($event)"
+  ></app-member-invite>
   }
 </div>
