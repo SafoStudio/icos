@@ -272,114 +272,158 @@
 // CARDS / GRID VIEW
 .members-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-}
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
 
-.member-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  .member-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 340px;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-  &:hover {
-    transform: translateY(-4px);
-    border-color: #c7d2fe;
-    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.12);
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 
-    .avatar-box {
-      transform: scale(1.05);
-    }
-
-    .btn-profile-link {
-      color: #4f46e5;
-    }
-  }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-
-    .avatar-box {
-      width: 64px;
-      height: 80px; // photo aspect ratio
-      border-radius: 12px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-      transition: transform 0.25s ease;
-    }
-  }
-
-  .card-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    .member-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0;
-    }
-
-    .member-email {
-      font-size: 0.85rem;
-      color: #64748b;
-      margin: 0 0 8px 0;
-      word-break: break-all;
-    }
-
-    .card-tags {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-
-      .tag-dept {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #475569;
-        background: #f1f5f9;
-        padding: 3px 8px;
-        border-radius: 6px;
+      .card-overlay {
+        background: rgba(0, 0, 0, 0.7);
       }
     }
-  }
 
-  .card-footer {
-    padding-top: 12px;
-    border-top: 1px solid #f1f5f9;
-
-    .btn-profile-link {
-      background: none;
-      border: none;
-      padding: 0;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #6366f1;
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.6) 50%,
+        rgba(0, 0, 0, 0.85) 100%
+      );
+      padding: 20px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      width: 100%;
-      cursor: pointer;
-      transition: color 0.2s;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
+    }
+
+    .card-info {
+      color: white;
+      text-align: center;
+
+      .member-name {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .member-email {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0 0 12px 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      }
+
+      .card-tags {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .badge-role {
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(4px);
+          color: white;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          font-weight: 500;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tag-dept {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(4px);
+          color: white;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+      }
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: center;
+
+      .btn-profile-link {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.25);
+          transform: scale(1.05);
+        }
+
+        span {
+          color: white;
+        }
+      }
+    }
+
+    .badge-status {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      &.status-active {
+        border-color: #4caf50;
+        color: #4caf50;
+      }
+
+      &.status-inactive {
+        border-color: #f44336;
+        color: #f44336;
+      }
+
+      &.status-pending {
+        border-color: #ff9800;
+        color: #ff9800;
+      }
     }
   }
 }

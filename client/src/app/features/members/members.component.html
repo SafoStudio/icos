@@ -139,45 +139,45 @@
         }
       </div>
     } @else {
-      <!-- GRID / CARDS VIEW -->
-      @if (viewMode() === 'grid') {
-        <div class="members-grid">
-          @for (member of filteredMembers(); track member.id) {
-            <div class="member-card" (click)="navigateToProfile(member.id)">
-              <div class="card-top">
-                <div class="avatar-box">
-                  <span class="avatar-letter">{{ member.firstName.charAt(0).toUpperCase() }}</span>
-                </div>
-                <span class="badge badge-status" [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')">
-                  {{ member.status || 'ACTIVE' }}
-                </span>
-              </div>
-
-              <div class="card-info">
-                <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
-                <p class="member-email">{{ member.email }}</p>
-
-                <div class="card-tags">
-                  <span class="badge badge-role" [class]="'role-' + member.role.toLowerCase()">
-                    {{ getRoleLabel(member.role) }}
-                  </span>
-                  <span class="tag-dept">
-                    <ng-icon name="tablerBuilding" size="14"></ng-icon>
-                    {{ member.departmentName }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="card-footer">
-                <button class="btn-profile-link" (click)="$event.stopPropagation(); navigateToProfile(member.id)">
-                  <span>View HR Profile</span>
-                  <ng-icon name="tablerChevronRight" size="16"></ng-icon>
-                </button>
-              </div>
-            </div>
-          }
+  <!-- GRID / CARDS VIEW -->
+  @if (viewMode() === 'grid') {
+  <div class="members-grid">
+    @for (member of filteredMembers(); track member.id) {
+    <div class="member-card" (click)="navigateToProfile(member.id)"
+         [style.background-image]="'url(' + getMemberPhotoUrl(member) + ')'">
+      <div class="card-overlay">
+        <div class="card-top">
+            <span class="badge badge-status" [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')">
+              {{ member.status || 'ACTIVE' }}
+            </span>
         </div>
-      }
+
+        <div class="card-info">
+          <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
+          <p class="member-email">{{ member.email }}</p>
+
+          <div class="card-tags">
+              <span class="badge badge-role" [class]="'role-' + member.role.toLowerCase()">
+                {{ getRoleLabel(member.role) }}
+              </span>
+            <span class="tag-dept">
+                <ng-icon name="tablerBuilding" size="14"></ng-icon>
+                {{ member.departmentName }}
+              </span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn-profile-link" (click)="$event.stopPropagation(); navigateToProfile(member.id)">
+            <span>View Profile</span>
+            <ng-icon name="tablerChevronRight" size="16"></ng-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
 
       <!-- LIST / TABLE VIEW -->
       @if (viewMode() === 'list') {
