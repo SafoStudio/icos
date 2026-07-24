@@ -1,25 +1,31 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()">
-  <div class="user-section">
-    <div class="user-profile" (click)="goToProfile()">
-      <div class="avatar">
-        <span class="avatar-letter">{{ userAvatar() }}</span>
-        <span class="status-dot online"></span>
-      </div>
-      @if (!isCollapsed()) {
-      <div class="user-info">
-        <div class="user-name">{{ userName() }}</div>
-        <div class="user-email">{{ userEmail() }}</div>
-      </div>
-      <button class="collapse-btn" (click)="$event.stopPropagation(); toggleSidebar()">
-        <ng-icon name="tablerChevronLeft" size="16"></ng-icon>
-      </button>
-      } @else {
-      <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
-        <ng-icon name="tablerChevronRight" size="16"></ng-icon>
-      </button>
-      }
+  <button
+    class="user-profile"
+    (click)="goToProfile()"
+    type="button"
+    [attr.aria-label]="'Go to profile of ' + userName()"
+  >
+    <div class="avatar">
+      <span class="avatar-letter">{{ userAvatar() }}</span>
+      <span class="status-dot online"></span>
     </div>
-  </div>
+    <div class="user-info">
+      <div class="user-name">{{ userName() }}</div>
+      <div class="user-email">{{ userEmail() }}</div>
+    </div>
+  </button>
+
+  <div class="divider"></div>
+
+  @if (!isCollapsed()) {
+  <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
+    <ng-icon name="tablerChevronLeft" size="16"></ng-icon>
+  </button>
+  } @else {
+  <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
+    <ng-icon name="tablerChevronRight" size="16"></ng-icon>
+  </button>
+  }
 
   <div class="divider"></div>
 
