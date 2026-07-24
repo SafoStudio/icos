@@ -36,7 +36,7 @@ export class MemberProfileComponent implements OnInit {
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
-    { id: 'hr_management', label: 'HR Actions & Roles', icon: 'tablerBuilding' },
+    { id: 'hr_management', label: 'Actions & Roles', icon: 'tablerBuilding' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];

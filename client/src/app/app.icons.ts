@@ -41,6 +41,7 @@ import {
   tablerArrowDown,
   tablerArrowLeft,
   tablerId,
+  tablerPhone,
   tablerBuildingStore
 } from '@ng-icons/tabler-icons';
 
@@ -86,5 +87,6 @@ export const APP_ICONS = provideIcons({
   tablerArrowDown,
   tablerArrowLeft,
   tablerId,
+  tablerPhone,
   tablerBuildingStore
 });

@@ -1,4 +1,4 @@
-<div class="employee-profile-page">
+<div>
   <div class="top-nav">
     <a routerLink="/members" class="btn-back">
       <ng-icon name="tablerChevronLeft" size="18"></ng-icon>
@@ -9,7 +9,7 @@
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Loading employee profile...</p>
+      <p>Loading member profile...</p>
     </div>
   } @else if (member()) {
     <div class="profile-layout">
@@ -36,7 +36,7 @@
             </div>
             @if (member()?.profile?.phoneNumber) {
               <div class="contact-item">
-                <ng-icon name="tablerUser" size="16"></ng-icon>
+                <ng-icon name="tablerPhone" size="16"></ng-icon>
                 <span>{{ member()?.profile?.phoneNumber }}</span>
               </div>
             }
@@ -60,9 +60,7 @@
           (tabChange)="activeTabId.set($event)"
         >
           @if (activeTabId() === 'personal') {
-            <div class="tab-content">
               <div class="section-header">
-                <h3>Employee Details</h3>
                 @if (canManage()) {
                   @if (!isEditing()) {
                     <button class="btn-edit" (click)="startEdit()" title="Edit Personal Information">
@@ -213,15 +211,12 @@
                   </div>
                 }
               </div>
-            </div>
           }
 
-          <!-- HR Actions & Roles -->
+          <!-- Actions & Roles -->
           @if (activeTabId() === 'hr_management') {
-            <div class="tab-content">
               <div class="section-header">
-                <h3>HR Management & Actions</h3>
-                <p class="section-desc">Assign system roles or transfer employee to a different department.</p>
+                <p class="section-desc">Assign system roles or transfer member to a different department.</p>
               </div>
 
               @if (canManage()) {
@@ -293,14 +288,11 @@
                   <p>You do not have HR/Admin permissions to modify employee roles or departments.</p>
                 </div>
               }
-            </div>
           }
 
           <!-- Compensation -->
           @if (activeTabId() === 'compensation') {
-            <div class="tab-content">
               <div class="section-header">
-                <h3>Compensation & Benefits</h3>
               </div>
               <div class="info-grid">
                 <div class="info-item">
@@ -320,19 +312,15 @@
                   <span class="value">Semi-Monthly</span>
                 </div>
               </div>
-            </div>
           }
 
           <!-- Documents -->
           @if (activeTabId() === 'documents') {
-            <div class="tab-content">
               <div class="section-header">
-                <h3>Employee Documents</h3>
               </div>
               <div class="documents-list">
                 <p class="empty-message">No uploaded documents available for this employee.</p>
               </div>
-            </div>
           }
         </app-tabs>
       </div>

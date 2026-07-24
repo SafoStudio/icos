@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.service';
 import { AuthService, ToastService } from '@services';
-import { type User, type UserProfile} from '@models';
+import { type User, type UserProfile, type Department } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem } from '@components';
 
@@ -26,6 +26,7 @@ export class ProfileComponent implements OnInit {
   readonly user = signal<User | null>(null);
   readonly isEditing = signal<boolean>(false);
   readonly activeTabId = signal<string>('personal');
+  readonly departments = signal<Department[]>([]);
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal Information', icon: 'tablerUser' },
@@ -37,6 +38,13 @@ export class ProfileComponent implements OnInit {
     const user = this.user();
     return user ? `${user.firstName} ${user.lastName}` : '';
   });
+
+readonly departmentName = computed(() => {
+  const u = this.user();
+  if (!u?.departmentId) return 'Unassigned / General';
+  const dept = this.departments().find(d => d.id === u.departmentId);
+  return dept ? dept.name : 'Unassigned';
+});
 
   readonly roleLabel = computed(() => {
     const user = this.user();
