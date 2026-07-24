@@ -1,7 +1,7 @@
 import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
-import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
+import { TabsComponent, type TabItem } from '@components';
 
 @Component({
   selector: 'app-organization',

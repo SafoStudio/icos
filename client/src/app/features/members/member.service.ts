@@ -1,12 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiService } from '@services/api.service';
-
-export interface Department {
-  id: string;
-  name: string;
-  description?: string;
-}
+import { ApiService } from '@services';
+import { type Department } from '@models';
 
 export interface Member {
   id: string;

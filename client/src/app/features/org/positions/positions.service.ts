@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiService } from '../../../core/services/api.service';
-import { Position } from '../../../shared/models/position.model';
+import { ApiService } from '@services';
+import { type Position } from '@models';
 
 @Injectable({
   providedIn: 'root'

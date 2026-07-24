@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@services';
 import { OwnerDashboardComponent } from './components/owner-dashboard/owner-dashboard.component';
 import { HrDashboardComponent } from './components/hr-dashboard/hr-dashboard.component';
 import { MemberDashboardComponent } from './components/member-dashboard/member-dashboard.component';

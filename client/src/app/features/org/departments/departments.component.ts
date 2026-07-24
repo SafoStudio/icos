@@ -3,9 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EditableTableComponent, TableColumn } from '@shared/components/editable-table/editable-table.component';
 import { DepartmentsService } from './departments.service';
-import { AuthService } from '@services/auth.service';
-import { Department } from '@models';
-import { ToastService } from '@services/toast.service';
+import { AuthService,ToastService } from '@services';
+import { type Department } from '@models';
 
 @Component({
   selector: 'app-departments',

@@ -1,10 +1,9 @@
 import { Component, inject, computed, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EditableTableComponent, TableColumn } from '../../../shared/components/editable-table/editable-table.component';
+import { EditableTableComponent, type TableColumn } from '@components';
 import { PositionsService } from './positions.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { Position } from '../../../shared/models/position.model';
-import { ToastService } from '../../../core/services/toast.service';
+import { AuthService, ToastService} from '@services';
+import { type Position } from '@models';
 
 @Component({
   selector: 'app-positions',

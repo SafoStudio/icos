@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ApiService } from '@services/api.service';
-import { User, UserProfile } from '@models';
+import { ApiService } from '@services';
+import { type User, type UserProfile } from '@models';
 
 export interface ProfileUpdateInput {
   userId: string;

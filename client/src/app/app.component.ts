@@ -1,8 +1,7 @@
 import { Component, inject, computed, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
-import { AuthService } from './core/services/auth.service';
-import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
+import { AuthService } from '@services';
+import { ToastContainerComponent, SidebarComponent } from '@components';
 
 @Component({
   selector: 'app-root',

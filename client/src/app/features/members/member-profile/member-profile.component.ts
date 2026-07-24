@@ -1,20 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from '../../profile/profile.service';
-import { ApiService } from '@services/api.service';
-import { AuthService } from '@services/auth.service';
-import { ToastService } from '@services/toast.service';
-import { User, UserProfile } from '@models';
+import { ApiService, AuthService, ToastService } from '@services';
+import { type User, type UserProfile, type Department } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
-import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
-
-interface Department {
-  id: string;
-  name: string;
-  description?: string;
-}
+import { TabsComponent, type TabItem } from '@components';
 
 @Component({
   selector: 'app-member-profile',
@@ -215,11 +208,11 @@ export class MemberProfileComponent implements OnInit {
     const updates: Promise<any>[] = [];
 
     if (Object.keys(userUpdate).length > 0) {
-      updates.push(this.profileService.updateUser(m.id, userUpdate).toPromise());
+       updates.push(firstValueFrom(this.profileService.updateUser(m.id, userUpdate)));
     }
 
     if (Object.keys(profileUpdate).length > 1) {
-      updates.push(this.profileService.updateProfile(profileUpdate).toPromise());
+      updates.push(firstValueFrom(this.profileService.updateProfile(profileUpdate)));
     }
 
     Promise.all(updates)

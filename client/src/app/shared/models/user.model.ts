@@ -7,7 +7,7 @@ export interface User {
   lastName: string;
   role?: string;
   profile?: UserProfile;
-  companyId?: string;
+  companyId: string;
   departmentId?: string;
   permissions?: string[];
   status?: string;

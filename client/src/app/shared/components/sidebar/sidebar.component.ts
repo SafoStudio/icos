@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
-import { AuthService } from '@services/auth.service';
+import { AuthService } from '@services';
 
 interface MainLink {
   label: string;

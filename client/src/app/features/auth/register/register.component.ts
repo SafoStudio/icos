@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AuthService, InviteResponse } from '../../../core/services/auth.service';
+import { AuthService, InviteResponse } from '@services';
 import { NgIconComponent } from '@ng-icons/core';
 
 @Component({

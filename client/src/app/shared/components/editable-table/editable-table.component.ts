@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, signal, WritableSignal, HostLis
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
-import { ToastService } from '@services/toast.service';
+import { ToastService } from '@services';
 
 export interface TableColumn {
   key: string;

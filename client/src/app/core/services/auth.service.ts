@@ -2,17 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap, of, catchError } from 'rxjs';
 import { ApiService } from './api.service';
-
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  companyId: string;
-  role: string;
-  departmentId?: string;
-  permissions: string[];
-}
+import { type User } from '@models';
 
 export interface AuthResponse {
   accessToken: string;

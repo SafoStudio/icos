@@ -2,12 +2,12 @@ import { Component, inject, OnInit, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { ToastService } from '../../core/services/toast.service';
+import { AuthService, ToastService } from '@services';
 import { NgIconComponent } from '@ng-icons/core';
 import { MemberInviteComponent } from './member-invite/member-invite.component';
-import { MemberService, Department, Member } from './member.service';
+import { MemberService, Member } from './member.service';
 import { MembersStateService } from './members-state.service';
+import { type Department } from '@models';
 
 export type ViewMode = 'grid' | 'list';
 export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
