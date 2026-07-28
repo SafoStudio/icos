@@ -4,8 +4,9 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from '../../profile/profile.service';
-import { ApiService, AuthService, ToastService } from '@services';
-import { type User, type UserProfile, type Department } from '@models';
+import { DepartmentsService } from '../../org/departments/departments.service';
+import { AuthService, ToastService } from '@services';
+import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem } from '@components';
 
@@ -21,7 +22,7 @@ export class MemberProfileComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly profileService = inject(ProfileService);
-  private readonly api = inject(ApiService);
+  private readonly departmentsService = inject(DepartmentsService);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
 
@@ -34,7 +35,7 @@ export class MemberProfileComponent implements OnInit {
   readonly activeTabId = signal<string>('personal');
   readonly returnUrl = signal<string>('/members');
 
-  readonly rolesList = ['OWNER', 'ADMIN', 'HEAD', 'SPECIALIST'];
+  readonly rolesList = ALL_ROLES;
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
@@ -43,7 +44,7 @@ export class MemberProfileComponent implements OnInit {
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
 
- readonly backButtonText = computed(() => {
+  readonly backButtonText = computed(() => {
     const url = this.returnUrl();
     if (url.includes('/organization/departments/')) {
       return 'Back to Department';
@@ -51,7 +52,7 @@ export class MemberProfileComponent implements OnInit {
     return 'Back to Members List';
   });
 
-readonly backIcon = computed(() => {
+  readonly backIcon = computed(() => {
     const url = this.returnUrl();
     if (url.includes('/organization/departments/')) {
       return 'tablerArrowLeft';
@@ -62,36 +63,26 @@ readonly backIcon = computed(() => {
   readonly canManage = computed(() => {
     const currentUser = this.authService.currentUser();
     if (!currentUser) return false;
-    if (currentUser.role === 'ADMIN' || currentUser.role === 'OWNER') return true;
+    if (currentUser.role === ROLES.ADMIN || currentUser.role === ROLES.OWNER) return true;
 
-    const hrDept = this.departments().find(d => d.id === currentUser.departmentId);
+    const hrDept = this.departments().find((d: Department) => d.id === currentUser.departmentId);
     return hrDept?.name?.toUpperCase() === 'HR';
   });
 
   readonly fullName = computed(() => {
-    const m = this.member();
-    return m ? `${m.firstName} ${m.lastName}` : '';
+    const member = this.member();
+    return member ? `${member.firstName} ${member.lastName}` : '';
   });
 
   readonly roleLabel = computed(() => {
-    const m = this.member();
-    if (!m) return '';
-
-    const labels: Record<string, string> = {
-      'OWNER': 'Company Owner',
-      'ADMIN': 'System Administrator',
-      'HEAD': 'Department Head',
-      'SPECIALIST': 'Specialist'
-    };
-
-    return m.role && labels[m.role] ? labels[m.role] : m.role;
+    const member = this.member();
+    if (!member) return '';
+    return getRoleLabel(member.role as UserRole);
   });
 
   readonly departmentName = computed(() => {
     const m = this.member();
-    if (!m?.departmentId) return 'Unassigned / General';
-    const dept = this.departments().find(d => d.id === m.departmentId);
-    return dept ? dept.name : 'Unassigned';
+    return m?.department?.name || 'Unassigned / General';
   });
 
   editUser: Partial<User> & { role?: string; departmentId?: string } = {};
@@ -106,7 +97,7 @@ readonly backIcon = computed(() => {
       this.returnUrl.set(returnUrl);
     }
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
         this.memberId.set(id);
@@ -117,7 +108,7 @@ readonly backIcon = computed(() => {
     });
   }
 
- goBack(): void {
+  goBack(): void {
     const url = this.returnUrl();
     if (url) {
       this.router.navigateByUrl(url);
@@ -132,20 +123,10 @@ readonly backIcon = computed(() => {
     const currentUser = this.authService.currentUser();
     const companyId = currentUser?.companyId;
 
-    const deptQuery = `
-      query GetDepartments($companyId: ID!) {
-        departments(companyId: $companyId) {
-          id
-          name
-          description
-        }
-      }
-    `;
-
     if (companyId) {
-      this.api.graphql<{ departments: Department[] }>(deptQuery, { companyId }).subscribe({
-        next: (res) => {
-          this.departments.set(res.departments || []);
+      this.departmentsService.getDepartments(companyId).subscribe({
+        next: (departments) => {
+          this.departments.set(departments);
           this.fetchMember(id);
         },
         error: () => {
@@ -161,13 +142,13 @@ readonly backIcon = computed(() => {
     this.profileService.getUserById(id).subscribe({
       next: (user) => {
         this.member.set(user);
-        this.selectedRole = user.role || 'SPECIALIST';
+        this.selectedRole = user.role || ROLES.SPECIALIST;
         this.selectedDepartmentId = user.departmentId || '';
         this.loading.set(false);
       },
       error: (err) => {
         console.error('Error fetching member profile:', err);
-        this.toastService.error('Failed to load employee profile');
+        this.toastService.error('Failed to load member profile');
         this.loading.set(false);
       }
     });
@@ -240,7 +221,7 @@ readonly backIcon = computed(() => {
     const updates: Promise<any>[] = [];
 
     if (Object.keys(userUpdate).length > 0) {
-       updates.push(firstValueFrom(this.profileService.updateUser(m.id, userUpdate)));
+      updates.push(firstValueFrom(this.profileService.updateUser(m.id, userUpdate)));
     }
 
     if (Object.keys(profileUpdate).length > 1) {
@@ -249,14 +230,14 @@ readonly backIcon = computed(() => {
 
     Promise.all(updates)
       .then(() => {
-        this.toastService.success('Employee profile updated successfully');
+        this.toastService.success('Member profile updated successfully');
         this.isEditing.set(false);
         this.fetchMember(m.id);
         this.saving.set(false);
       })
       .catch((err) => {
         console.error('Error updating member:', err);
-        this.toastService.error(err.message || 'Failed to update employee profile');
+        this.toastService.error(err.message || 'Failed to update member profile');
         this.saving.set(false);
       });
   }
@@ -289,16 +270,16 @@ readonly backIcon = computed(() => {
     if (!m) return;
 
     if (this.selectedDepartmentId === (m.departmentId || '')) {
-      this.toastService.info('Employee is already in this department');
+      this.toastService.info('Member is already in this department');
       return;
     }
 
     this.saving.set(true);
     this.profileService.updateUser(m.id, { departmentId: this.selectedDepartmentId }).subscribe({
       next: () => {
-        const targetDept = this.departments().find(d => d.id === this.selectedDepartmentId);
+        const targetDept = this.departments().find((d: Department) => d.id === this.selectedDepartmentId);
         const deptName = targetDept ? targetDept.name : 'Unassigned';
-        this.toastService.success(`Employee transferred to ${deptName} department!`);
+        this.toastService.success(`Member transferred to ${deptName} department!`);
         this.fetchMember(m.id);
         this.saving.set(false);
       },

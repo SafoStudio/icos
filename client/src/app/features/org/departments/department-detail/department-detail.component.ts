@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentsService } from '../departments.service';
 import { AuthService,ToastService } from '@services';
-import { type Department, type Permission, type DepartmentMember } from '@models';
+import { type Department, type Permission, type DepartmentMember,type UserRole, ROLES } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { DepartmentPermissionsComponent } from './components/department-permissions/department-permissions.component';
 import { DepartmentMembersComponent } from './components/department-members/department-members.component';
@@ -33,7 +33,7 @@ export class DepartmentDetailComponent implements OnInit {
 
   canEdit = computed(() => {
     const user = this.authService.currentUser();
-    return user?.role === 'OWNER' || user?.role === 'ADMIN';
+    return user?.role === ROLES.OWNER || user?.role === ROLES.ADMIN;
   });
 
   ngOnInit() {
@@ -91,13 +91,13 @@ export class DepartmentDetailComponent implements OnInit {
   private loadDepartmentPermissions(departmentId: string): Promise<void> {
     return Promise.all([
       new Promise<void>((resolve) => {
-        this.departmentsService.getDepartmentPermissions(departmentId, 'HEAD').subscribe({
+        this.departmentsService.getDepartmentPermissions(departmentId, ROLES.HEAD).subscribe({
           next: (perms) => { this.headPermissions.set(perms); resolve(); },
           error: () => resolve()
         });
       }),
       new Promise<void>((resolve) => {
-        this.departmentsService.getDepartmentPermissions(departmentId, 'SPECIALIST').subscribe({
+        this.departmentsService.getDepartmentPermissions(departmentId, ROLES.SPECIALIST).subscribe({
           next: (perms) => { this.specialistPermissions.set(perms); resolve(); },
           error: () => resolve()
         });
@@ -105,11 +105,11 @@ export class DepartmentDetailComponent implements OnInit {
     ]).then(() => {});
   }
 
-  onTogglePermission(event: { permission: Permission; role: 'HEAD' | 'SPECIALIST' }): void {
+  onTogglePermission(event: { permission: Permission; role: UserRole }): void {
     const { permission, role } = event;
     if (!this.canEdit()) return;
 
-    const isAssigned = role === 'HEAD'
+    const isAssigned = role === ROLES.HEAD
       ? this.headPermissions().some(p => p.id === permission.id)
       : this.specialistPermissions().some(p => p.id === permission.id);
 
@@ -123,14 +123,14 @@ export class DepartmentDetailComponent implements OnInit {
     action.subscribe({
       next: () => {
         if (isAssigned) {
-          if (role === 'HEAD') {
+          if (role === ROLES.HEAD) {
             this.headPermissions.update(list => list.filter(p => p.id !== permission.id));
           } else {
             this.specialistPermissions.update(list => list.filter(p => p.id !== permission.id));
           }
           this.toastService.success(`Permission revoked from ${role}`);
         } else {
-          if (role === 'HEAD') {
+          if (role === ROLES.HEAD) {
             this.headPermissions.update(list => [...list, permission]);
           } else {
             this.specialistPermissions.update(list => [...list, permission]);

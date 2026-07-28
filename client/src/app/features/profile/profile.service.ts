@@ -35,6 +35,10 @@ export class ProfileService {
           companyId
           role
           departmentId
+          department {
+            id
+            name
+          }
           status
           permissions
           profile {
@@ -63,6 +67,10 @@ export class ProfileService {
           companyId
           role
           departmentId
+          department {
+            id
+            name
+          }
           status
           permissions
           profile {
@@ -77,6 +85,38 @@ export class ProfileService {
     `;
     return this.api.graphql<{ user: User }>(query, { id }).pipe(
       map((res: any) => res.user)
+    );
+  }
+
+  updateUser(id: string, input: UserUpdateInput): Observable<User> {
+    const mutation = `
+      mutation UpdateUser($id: ID!, $input: UserUpdateInput!) {
+        updateUser(id: $id, input: $input) {
+          id
+          email
+          firstName
+          lastName
+          companyId
+          role
+          departmentId
+          department {
+            id
+            name
+          }
+          status
+          permissions
+          profile {
+            userId
+            phoneNumber
+            address
+            hireDate
+            birthDate
+          }
+        }
+      }
+    `;
+    return this.api.graphql<{ updateUser: User }>(mutation, { id, input }).pipe(
+      map((res: any) => res.updateUser)
     );
   }
 
@@ -97,34 +137,6 @@ export class ProfileService {
       input
     }).pipe(
       map((res: any) => res.updateProfile)
-    );
-  }
-
-  updateUser(id: string, input: UserUpdateInput): Observable<User> {
-    const mutation = `
-      mutation UpdateUser($id: ID!, $input: UserUpdateInput!) {
-        updateUser(id: $id, input: $input) {
-          id
-          email
-          firstName
-          lastName
-          companyId
-          role
-          departmentId
-          status
-          permissions
-          profile {
-            userId
-            phoneNumber
-            address
-            hireDate
-            birthDate
-          }
-        }
-      }
-    `;
-    return this.api.graphql<{ updateUser: User }>(mutation, { id, input }).pipe(
-      map((res: any) => res.updateUser)
     );
   }
 }

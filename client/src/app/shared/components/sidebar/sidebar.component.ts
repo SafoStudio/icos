@@ -62,7 +62,6 @@ export class SidebarComponent {
     { label: 'Reports', icon: 'tablerChartBar', route: '/reports' },
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
-    { label: 'Profile', icon: 'tablerUser', route: '/profile' },
     { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
   ];
 

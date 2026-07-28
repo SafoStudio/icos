@@ -1,4 +1,5 @@
-import {UserProfile} from './user-profile.model'
+import { UserProfile } from './user-profile.model';
+import { Department } from './department.model';
 
 export interface User {
   id: string;
@@ -9,6 +10,7 @@ export interface User {
   profile?: UserProfile;
   companyId: string;
   departmentId?: string;
+  department?: Department;
   permissions?: string[];
   status?: string;
 }

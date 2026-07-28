@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { type Permission } from '@models';
+import { type Permission, type UserRole, ROLES, getRoleShortLabel } from '@models';
 
 export interface PermissionGroup {
   name: string;
@@ -21,7 +21,16 @@ export class DepartmentPermissionsComponent {
   @Input() specialistPermissions: Permission[] = [];
   @Input() canEdit: boolean = false;
   @Input() saving: boolean = false;
-  @Output() togglePermission = new EventEmitter<{ permission: Permission; role: 'HEAD' | 'SPECIALIST' }>();
+  @Output() togglePermission = new EventEmitter<{ permission: Permission; role: UserRole }>();
+
+  readonly ROLES = ROLES;
+
+  readonly availableRoles = computed(() => {
+    return [
+      { value: ROLES.HEAD, label: getRoleShortLabel(ROLES.HEAD) },
+      { value: ROLES.SPECIALIST, label: getRoleShortLabel(ROLES.SPECIALIST) }
+    ];
+  });
 
   readonly groupedPermissions = computed(() => {
     const groups: Map<string, Permission[]> = new Map();
@@ -76,16 +85,20 @@ export class DepartmentPermissionsComponent {
     'approval': 'Approval'
   };
 
-  isPermissionAssigned(permission: Permission, role: 'HEAD' | 'SPECIALIST'): boolean {
-    const list = role === 'HEAD' ? this.headPermissions : this.specialistPermissions;
+  isPermissionAssigned(permission: Permission, role: UserRole): boolean {
+    const list = role === ROLES.HEAD ? this.headPermissions : this.specialistPermissions;
     return list.some(p => p.id === permission.id);
   }
 
-  onToggle(permission: Permission, role: 'HEAD' | 'SPECIALIST'): void {
+  onToggle(permission: Permission, role: UserRole): void {
     this.togglePermission.emit({ permission, role });
   }
 
   getGroupLabel(groupName: string): string {
     return this.groupLabels[groupName] || groupName.charAt(0).toUpperCase() + groupName.slice(1);
+  }
+
+  getRoleLabel(role: UserRole): string {
+    return getRoleShortLabel(role);
   }
 }

@@ -7,7 +7,7 @@ import { NgIconComponent } from '@ng-icons/core';
 import { MemberInviteComponent } from './member-invite/member-invite.component';
 import { MemberService, Member } from './member.service';
 import { MembersStateService } from './members-state.service';
-import { type Department } from '@models';
+import { type Department, getRoleShortLabel, ALL_ROLES, type UserRole, ROLES  } from '@models';
 
 export type ViewMode = 'grid' | 'list';
 export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
@@ -87,9 +87,9 @@ export class MembersComponent implements OnInit {
   availableRoles = computed(() => {
     const user = this.authService.currentUser();
     if (user?.role === 'ADMIN' || user?.role === 'OWNER') {
-      return ['ADMIN', 'OWNER', 'HEAD', 'SPECIALIST'];
+      return ALL_ROLES;
     }
-    return ['OWNER', 'HEAD', 'SPECIALIST'];
+    return [ROLES.OWNER, ROLES.HEAD, ROLES.SPECIALIST];
   });
 
   filteredMembers = computed(() => {
@@ -255,13 +255,7 @@ export class MembersComponent implements OnInit {
   }
 
   getRoleLabel(role: string): string {
-    const labels: Record<string, string> = {
-      'OWNER': 'Owner',
-      'ADMIN': 'Admin',
-      'HEAD': 'Head',
-      'SPECIALIST': 'Specialist'
-    };
-    return labels[role] || role;
+     return getRoleShortLabel(role as UserRole) || role;
   }
 
   getMemberPhotoUrl(member: Member): string {

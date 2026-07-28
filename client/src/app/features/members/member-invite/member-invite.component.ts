@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges, inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ROLES } from '@models';
 
 interface Department {
   id: string;
@@ -40,7 +41,7 @@ export class MemberInviteComponent implements OnInit, OnChanges, AfterViewInit {
   ngOnInit(): void {
     this.inviteForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      role: ['SPECIALIST', [Validators.required]],
+      role: [ROLES.SPECIALIST, [Validators.required]],
       departmentId: ['', [Validators.required]],
       managerId: ['']
     });

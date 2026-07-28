@@ -2,9 +2,10 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.service';
 import { AuthService, ToastService } from '@services';
-import { type User, type UserProfile, type Department } from '@models';
+import { type User, type UserProfile, getRoleLabel, type UserRole } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem } from '@components';
 
@@ -26,7 +27,6 @@ export class ProfileComponent implements OnInit {
   readonly user = signal<User | null>(null);
   readonly isEditing = signal<boolean>(false);
   readonly activeTabId = signal<string>('personal');
-  readonly departments = signal<Department[]>([]);
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal Information', icon: 'tablerUser' },
@@ -39,25 +39,15 @@ export class ProfileComponent implements OnInit {
     return user ? `${user.firstName} ${user.lastName}` : '';
   });
 
-readonly departmentName = computed(() => {
-  const u = this.user();
-  if (!u?.departmentId) return 'Unassigned / General';
-  const dept = this.departments().find(d => d.id === u.departmentId);
-  return dept ? dept.name : 'Unassigned';
-});
+  readonly departmentName = computed(() => {
+    const u = this.user();
+    return u?.department?.name || 'Unassigned / General';
+  });
 
   readonly roleLabel = computed(() => {
     const user = this.user();
     if (!user) return '';
-
-    const labels: Record<string, string> = {
-      'OWNER': 'Company Owner',
-      'ADMIN': 'System Administrator',
-      'HEAD': 'Department Head',
-      'SPECIALIST': 'Specialist'
-    };
-
-    return user.role && labels[user.role] ? labels[user.role] : user.role;
+    return getRoleLabel(user.role as UserRole);
   });
 
   editUser: Partial<User> = {};
@@ -137,15 +127,11 @@ readonly departmentName = computed(() => {
     const updates: Promise<any>[] = [];
 
     if (Object.keys(userUpdate).length > 0) {
-      updates.push(
-        this.profileService.updateUser(user.id, userUpdate).toPromise()
-      );
+      updates.push(firstValueFrom(this.profileService.updateUser(user.id, userUpdate)));
     }
 
     if (Object.keys(profileUpdate).length > 1) {
-      updates.push(
-        this.profileService.updateProfile(profileUpdate).toPromise()
-      );
+      updates.push(firstValueFrom(this.profileService.updateProfile(profileUpdate)));
     }
 
     Promise.all(updates)

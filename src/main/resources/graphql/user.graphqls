@@ -20,6 +20,7 @@ type User {
     companyId: ID!
     role: String!
     departmentId: ID
+    department: Department
     status: String
     permissions: [String!]!
     profile: UserProfile
