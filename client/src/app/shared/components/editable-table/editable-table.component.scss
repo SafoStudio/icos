@@ -216,10 +216,8 @@ tr {
   }
 
   &.required {
-    border-color: #ff9800;
-
     &:focus {
-      border-color: #ff9800;
+      border-color: #4CAF50;
       box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
     }
   }
