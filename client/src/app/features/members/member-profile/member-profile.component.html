@@ -1,11 +1,4 @@
 <div>
-  <div class="top-nav">
-    <a routerLink="/members" class="btn-back">
-      <ng-icon name="tablerChevronLeft" size="18"></ng-icon>
-      <span>Back to Members List</span>
-    </a>
-  </div>
-
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -50,6 +43,13 @@
               </button>
             </div>
           }
+        </div>
+
+        <div class="top-nav">
+          <button class="btn-back" (click)="goBack()" type="button">
+            <ng-icon [name]="backIcon()" size="18"></ng-icon>
+            <span>{{ backButtonText() }}</span>
+          </button>
         </div>
       </div>
 

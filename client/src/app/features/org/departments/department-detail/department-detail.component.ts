@@ -147,8 +147,11 @@ export class DepartmentDetailComponent implements OnInit {
   }
 
   onMemberClick(user: DepartmentMember): void {
-    console.log('Navigate to user profile:', user.userId);
-  }
+    const currentUrl = this.router.url;
+    this.router.navigate(['/members', user.userId], {
+        queryParams: { returnUrl: currentUrl }
+      });
+    }
 
   goBack() {
     this.router.navigate(['/organization/departments']);

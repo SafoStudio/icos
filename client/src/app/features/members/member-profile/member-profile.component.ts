@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from '../../profile/profile.service';
 import { ApiService, AuthService, ToastService } from '@services';
 import { type User, type UserProfile, type Department } from '@models';
@@ -12,13 +12,14 @@ import { TabsComponent, type TabItem } from '@components';
 @Component({
   selector: 'app-member-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, NgIconComponent, TabsComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent],
   templateUrl: './member-profile.component.html',
   styleUrls: ['./member-profile.component.scss']
 })
 export class MemberProfileComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly profileService = inject(ProfileService);
   private readonly api = inject(ApiService);
   private readonly authService = inject(AuthService);
@@ -31,6 +32,7 @@ export class MemberProfileComponent implements OnInit {
   readonly departments = signal<Department[]>([]);
   readonly isEditing = signal<boolean>(false);
   readonly activeTabId = signal<string>('personal');
+  readonly returnUrl = signal<string>('/members');
 
   readonly rolesList = ['OWNER', 'ADMIN', 'HEAD', 'SPECIALIST'];
 
@@ -40,6 +42,22 @@ export class MemberProfileComponent implements OnInit {
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
+
+ readonly backButtonText = computed(() => {
+    const url = this.returnUrl();
+    if (url.includes('/organization/departments/')) {
+      return 'Back to Department';
+    }
+    return 'Back to Members List';
+  });
+
+readonly backIcon = computed(() => {
+    const url = this.returnUrl();
+    if (url.includes('/organization/departments/')) {
+      return 'tablerArrowLeft';
+    }
+    return 'tablerChevronLeft';
+  });
 
   readonly canManage = computed(() => {
     const currentUser = this.authService.currentUser();
@@ -83,6 +101,11 @@ export class MemberProfileComponent implements OnInit {
   selectedDepartmentId: string = '';
 
   ngOnInit(): void {
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    if (returnUrl) {
+      this.returnUrl.set(returnUrl);
+    }
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -92,6 +115,15 @@ export class MemberProfileComponent implements OnInit {
         this.router.navigate(['/members']);
       }
     });
+  }
+
+ goBack(): void {
+    const url = this.returnUrl();
+    if (url) {
+      this.router.navigateByUrl(url);
+    } else {
+      this.location.back();
+    }
   }
 
   loadData(id: string): void {

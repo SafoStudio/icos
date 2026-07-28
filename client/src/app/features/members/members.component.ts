@@ -205,8 +205,16 @@ export class MembersComponent implements OnInit {
   }
 
   navigateToProfile(memberId: string): void {
-    this.router.navigate(['/members', memberId]);
-  }
+      this.router.navigate(['/members', memberId], {
+        queryParams: { returnUrl: '/members' }
+      });
+    }
+
+    onMemberClick(member: Member): void {
+      this.router.navigate(['/members', member.id], {
+        queryParams: { returnUrl: '/members' }
+      });
+    }
 
   openInviteModal(): void {
     if (!this.canInvite()) return;
@@ -279,4 +287,5 @@ export class MembersComponent implements OnInit {
     const index = Math.abs(hash) % photos.length;
     return photos[index];
   }
+
 }

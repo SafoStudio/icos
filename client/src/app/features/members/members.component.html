@@ -186,9 +186,9 @@
     @for (member of filteredMembers(); track member.id) {
     <li class="member-card">
       <button class="card-button"
-              (click)="navigateToProfile(member.id)"
-              (keydown.enter)="navigateToProfile(member.id)"
-              (keydown.space)="$event.preventDefault(); navigateToProfile(member.id)"
+              (click)="onMemberClick(member)"
+              (keydown.enter)="onMemberClick(member)"
+              (keydown.space)="$event.preventDefault(); onMemberClick(member)"
               [style.background-image]="'url(' + getMemberPhotoUrl(member) + ')'"
               [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
         <div class="card-overlay">
@@ -246,9 +246,9 @@
       <tr class="clickable-row">
         <td colspan="5" class="clickable-cell">
           <button class="row-button"
-                  (click)="navigateToProfile(member.id)"
-                  (keydown.enter)="navigateToProfile(member.id)"
-                  (keydown.space)="$event.preventDefault(); navigateToProfile(member.id)"
+                  (click)="onMemberClick(member)"
+                  (keydown.enter)="onMemberClick(member)"
+                  (keydown.space)="$event.preventDefault(); onMemberClick(member)"
                   [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
                 <span class="col-member">
                   <span class="full-name">{{ member.firstName }} {{ member.lastName }}</span>
