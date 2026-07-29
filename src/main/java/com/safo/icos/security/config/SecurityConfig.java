@@ -45,7 +45,7 @@ public class SecurityConfig {
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/graphql", "/api/public/**").permitAll()
+                    .requestMatchers("/graphql", "/api/public/**", "/api/storage/avatar/**").permitAll()
                     .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter,
