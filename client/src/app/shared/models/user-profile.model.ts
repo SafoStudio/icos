@@ -4,4 +4,5 @@ export interface UserProfile {
   address?: string;
   hireDate?: string;
   birthDate?: string;
+  avatarPath?: string;
 }
