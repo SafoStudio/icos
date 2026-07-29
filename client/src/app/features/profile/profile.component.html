@@ -6,12 +6,16 @@
   </div>
   } @else {
   <div class="profile-layout">
-    <!-- Photo Block (Sidebar) - вынесен отдельно -->
     <div class="profile-sidebar">
       <div class="photo-container">
-        <div class="avatar">
-          <span class="avatar-letter">{{ fullName().charAt(0).toUpperCase() }}</span>
-        </div>
+        @if (user()) {
+        <app-avatar
+          [userId]="user()!.id"
+          [fullName]="fullName()"
+          [avatarPath]="user()?.profile?.avatarPath"
+          (avatarChanged)="loadProfile()"
+        ></app-avatar>
+        }
         <h2 class="photo-name">{{ fullName() }}</h2>
         <div class="badges-row">
             <span class="badge badge-role" [class]="'role-' + user()?.role?.toLowerCase()">
@@ -38,14 +42,12 @@
       </div>
     </div>
 
-    <!-- Content Block (Tabs) -->
     <div class="profile-details">
       <app-tabs
         [tabs]="tabs"
         [activeTabId]="activeTabId()"
         (tabChange)="activeTabId.set($event)"
       >
-        <!-- Personal Information Tab -->
         @if (activeTabId() === 'personal') {
         <div class="tab-content">
           <div class="section-header">
@@ -62,7 +64,6 @@
 
           <div class="profile-fields">
             @if (isEditing()) {
-            <!-- Edit Mode -->
             <div class="edit-form">
               <div class="form-grid">
                 <div class="form-group">
@@ -162,7 +163,6 @@
               </div>
             </div>
             } @else {
-            <!-- View Mode -->
             <div class="info-grid">
               <div class="info-item">
                 <span class="label">First Name</span>
@@ -209,7 +209,6 @@
         </div>
         }
 
-        <!-- Compensation Tab -->
         @if (activeTabId() === 'compensation') {
         <div class="tab-content">
           <div class="section-header"></div>
@@ -234,7 +233,6 @@
         </div>
         }
 
-        <!-- Documents Tab -->
         @if (activeTabId() === 'documents') {
         <div class="tab-content">
           <div class="section-header"></div>

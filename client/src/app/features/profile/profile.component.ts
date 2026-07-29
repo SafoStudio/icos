@@ -8,11 +8,12 @@ import { AuthService, ToastService } from '@services';
 import { type User, type UserProfile, getRoleLabel, type UserRole } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem } from '@components';
+import { AvatarComponent } from './avatar/avatar.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, AvatarComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })

@@ -45,25 +45,6 @@
     text-align: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 
-    .avatar {
-      width: 140px;
-      height: 175px;
-      margin: 0 auto 16px;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
-
-      .avatar-letter {
-        font-size: 56px;
-        font-weight: 700;
-        color: white;
-        text-transform: uppercase;
-      }
-    }
-
     .photo-name {
       font-size: 1.25rem;
       font-weight: 700;

@@ -42,7 +42,13 @@ import {
   tablerArrowLeft,
   tablerId,
   tablerPhone,
-  tablerBuildingStore
+  tablerBuildingStore,
+  tablerCamera,
+  tablerZoomIn,
+  tablerZoomOut,
+  tablerRotateClockwise,
+  tablerUpload,
+  tablerFocus2
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -88,5 +94,11 @@ export const APP_ICONS = provideIcons({
   tablerArrowLeft,
   tablerId,
   tablerPhone,
-  tablerBuildingStore
+  tablerBuildingStore,
+  tablerCamera,
+  tablerZoomIn,
+  tablerZoomOut,
+  tablerRotateClockwise,
+  tablerUpload,
+  tablerFocus2
 });
