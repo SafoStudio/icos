@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,23 @@ public class StorageController {
             @RequestParam("file") MultipartFile file) throws Exception {
         String path = fileService.uploadAvatar(userId, file.getInputStream(), file.getOriginalFilename(), file.getContentType());
         return ResponseEntity.ok(path);
+    }
+
+    @GetMapping("/avatar/{userId}")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable UUID userId) {
+        byte[] bytes = fileService.getAvatarBytes(userId);
+        if (bytes == null || bytes.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        String contentType = "image/png";
+        if (bytes.length >= 3 && (bytes[0] & 0xFF) == 0xFF && (bytes[1] & 0xFF) == 0xD8 && (bytes[2] & 0xFF) == 0xFF) {
+            contentType = "image/jpeg";
+        } else if (bytes.length >= 4 && bytes[0] == 'R' && bytes[1] == 'I' && bytes[2] == 'F' && bytes[3] == 'F') {
+            contentType = "image/webp";
+        }
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, contentType)
+                .body(bytes);
     }
 
     @DeleteMapping("/avatar/{userId}")

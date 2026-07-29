@@ -61,6 +61,28 @@ public class FileService {
   }
 
   /**
+   * Retrieves the user's avatar image content as bytes.
+   *
+   * @param userId the user's UUID
+   * @return byte array of avatar image, or null if not found
+   */
+  public byte[] getAvatarBytes(UUID userId) {
+    UserResponseDto user = userService.getUserById(userId);
+    if (user.getProfile() == null || user.getProfile().getAvatarPath() == null) {
+      return null;
+    }
+    String path = user.getProfile().getAvatarPath();
+    try (InputStream is = storageProvider.getFile(path)) {
+      if (is == null) {
+        return null;
+      }
+      return is.readAllBytes();
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  /**
    * Uploads a document for the given user.
    * Generates a storage path, uploads the file, and saves document metadata.
    *

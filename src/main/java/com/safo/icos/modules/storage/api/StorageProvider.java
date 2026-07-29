@@ -26,4 +26,9 @@ public interface StorageProvider {
      * companyId/email_email/documents/type/filename
      */
     String getDocumentPath(UUID companyId, String email, String docType, String filename);
+
+    /**
+     * Retrieves a file stream by its path.
+     */
+    InputStream getFile(String path);
 }

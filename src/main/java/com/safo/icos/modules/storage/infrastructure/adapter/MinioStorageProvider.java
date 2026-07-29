@@ -20,9 +20,25 @@ public class MinioStorageProvider implements StorageProvider {
     @Value("${MINIO_BUCKET}")
     private String bucket;
 
+    private void ensureBucketExists() {
+        try {
+            boolean found = minioClient.bucketExists(
+                    io.minio.BucketExistsArgs.builder().bucket(bucket).build()
+            );
+            if (!found) {
+                minioClient.makeBucket(
+                        io.minio.MakeBucketArgs.builder().bucket(bucket).build()
+                );
+            }
+        } catch (Exception e) {
+            // Log or ignore if bucket exists
+        }
+    }
+
     @Override
     @SneakyThrows
     public void uploadFile(String path, InputStream inputStream, String contentType) {
+        ensureBucketExists();
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucket)
@@ -36,12 +52,15 @@ public class MinioStorageProvider implements StorageProvider {
     @Override
     @SneakyThrows
     public void deleteFile(String path) {
-        minioClient.removeObject(
-                RemoveObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(path)
-                        .build()
-        );
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(path)
+                            .build()
+            );
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -55,6 +74,21 @@ public class MinioStorageProvider implements StorageProvider {
     public String getDocumentPath(UUID companyId, String email, String docType, String filename) {
         String emailSlug = email.replace("@", "_").replace(".", "_");
         return String.format("%s/%s/documents/%s/%s", companyId, emailSlug, docType.toLowerCase(), filename);
+    }
+
+    @Override
+    public InputStream getFile(String path) {
+        try {
+            ensureBucketExists();
+            return minioClient.getObject(
+                    io.minio.GetObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(path)
+                            .build()
+            );
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String getExtension(String filename) {
