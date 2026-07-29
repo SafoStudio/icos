@@ -1,0 +1,73 @@
+.avatar-wrapper {
+  display: inline-block;
+}
+
+.avatar-card {
+  position: relative;
+  width: 140px;
+  height: 175px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+  overflow: visible; // allows corner button to rest on corner cleanly
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &.editable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+
+      .avatar-badge-btn {
+        transform: scale(1.1);
+        background: #ffffff;
+        color: #4f46e5;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+
+  .avatar-letter {
+    font-size: 56px;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .avatar-badge-btn {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    background: #4f46e5;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 5;
+
+    &:hover {
+      background: #4338ca;
+      transform: scale(1.12);
+    }
+  }
+}

@@ -1,0 +1,37 @@
+<div class="avatar-wrapper">
+  <div class="avatar-card" [class.editable]="editable" (click)="openModal()">
+    @if (avatarUrl() && !imageError()) {
+    <img
+      [src]="avatarUrl()"
+      [alt]="fullName"
+      class="avatar-img"
+      (error)="onImageError()"
+     />
+    } @else {
+    <span class="avatar-letter">{{ initialLetter() }}</span>
+    }
+
+    @if (editable) {
+    <!-- Corner Action Button -->
+    <button
+      type="button"
+      class="avatar-badge-btn"
+      (click)="$event.stopPropagation(); openModal()"
+      title="Edit profile photo"
+    >
+      <ng-icon name="tablerCamera" size="16"></ng-icon>
+    </button>
+    }
+  </div>
+
+  @if (isModalOpen()) {
+  <app-avatar-modal
+    [userId]="userId"
+    [hasExistingAvatar]="!!(avatarPath && !imageError())"
+    [currentAvatarUrl]="avatarUrl()"
+    (saved)="onAvatarSaved()"
+    (deleted)="onAvatarDeleted()"
+    (closed)="closeModal()"
+  ></app-avatar-modal>
+  }
+</div>
