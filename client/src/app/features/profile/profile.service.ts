@@ -47,6 +47,7 @@ export class ProfileService {
             address
             hireDate
             birthDate
+            avatarPath
           }
         }
       }
@@ -79,6 +80,7 @@ export class ProfileService {
             address
             hireDate
             birthDate
+            avatarPath
           }
         }
       }
