@@ -5,11 +5,14 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing an employee's onboarding process.
+ */
 @Getter
 @Builder
 public class OnboardingProcessDto {
-    private final UUID id;
-    private final UUID membershipId;
-    private final String status;
-    private final LocalDate startDate;
+  private final UUID id;
+  private final UUID membershipId;
+  private final String status;
+  private final LocalDate startDate;
 }

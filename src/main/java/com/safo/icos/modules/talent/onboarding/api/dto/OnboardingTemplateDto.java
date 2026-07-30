@@ -4,10 +4,13 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing an onboarding template.
+ */
 @Getter
 @Builder
 public class OnboardingTemplateDto {
-    private final UUID id;
-    private final String name;
-    private final String description;
+  private final UUID id;
+  private final String name;
+  private final String description;
 }
