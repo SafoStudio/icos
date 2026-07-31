@@ -5,13 +5,16 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO representing a calendar event.
+ */
 @Getter
 @Builder
 public class EventDto {
-    private final UUID id;
-    private final UUID userId;
-    private final String title;
-    private final String description;
-    private final OffsetDateTime startAt;
-    private final OffsetDateTime endAt;
+  private final UUID id;
+  private final UUID userId;
+  private final String title;
+  private final String description;
+  private final OffsetDateTime startAt;
+  private final OffsetDateTime endAt;
 }
