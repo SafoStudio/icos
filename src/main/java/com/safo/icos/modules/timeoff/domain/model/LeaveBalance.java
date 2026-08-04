@@ -2,30 +2,35 @@ package com.safo.icos.modules.timeoff.domain.model;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * Domain entity representing an employee's leave balance for a specific leave type.
+ * Supports deduction and restoration of days.
+ */
 @Getter
 @Builder(toBuilder = true)
 public class LeaveBalance {
-    private final UUID id;
-    private final UUID userId;
-    private final UUID leaveTypeId;
-    private final BigDecimal totalDays;
-    private final BigDecimal usedDays;
-    private final BigDecimal remainingDays;
+  private final UUID id;
+  private final UUID userId;
+  private final UUID leaveTypeId;
+  private final BigDecimal totalDays;
+  private final BigDecimal usedDays;
+  private final BigDecimal remainingDays;
 
-    public LeaveBalance deduct(BigDecimal days) {
-        return this.toBuilder()
-                .usedDays(this.usedDays.add(days))
-                .remainingDays(this.remainingDays.subtract(days))
-                .build();
-    }
+  public LeaveBalance deduct(BigDecimal days) {
+    return this.toBuilder()
+            .usedDays(this.usedDays.add(days))
+            .remainingDays(this.remainingDays.subtract(days))
+            .build();
+  }
 
-    public LeaveBalance restore(BigDecimal days) {
-        return this.toBuilder()
-                .usedDays(this.usedDays.subtract(days))
-                .remainingDays(this.remainingDays.add(days))
-                .build();
-    }
+  public LeaveBalance restore(BigDecimal days) {
+    return this.toBuilder()
+            .usedDays(this.usedDays.subtract(days))
+            .remainingDays(this.remainingDays.add(days))
+            .build();
+  }
 }

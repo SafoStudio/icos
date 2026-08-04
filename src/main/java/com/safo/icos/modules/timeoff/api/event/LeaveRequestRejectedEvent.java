@@ -4,12 +4,15 @@ import com.safo.icos.modules.timeoff.domain.model.LeaveRequest;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * Published when a leave request is rejected.
+ */
 @Getter
 public class LeaveRequestRejectedEvent extends ApplicationEvent {
-    private final LeaveRequest leaveRequest;
+  private final transient LeaveRequest leaveRequest;
 
-    public LeaveRequestRejectedEvent(Object source, LeaveRequest leaveRequest) {
-        super(source);
-        this.leaveRequest = leaveRequest;
-    }
+  public LeaveRequestRejectedEvent(Object source, LeaveRequest leaveRequest) {
+    super(source);
+    this.leaveRequest = leaveRequest;
+  }
 }
