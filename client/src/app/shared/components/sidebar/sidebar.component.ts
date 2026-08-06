@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
-import { AuthService } from '@services';
+import { AuthService, ThemeService } from '@services';
 
 interface MainLink {
   label: string;
@@ -27,9 +27,12 @@ interface MenuItem {
 export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
+
   private readonly isCollapsedSignal = signal(true);
 
   isCollapsed = computed(() => this.isCollapsedSignal());
+  isDark = computed(() => this.themeService.isDark());
   collapsedChange = output<boolean>();
 
   userName = computed(() => {
@@ -55,12 +58,9 @@ export class SidebarComponent {
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
-    { label: 'Candidates', icon: 'tablerUserCheck', route: '/candidates' },
-    { label: 'Vacancies', icon: 'tablerBriefcase', route: '/vacancies' },
+    { label: 'Recruitment (Vertical)', icon: 'tablerBriefcase', route: '/recruitment' },
+    { label: 'Tasks (Horizontal)', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
-    { label: 'Interviews', icon: 'tablerCalendarEvent', route: '/interviews' },
-    { label: 'Reports', icon: 'tablerChartBar', route: '/reports' },
-    { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
     { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
   ];
@@ -84,6 +84,10 @@ export class SidebarComponent {
 
   isActive(route: string): boolean {
     return this.router.url.includes(route);
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   logout(): void {

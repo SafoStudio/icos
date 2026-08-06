@@ -90,6 +90,23 @@
   </div>
 
   <div class="sidebar-footer">
+    <button
+      class="theme-toggle-btn"
+      (click)="toggleTheme()"
+      type="button"
+      [attr.aria-label]="isDark() ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+    >
+      <div class="theme-btn-inner">
+        <ng-icon [name]="isDark() ? 'tablerSun' : 'tablerMoon'" class="theme-icon" size="20"></ng-icon>
+        @if (!isCollapsed()) {
+          <span>{{ isDark() ? 'Light Theme' : 'Dark Theme' }}</span>
+        }
+      </div>
+      @if (!isCollapsed()) {
+        <span class="theme-pill" [class.dark]="isDark()">{{ isDark() ? 'DARK' : 'LIGHT' }}</span>
+      }
+    </button>
+
     <button class="logout-btn" (click)="logout()">
       <div class="logout-btn-inner">
         <ng-icon name="tablerLogout" class="logout-icon" size="20"></ng-icon>
