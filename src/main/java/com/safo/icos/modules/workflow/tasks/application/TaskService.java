@@ -66,4 +66,12 @@ public class TaskService {
 
     return savedTask;
   }
+
+  @Transactional(readOnly = true)
+  public java.util.List<Task> getTasksByAssignee(UUID assigneeId) {
+    if (assigneeId == null) {
+      return taskRepository.findAll();
+    }
+    return taskRepository.findByAssigneeId(assigneeId);
+  }
 }

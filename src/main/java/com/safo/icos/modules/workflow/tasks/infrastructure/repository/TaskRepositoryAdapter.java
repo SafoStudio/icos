@@ -24,4 +24,14 @@ public class TaskRepositoryAdapter implements TaskRepository {
     public Optional<Task> findById(UUID id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
+
+    @Override
+    public java.util.List<Task> findByAssigneeId(UUID id) {
+        return jpaRepository.findByAssigneeId(id).stream().map(mapper::toDomain).toList();
+    }
+
+    @Override
+    public java.util.List<Task> findAll() {
+        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+    }
 }

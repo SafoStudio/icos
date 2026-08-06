@@ -9,11 +9,19 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class TaskGraphQLResolver {
 
     private final TaskService taskService;
+
+    @QueryMapping
+    public List<Task> tasksByAssignee(@Argument UUID assigneeId) {
+        return taskService.getTasksByAssignee(assigneeId);
+    }
 
     @MutationMapping
     public Task createTask(@Argument String title, @Argument String description, @Argument UUID assigneeId, @Argument UUID departmentId) {

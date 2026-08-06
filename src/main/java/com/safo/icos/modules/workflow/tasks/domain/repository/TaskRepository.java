@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface TaskRepository {
   Task save(Task task);
   Optional<Task> findById(UUID id);
+  java.util.List<Task> findByAssigneeId(UUID assigneeId);
+  java.util.List<Task> findAll();
 }
