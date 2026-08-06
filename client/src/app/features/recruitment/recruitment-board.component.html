@@ -1,0 +1,327 @@
+<div class="recruitment-container">
+  <header class="board-header">
+    <div class="header-left">
+      <div class="title-badge">
+        <ng-icon name="tablerBriefcase" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
+        <span class="badge-text">Recruitment Funnel</span>
+      </div>
+      <h1 class="header-title">Candidate Pipeline</h1>
+      <p class="header-subtitle">Manage applicants, track recruitment stages vertically, and onboard talent seamlessly.</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="vacancy-selector-wrapper">
+        <label for="vacancySelect" class="selector-label">Vacancy:</label>
+        <select
+          id="vacancySelect"
+          class="vacancy-select"
+          [ngModel]="selectedVacancyId()"
+          (ngModelChange)="onVacancyChange($event)"
+        >
+          @for (vac of vacancies(); track vac.id) {
+          <option [value]="vac.id">{{ vac.title }} ({{ vac.status }})</option>
+          }
+          @if (vacancies().length === 0) {
+          <option value="">No active vacancies</option>
+          }
+        </select>
+      </div>
+
+      <button type="button" class="btn btn-secondary" (click)="openVacancyModal()">
+        <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+        <span>New Vacancy</span>
+      </button>
+
+      <button type="button" class="btn btn-primary" (click)="openApplyModal()">
+        <ng-icon name="tablerUserCheck" size="18" aria-hidden="true"></ng-icon>
+        <span>Add Candidate</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="search-input-box">
+      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
+      <label for="searchInput" class="visually-hidden">Search candidates</label>
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Filter candidates by name, email, or source..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </div>
+
+    @if (selectedVacancy()) {
+    <div class="vacancy-info-pill">
+      <span class="info-label">Active Vacancy:</span>
+      <span class="info-title">{{ selectedVacancy()?.title }}</span>
+      <span class="status-badge" [class.open]="selectedVacancy()?.status === 'OPEN'">
+          {{ selectedVacancy()?.status }}
+        </span>
+    </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading recruitment pipeline...</span>
+  </div>
+  }
+
+  @if (!isLoading() && board()) {
+  <div class="vertical-board-wrapper">
+    <div class="vertical-kanban-columns">
+      @for (col of filteredColumns(); track col.stage.id) {
+      <div class="kanban-column" [attr.data-stage-type]="col.stage.type">
+        <div class="column-header">
+          <div class="stage-title-wrap">
+            <span class="stage-dot" [class]="'type-' + col.stage.type.toLowerCase()" aria-hidden="true"></span>
+            <h3 class="stage-name">{{ col.stage.name }}</h3>
+          </div>
+          <span class="count-badge">{{ col.applications.length }}</span>
+        </div>
+
+        <div class="cards-container">
+          @for (app of col.applications; track app.id) {
+          <button type="button" class="candidate-card" (click)="openCandidateDetail(app)">
+            <div class="card-header">
+              <div class="avatar-gradient" aria-hidden="true">
+                {{ getInitials(app.candidate.firstName, app.candidate.lastName) }}
+              </div>
+              <div class="candidate-info">
+                <h4 class="candidate-name">{{ app.candidate.firstName }} {{ app.candidate.lastName }}</h4>
+                <span class="candidate-email">{{ app.candidate.email }}</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              @if (app.candidate.phone) {
+              <div class="meta-row">
+                <ng-icon name="tablerPhone" size="14" aria-hidden="true"></ng-icon>
+                <span>{{ app.candidate.phone }}</span>
+              </div>
+              }
+              @if (app.candidate.source) {
+              <div class="meta-row">
+                <ng-icon name="tablerUser" size="14" aria-hidden="true"></ng-icon>
+                <span class="source-tag">{{ app.candidate.source }}</span>
+              </div>
+              }
+            </div>
+
+            <div class="card-footer">
+                    <span class="app-status-badge" [class]="'status-' + app.status.toLowerCase()">
+                      {{ app.status }}
+                    </span>
+
+              <div class="card-actions" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+                <div class="stage-dropdown-wrapper">
+                  <label for="stageSelect-{{ app.id }}" class="visually-hidden">Move candidate to stage</label>
+                  <select
+                    id="stageSelect-{{ app.id }}"
+                    class="stage-quick-select"
+                    [ngModel]="app.currentStageId"
+                    (ngModelChange)="moveApplication(app, $event)"
+                    title="Move candidate to stage"
+                  >
+                    <option value="" disabled>Move stage...</option>
+                    @for (otherCol of board()?.columns; track otherCol.stage.id) {
+                    <option [value]="otherCol.stage.id">
+                      → {{ otherCol.stage.name }}
+                    </option>
+                    }
+                  </select>
+                </div>
+
+                @if (col.stage.type === 'OFFER' && app.status !== 'HIRED') {
+                <button
+                  type="button"
+                  class="btn-mini btn-hire"
+                  (click)="hireCandidate(app)"
+                  title="Hire candidate"
+                >
+                  <ng-icon name="tablerCheck" size="14" aria-hidden="true"></ng-icon>
+                  Hire
+                </button>
+                }
+              </div>
+            </div>
+          </button>
+          }
+
+          @if (col.applications.length === 0) {
+          <div class="empty-column-placeholder">
+            <span>No candidates in {{ col.stage.name }}</span>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  @if (showApplyModal()) {
+  <dialog
+    class="modal-backdrop"
+    [open]="showApplyModal()"
+    (click)="closeModalOnBackdrop($event, 'apply')"
+    (keydown)="onModalKeydown($event)"
+  >
+    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="applyModalTitle">Add Candidate to {{ selectedVacancy()?.title || 'Pipeline' }}</h2>
+        <button type="button" class="close-btn" (click)="closeApplyModal()" aria-label="Close modal">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstNameInput">First Name *</label>
+            <input id="firstNameInput" type="text" [(ngModel)]="candidateForm.firstName" placeholder="e.g. Alex" />
+          </div>
+          <div class="form-group">
+            <label for="lastNameInput">Last Name *</label>
+            <input id="lastNameInput" type="text" [(ngModel)]="candidateForm.lastName" placeholder="e.g. Morgan" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="emailInput">Email Address *</label>
+          <input id="emailInput" type="email" [(ngModel)]="candidateForm.email" placeholder="e.g. alex.morgan@example.com" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phoneInput">Phone Number</label>
+            <input id="phoneInput" type="tel" [(ngModel)]="candidateForm.phone" placeholder="+1 (555) 000-0000" />
+          </div>
+          <div class="form-group">
+            <label for="sourceSelect">Source</label>
+            <select id="sourceSelect" [(ngModel)]="candidateForm.source">
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Referral">Referral</option>
+              <option value="Career Site">Career Site</option>
+              <option value="Agency">Agency</option>
+              <option value="Direct Application">Direct Application</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="resumeUrlInput">Resume Link / URL</label>
+          <input id="resumeUrlInput" type="url" [(ngModel)]="candidateForm.resumeUrl" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeApplyModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitApply()">Submit Application</button>
+      </div>
+    </div>
+  </dialog>
+  }
+
+  @if (showVacancyModal()) {
+  <dialog
+    class="modal-backdrop"
+    [open]="showVacancyModal()"
+    (click)="closeModalOnBackdrop($event, 'vacancy')"
+    (keydown)="onModalKeydown($event)"
+  >
+    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="vacancyModalTitle">Create New Vacancy</h2>
+        <button type="button" class="close-btn" (click)="closeVacancyModal()" aria-label="Close modal">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="vacancyTitleInput">Vacancy Title *</label>
+          <input id="vacancyTitleInput" type="text" [(ngModel)]="vacancyForm.title" placeholder="e.g. Senior Frontend Developer" />
+        </div>
+        <div class="form-group">
+          <label for="vacancyDescInput">Description</label>
+          <textarea id="vacancyDescInput" rows="3" [(ngModel)]="vacancyForm.description" placeholder="Describe the position responsibilities..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="vacancyReqInput">Requirements</label>
+          <textarea id="vacancyReqInput" rows="3" [(ngModel)]="vacancyForm.requirements" placeholder="List key requirements and qualifications..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeVacancyModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitVacancy()">Create Vacancy</button>
+      </div>
+    </div>
+  </dialog>
+  }
+
+  @if (selectedApplication()) {
+  <dialog
+    class="modal-backdrop"
+    [open]="!!selectedApplication()"
+    (click)="closeModalOnBackdrop($event, 'detail')"
+    (keydown)="onModalKeydown($event)"
+  >
+    <div class="modal-card detail-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="header-candidate">
+          <div class="avatar-large" aria-hidden="true">
+            {{ getInitials(selectedApplication()!.candidate.firstName, selectedApplication()!.candidate.lastName) }}
+          </div>
+          <div>
+            <h2 id="detailModalTitle">{{ selectedApplication()!.candidate.firstName }} {{ selectedApplication()!.candidate.lastName }}</h2>
+            <span class="subtitle-email">{{ selectedApplication()!.candidate.email }}</span>
+          </div>
+        </div>
+        <button type="button" class="close-btn" (click)="closeCandidateDetail()" aria-label="Close candidate details">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h4>Contact & Info</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Phone</span>
+              <span class="value">{{ selectedApplication()!.candidate.phone || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Source</span>
+              <span class="value">{{ selectedApplication()!.candidate.source || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Status</span>
+              <span class="value badge-value">{{ selectedApplication()!.status }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Applied Date</span>
+              <span class="value">{{ selectedApplication()!.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+        </div>
+
+        @if (selectedApplication()!.candidate.resumeUrl) {
+        <div class="detail-section">
+          <h4>Resume</h4>
+          <a [href]="selectedApplication()!.candidate.resumeUrl" target="_blank" class="resume-link" rel="noopener noreferrer">
+            <ng-icon name="tablerFile" size="18" aria-hidden="true"></ng-icon>
+            View Resume / CV
+          </a>
+        </div>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (selectedApplication()!.status !== 'HIRED') {
+        <button type="button" class="btn btn-primary" (click)="hireCandidate(selectedApplication()!); closeCandidateDetail()">
+          <ng-icon name="tablerCheck" size="18" aria-hidden="true"></ng-icon>
+          Hire Candidate
+        </button>
+        }
+        <button type="button" class="btn btn-secondary" (click)="closeCandidateDetail()">Close</button>
+      </div>
+    </div>
+  </dialog>
+  }
+</div>
