@@ -2,8 +2,7 @@
   class="modal-overlay"
   (click)="closeModal()"
   (keydown.esc)="closeModal()"
-  (keydown)="onDialogKeydown($event)"
-  [open]="isOpen()"
+  [open]="true"
   (close)="closeModal()"
 >
   <div class="modal-card" (click)="$event.stopPropagation()">

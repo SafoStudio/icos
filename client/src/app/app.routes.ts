@@ -11,6 +11,9 @@ import { PositionsComponent } from './features/org/positions/positions.component
 import { ProfileComponent } from './features/profile/profile.component';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
 
+import { RecruitmentBoardComponent } from './features/recruitment/recruitment-board.component';
+import { TaskBoardComponent } from './features/tasks/task-board.component';
+
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [publicGuard] },
@@ -18,6 +21,10 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
+  { path: 'recruitment', component: RecruitmentBoardComponent, canActivate: [authGuard] },
+  { path: 'vacancies', redirectTo: 'recruitment', pathMatch: 'full' },
+  { path: 'candidates', redirectTo: 'recruitment', pathMatch: 'full' },
+  { path: 'tasks', component: TaskBoardComponent, canActivate: [authGuard] },
   {
     path: 'organization',
     component: OrganizationComponent,
