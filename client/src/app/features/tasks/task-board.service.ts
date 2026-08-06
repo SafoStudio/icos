@@ -1,0 +1,63 @@
+import { Injectable, inject } from '@angular/core';
+import { ApiService } from '@services';
+import { Observable } from 'rxjs';
+
+export interface TaskItem {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
+  assigneeId: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskBoardService {
+  private readonly api = inject(ApiService);
+
+  getTasksByAssignee(assigneeId: string): Observable<{ tasksByAssignee: TaskItem[] }> {
+    const query = `
+      query GetTasksByAssignee($assigneeId: ID!) {
+        tasksByAssignee(assigneeId: $assigneeId) {
+          id
+          title
+          description
+          status
+          assigneeId
+        }
+      }
+    `;
+    return this.api.graphql<{ tasksByAssignee: TaskItem[] }>(query, { assigneeId });
+  }
+
+  createTask(title: string, description: string, assigneeId: string, departmentId: string): Observable<{ createTask: TaskItem }> {
+    const mutation = `
+      mutation CreateTask($title: String!, $description: String, $assigneeId: ID!, $departmentId: ID!) {
+        createTask(title: $title, description: $description, assigneeId: $assigneeId, departmentId: $departmentId) {
+          id
+          title
+          description
+          status
+          assigneeId
+        }
+      }
+    `;
+    return this.api.graphql<{ createTask: TaskItem }>(mutation, { title, description, assigneeId, departmentId });
+  }
+
+  moveTask(taskId: string, newStatus: string): Observable<{ moveTask: TaskItem }> {
+    const mutation = `
+      mutation MoveTask($taskId: ID!, $newStatus: String!) {
+        moveTask(taskId: $taskId, newStatus: $newStatus) {
+          id
+          title
+          description
+          status
+          assigneeId
+        }
+      }
+    `;
+    return this.api.graphql<{ moveTask: TaskItem }>(mutation, { taskId, newStatus });
+  }
+}

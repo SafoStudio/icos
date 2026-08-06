@@ -1,0 +1,202 @@
+<div class="task-board-container">
+  <header class="board-header">
+    <div class="header-left">
+      <div class="title-badge">
+        <ng-icon name="tablerClipboardList" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
+        <span class="badge-text">Work Management</span>
+      </div>
+      <h1 class="header-title">Employee Tasks</h1>
+      <p class="header-subtitle">Manage daily employee workflow tasks arranged in continuous horizontal status lanes.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="openCreateModal()">
+        <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+        <span>Create Task</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
+      <label for="taskSearchInput" class="visually-hidden">Search tasks</label>
+      <input
+        id="taskSearchInput"
+        type="text"
+        placeholder="Search tasks by title or description..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </div>
+
+    <div class="status-filters">
+      <span class="filter-label">Filter:</span>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedStatusFilter() === 'ALL'"
+        (click)="selectedStatusFilter.set('ALL')"
+      >
+        All Tasks ({{ filteredTasks().length }})
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedStatusFilter() === 'TODO'"
+        (click)="selectedStatusFilter.set('TODO')"
+      >
+        To Do
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedStatusFilter() === 'IN_PROGRESS'"
+        (click)="selectedStatusFilter.set('IN_PROGRESS')"
+      >
+        In Progress
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedStatusFilter() === 'IN_REVIEW'"
+        (click)="selectedStatusFilter.set('IN_REVIEW')"
+      >
+        In Review
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedStatusFilter() === 'DONE'"
+        (click)="selectedStatusFilter.set('DONE')"
+      >
+        Done
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading employee tasks...</span>
+  </div>
+  }
+
+  @if (!isLoading()) {
+  <div class="horizontal-board-layout">
+    @for (lane of lanes; track lane.key) {
+    <div class="horizontal-lane" [attr.data-lane]="lane.key">
+      <div class="lane-header">
+        <div class="lane-title-wrap">
+          <ng-icon [name]="lane.icon" size="20" class="lane-icon" aria-hidden="true"></ng-icon>
+          <div>
+            <h3 class="lane-title">{{ lane.label }}</h3>
+            <span class="lane-desc">{{ lane.description }}</span>
+          </div>
+        </div>
+        <span class="lane-count-badge">{{ getTasksForLane(lane.key).length }}</span>
+      </div>
+
+      <div class="lane-cards-row">
+        @for (task of getTasksForLane(lane.key); track task.id) {
+        <div class="task-card-horizontal">
+          <div class="card-top">
+            <span class="task-id">#{{ task.id.substring(0, 8) }}</span>
+            <span class="status-pill" [class]="'status-' + task.status.toLowerCase()">
+                    {{ task.status }}
+                  </span>
+          </div>
+
+          <h4 class="task-title">{{ task.title }}</h4>
+
+          @if (task.description) {
+          <p class="task-description">{{ task.description }}</p>
+          }
+
+          <div class="card-bottom">
+            <div class="assignee-tag">
+              <ng-icon name="tablerUser" size="14" aria-hidden="true"></ng-icon>
+              <span>Assignee: {{ task.assigneeId.substring(0, 8) }}...</span>
+            </div>
+
+            <div class="horizontal-actions" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+              @if (getPrevStatus(task.status); as prevStatus) {
+              <button
+                type="button"
+                class="btn-step btn-prev"
+                (click)="moveTask(task, prevStatus)"
+                title="Move back to {{ prevStatus }}"
+                aria-label="Move task back to {{ prevStatus }}"
+              >
+                <ng-icon name="tablerChevronLeft" size="14" aria-hidden="true"></ng-icon>
+              </button>
+              }
+
+              @if (getNextStatus(task.status); as nextStatus) {
+              <button
+                type="button"
+                class="btn-step btn-next"
+                (click)="moveTask(task, nextStatus)"
+                title="Advance to {{ nextStatus }}"
+                aria-label="Advance task to {{ nextStatus }}"
+              >
+                <span>Move</span>
+                <ng-icon name="tablerChevronRight" size="14" aria-hidden="true"></ng-icon>
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (getTasksForLane(lane.key).length === 0) {
+        <div class="empty-lane-placeholder">
+          <span>No tasks in {{ lane.label }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (showCreateModal()) {
+  <dialog
+    class="modal-backdrop"
+    [open]="showCreateModal()"
+    (click)="closeModalOnBackdrop($event)"
+    (keydown)="onModalKeydown($event)"
+  >
+    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="createTaskModalTitle">Create Employee Task</h2>
+        <button type="button" class="close-btn" (click)="closeCreateModal()" aria-label="Close modal">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="taskTitleInput">Task Title *</label>
+          <input id="taskTitleInput" type="text" [(ngModel)]="taskForm.title" placeholder="e.g. Implement user profile API" />
+        </div>
+        <div class="form-group">
+          <label for="taskDescInput">Description</label>
+          <textarea id="taskDescInput" rows="3" [(ngModel)]="taskForm.description" placeholder="Add task details and acceptance criteria..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="taskAssigneeInput">Assignee ID *</label>
+          <input id="taskAssigneeInput" type="text" [(ngModel)]="taskForm.assigneeId" placeholder="UUID of assignee" />
+        </div>
+        <div class="form-group">
+          <label for="taskDepartmentInput">Department ID *</label>
+          <input id="taskDepartmentInput" type="text" [(ngModel)]="taskForm.departmentId" placeholder="UUID of department" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitCreateTask()">Create Task</button>
+      </div>
+    </div>
+  </dialog>
+  }
+</div>
