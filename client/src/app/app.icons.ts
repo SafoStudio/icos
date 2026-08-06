@@ -48,7 +48,9 @@ import {
   tablerZoomOut,
   tablerRotateClockwise,
   tablerUpload,
-  tablerFocus2
+  tablerFocus2,
+  tablerSun,
+  tablerMoon
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -100,5 +102,7 @@ export const APP_ICONS = provideIcons({
   tablerZoomOut,
   tablerRotateClockwise,
   tablerUpload,
-  tablerFocus2
+  tablerFocus2,
+  tablerSun,
+  tablerMoon
 });
