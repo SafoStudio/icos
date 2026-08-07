@@ -17,37 +17,33 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PerformanceService {
+  private final ReviewCycleRepository cycleRepository;
+  private final PerformanceReviewRepository reviewRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
-    private final ReviewCycleRepository cycleRepository;
-    private final PerformanceReviewRepository reviewRepository;
-    private final ApplicationEventPublisher eventPublisher;
+  @Transactional
+  public ReviewCycle createCycle(String name, LocalDate start, LocalDate end) {
+    ReviewCycle cycle = ReviewCycle.create(name, start, end);
+    return cycleRepository.save(cycle);
+  }
 
-    @Transactional
-    public ReviewCycle createCycle(String name, LocalDate start, LocalDate end) {
-        ReviewCycle cycle = ReviewCycle.create(name, start, end);
-        return cycleRepository.save(cycle);
-    }
+  @Transactional
+  public PerformanceReview createReview(UUID cycleId, UUID employeeId, UUID managerId) {
+    PerformanceReview review = PerformanceReview.create(cycleId, employeeId, managerId);
+    return reviewRepository.save(review);
+  }
 
-    @Transactional
-    public PerformanceReview createReview(UUID cycleId, UUID employeeId, UUID managerId) {
-        PerformanceReview review = PerformanceReview.create(cycleId, employeeId, managerId);
-        return reviewRepository.save(review);
-    }
+  @Transactional
+  public PerformanceReview finalizeReview(UUID reviewId, Integer rating, String summary) {
+    PerformanceReview review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new NotFoundException("Review not found"));
+    PerformanceReview finalized = review.finalize(rating, summary);
+    PerformanceReview saved = reviewRepository.save(finalized);
+    eventPublisher.publishEvent(new PerformanceReviewFinalizedEvent(this, saved));
+    return saved;
+  }
 
-    @Transactional
-    public PerformanceReview finalizeReview(UUID reviewId, Integer rating, String summary) {
-        PerformanceReview review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new NotFoundException("Review not found"));
-
-        PerformanceReview finalized = review.finalize(rating, summary);
-        PerformanceReview saved = reviewRepository.save(finalized);
-
-        eventPublisher.publishEvent(new PerformanceReviewFinalizedEvent(this, saved));
-
-        return saved;
-    }
-
-    public List<PerformanceReview> getEmployeeReviews(UUID employeeId) {
-        return reviewRepository.findByEmployeeId(employeeId);
-    }
+  public List<PerformanceReview> getEmployeeReviews(UUID employeeId) {
+    return reviewRepository.findByEmployeeId(employeeId);
+  }
 }

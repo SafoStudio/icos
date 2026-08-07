@@ -8,19 +8,15 @@ import lombok.Getter;
 @Getter
 @Builder(toBuilder = true)
 public class ReviewCycle {
-    private final UUID id;
-    private final String name;
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final String status; // ACTIVE, CLOSED
+  private final UUID id;
+  private final String name;
+  private final LocalDate startDate;
+  private final LocalDate endDate;
+  private final String status;
 
-    public static ReviewCycle create(String name, LocalDate start, LocalDate end) {
-        return ReviewCycle.builder()
-                .id(UUID.randomUUID())
-                .name(name)
-                .startDate(start)
-                .endDate(end)
-                .status("ACTIVE")
-                .build();
-    }
+  public static ReviewCycle create(String name, LocalDate start, LocalDate end) {
+    return ReviewCycle.builder()
+            .id(UUID.randomUUID()).name(name).startDate(start).endDate(end)
+            .status("ACTIVE").build();
+  }
 }
