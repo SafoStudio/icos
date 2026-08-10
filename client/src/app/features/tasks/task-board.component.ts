@@ -6,7 +6,7 @@ import { AuthService, ToastService } from '@services';
 import { TaskBoardService, TaskItem } from './task-board.service';
 
 export interface TaskStatusLane {
-  key: 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
+  key: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
   label: string;
   description: string;
   icon: string;
@@ -43,7 +43,7 @@ export class TaskBoardComponent implements OnInit {
   readonly lanes: TaskStatusLane[] = [
     { key: 'TODO', label: 'To Do / Backlog', description: 'Pending tasks ready to be started', icon: 'tablerClipboardList' },
     { key: 'IN_PROGRESS', label: 'In Progress', description: 'Currently active work items', icon: 'tablerBulb' },
-    { key: 'IN_REVIEW', label: 'In Review', description: 'Under peer review or QA inspection', icon: 'tablerEye' },
+    { key: 'REVIEW', label: 'In Review', description: 'Under peer review or QA inspection', icon: 'tablerEye' },
     { key: 'DONE', label: 'Completed', description: 'Finished work ready for archive', icon: 'tablerCheck' }
   ];
 
@@ -144,14 +144,14 @@ export class TaskBoardComponent implements OnInit {
 
   getNextStatus(currentStatus: string): string | null {
     if (currentStatus === 'TODO') return 'IN_PROGRESS';
-    if (currentStatus === 'IN_PROGRESS') return 'IN_REVIEW';
-    if (currentStatus === 'IN_REVIEW') return 'DONE';
+    if (currentStatus === 'IN_PROGRESS') return 'REVIEW';
+    if (currentStatus === 'REVIEW') return 'DONE';
     return null;
   }
 
   getPrevStatus(currentStatus: string): string | null {
-    if (currentStatus === 'DONE') return 'IN_REVIEW';
-    if (currentStatus === 'IN_REVIEW') return 'IN_PROGRESS';
+    if (currentStatus === 'DONE') return 'REVIEW';
+    if (currentStatus === 'REVIEW') return 'IN_PROGRESS';
     if (currentStatus === 'IN_PROGRESS') return 'TODO';
     return null;
   }

@@ -6,7 +6,7 @@ export interface TaskItem {
   id: string;
   title: string;
   description?: string;
-  status: 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
+  status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
   assigneeId: string;
 }
 

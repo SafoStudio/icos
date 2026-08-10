@@ -5,8 +5,7 @@
         <ng-icon name="tablerClipboardList" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
         <span class="badge-text">Work Management</span>
       </div>
-      <h1 class="header-title">Employee Tasks</h1>
-      <p class="header-subtitle">Manage daily employee workflow tasks arranged in continuous horizontal status lanes.</p>
+      <p class="header-subtitle">Manage daily workflow tasks.</p>
     </div>
 
     <div class="header-actions">
@@ -59,8 +58,8 @@
       <button
         type="button"
         class="filter-pill"
-        [class.active]="selectedStatusFilter() === 'IN_REVIEW'"
-        (click)="selectedStatusFilter.set('IN_REVIEW')"
+        [class.active]="selectedStatusFilter() === 'REVIEW'"
+        (click)="selectedStatusFilter.set('REVIEW')"
       >
         In Review
       </button>
@@ -103,8 +102,8 @@
           <div class="card-top">
             <span class="task-id">#{{ task.id.substring(0, 8) }}</span>
             <span class="status-pill" [class]="'status-' + task.status.toLowerCase()">
-                    {{ task.status }}
-                  </span>
+              {{ task.status === 'IN_PROGRESS' ? 'PROGRESS' : task.status }}
+            </span>
           </div>
 
           <h4 class="task-title">{{ task.title }}</h4>

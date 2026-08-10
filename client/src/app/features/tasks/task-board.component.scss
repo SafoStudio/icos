@@ -38,28 +38,6 @@
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
-    .header-title {
-      font-size: 1.85rem;
-      font-weight: 800;
-      margin: 0;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: var(--text-primary, #f8fafc);
-
-      .layout-tag {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.6rem;
-        border-radius: 6px;
-        background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-      }
-    }
-
     .header-subtitle {
       margin: 0.35rem 0 0;
       font-size: 0.95rem;
@@ -326,7 +304,7 @@
 
       &.status-todo { background: rgba(148, 163, 184, 0.15); color: var(--text-secondary, #cbd5e1); }
       &.status-in_progress { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-      &.status-in_review { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+      &.status-review { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
       &.status-done { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
     }
   }
