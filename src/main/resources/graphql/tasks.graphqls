@@ -3,15 +3,17 @@ type Task {
     title: String!
     description: String
     status: String!
-    assigneeId: ID!
+    assigneeId: ID
+    departmentId: ID
 }
 
 extend type Query {
-    tasksByAssignee(assigneeId: ID!): [Task!]!
+    tasksByAssignee(assigneeId: ID): [Task!]!
+    tasksByDepartment(departmentId: ID): [Task!]!
 }
 
 extend type Mutation {
-    createTask(title: String!, description: String, assigneeId: ID!, departmentId: ID!): Task!
+    createTask(title: String!, description: String, assigneeId: ID, departmentId: ID): Task!
     moveTask(taskId: ID!, newStatus: String!): Task!
 }
 

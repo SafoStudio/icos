@@ -20,8 +20,13 @@ public class TaskGraphQLResolver {
 
     @QueryMapping
     public List<Task> tasksByAssignee(@Argument UUID assigneeId) {
-        return taskService.getTasksByAssignee(assigneeId);
+      return taskService.getTasksByAssignee(assigneeId);
     }
+
+  @QueryMapping
+  public List<Task> tasksByDepartment(@Argument UUID departmentId) {
+    return taskService.getTasksByDepartment(departmentId);
+  }
 
     @MutationMapping
     public Task createTask(@Argument String title, @Argument String description, @Argument UUID assigneeId, @Argument UUID departmentId) {

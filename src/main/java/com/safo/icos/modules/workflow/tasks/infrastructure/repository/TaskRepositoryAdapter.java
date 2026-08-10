@@ -12,26 +12,33 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class TaskRepositoryAdapter implements TaskRepository {
-    private final TaskJpaRepository jpaRepository;
-    private final TaskMapper mapper;
+  private final TaskJpaRepository jpaRepository;
+  private final TaskMapper mapper;
 
-    @Override
-    public Task save(Task task) {
-        return mapper.toDomain(jpaRepository.save(mapper.toEntity(task)));
-    }
+  @Override
+  public Task save(Task task) {
+    return mapper.toDomain(jpaRepository.save(mapper.toEntity(task)));
+  }
 
-    @Override
-    public Optional<Task> findById(UUID id) {
-        return jpaRepository.findById(id).map(mapper::toDomain);
-    }
+  @Override
+  public Optional<Task> findById(UUID id) {
+    return jpaRepository.findById(id).map(mapper::toDomain);
+  }
 
-    @Override
-    public java.util.List<Task> findByAssigneeId(UUID id) {
-        return jpaRepository.findByAssigneeId(id).stream().map(mapper::toDomain).toList();
-    }
+  @Override
+  public java.util.List<Task> findByAssigneeId(UUID id) {
+    return jpaRepository.findByAssigneeId(id).stream().map(mapper::toDomain).toList();
+  }
 
-    @Override
-    public java.util.List<Task> findAll() {
-        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
-    }
+  @Override
+  public java.util.List<Task> findAll() {
+    return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  @Override
+  public java.util.List<Task> findByDepartmentId(UUID departmentId) {
+    return jpaRepository.findByDepartmentId(departmentId).stream()
+            .map(mapper::toDomain)
+            .toList();
+  }
 }

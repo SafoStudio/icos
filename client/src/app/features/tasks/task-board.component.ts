@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ToastService } from '@services';
 import { TaskBoardService, TaskItem } from './task-board.service';
+import { type DepartmentMember } from '@models';
 
 export interface TaskStatusLane {
   key: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
@@ -24,20 +25,18 @@ export class TaskBoardComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly authService = inject(AuthService);
 
-  readonly defaultDepartmentId = '00000000-0000-0000-0000-000000000010';
-  readonly defaultAssigneeId = '00000000-0000-0000-0000-000000000002';
-
   tasks = signal<TaskItem[]>([]);
+  departmentMembers = signal<DepartmentMember[]>([]);
   isLoading = signal<boolean>(false);
+  isCreating = signal<boolean>(false);
   searchQuery = signal<string>('');
   selectedStatusFilter = signal<string>('ALL');
-
   showCreateModal = signal<boolean>(false);
+
   taskForm = {
     title: '',
     description: '',
-    assigneeId: this.defaultAssigneeId,
-    departmentId: this.defaultDepartmentId
+    assigneeId: ''
   };
 
   readonly lanes: TaskStatusLane[] = [
@@ -46,6 +45,15 @@ export class TaskBoardComponent implements OnInit {
     { key: 'REVIEW', label: 'In Review', description: 'Under peer review or QA inspection', icon: 'tablerEye' },
     { key: 'DONE', label: 'Completed', description: 'Finished work ready for archive', icon: 'tablerCheck' }
   ];
+
+  hasDepartment = computed(() => {
+    const user = this.authService.currentUser();
+    return !!user?.departmentId;
+  });
+
+  currentUser = computed(() => {
+    return this.authService.currentUser();
+  });
 
   filteredTasks = computed(() => {
     let list = this.tasks();
@@ -66,15 +74,71 @@ export class TaskBoardComponent implements OnInit {
     return list;
   });
 
+  getUserName = computed(() => {
+    const userMap = new Map<string, string>();
+    this.departmentMembers().forEach(member => {
+      userMap.set(member.userId, `${member.firstName} ${member.lastName}`);
+    });
+    return (userId: string | null) => {
+      if (!userId) return 'Unassigned';
+      return userMap.get(userId) || userId.substring(0, 8) + '...';
+    };
+  });
+
   ngOnInit(): void {
+    this.loadDepartmentMembers();
     this.loadTasks();
+  }
+
+  loadDepartmentMembers(): void {
+    const user = this.authService.currentUser();
+    if (!user?.departmentId) {
+      this.departmentMembers.set([]);
+      return;
+    }
+
+    this.taskService.getDepartmentMembers(user.departmentId).subscribe({
+      next: (members) => {
+        this.departmentMembers.set(members);
+      },
+      error: (err) => {
+        console.error('Failed to load department members:', err);
+        this.toast.error('Failed to load team members');
+      }
+    });
   }
 
   loadTasks(): void {
     this.isLoading.set(true);
     const user = this.authService.currentUser();
-    const assigneeId = user?.id || this.defaultAssigneeId;
 
+    if (!user?.id) {
+      this.toast.error('User not authenticated');
+      this.isLoading.set(false);
+      return;
+    }
+
+    if (this.hasDepartment()) {
+      this.loadDepartmentTasks(user.departmentId!);
+    } else {
+      this.loadPersonalTasks(user.id);
+    }
+  }
+
+  loadDepartmentTasks(departmentId: string): void {
+    this.taskService.getTasksByDepartment(departmentId).subscribe({
+      next: (res: any) => {
+        this.tasks.set(res.tasksByDepartment || []);
+        this.isLoading.set(false);
+      },
+      error: (err: any) => {
+        this.toast.error('Failed to load tasks: ' + (err.message || 'Error'));
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  loadPersonalTasks(assigneeId: string): void {
     this.taskService.getTasksByAssignee(assigneeId).subscribe({
       next: (res: any) => {
         this.tasks.set(res.tasksByAssignee || []);
@@ -93,9 +157,10 @@ export class TaskBoardComponent implements OnInit {
 
   moveTask(task: TaskItem, newStatus: string): void {
     if (task.status === newStatus) return;
+
     this.taskService.moveTask(task.id, newStatus).subscribe({
-      next: (res: any) => {
-        this.toast.success(`Task status updated to ${newStatus}`);
+      next: () => {
+        this.toast.success(`Task moved to ${newStatus}`);
         this.loadTasks();
       },
       error: (err: any) => {
@@ -105,39 +170,51 @@ export class TaskBoardComponent implements OnInit {
   }
 
   openCreateModal(): void {
-    const user = this.authService.currentUser();
     this.taskForm = {
       title: '',
       description: '',
-      assigneeId: user?.id || this.defaultAssigneeId,
-      departmentId: this.defaultDepartmentId
+      assigneeId: ''
     };
     this.showCreateModal.set(true);
   }
 
   closeCreateModal(): void {
     this.showCreateModal.set(false);
+    this.isCreating.set(false);
   }
 
   submitCreateTask(): void {
-    if (!this.taskForm.title) {
+    if (!this.taskForm.title?.trim()) {
       this.toast.error('Task title is required');
       return;
     }
 
+    const user = this.authService.currentUser();
+    if (!user?.id) {
+      this.toast.error('User not authenticated');
+      return;
+    }
+
+    this.isCreating.set(true);
+
+    const assigneeId = this.taskForm.assigneeId || user.id;
+    const departmentId = user.departmentId || null;
+
     this.taskService.createTask(
       this.taskForm.title,
       this.taskForm.description,
-      this.taskForm.assigneeId,
-      this.taskForm.departmentId
+      assigneeId,
+      departmentId
     ).subscribe({
       next: (res: any) => {
         this.toast.success(`Task "${res.createTask.title}" created successfully!`);
         this.closeCreateModal();
         this.loadTasks();
+        this.isCreating.set(false);
       },
       error: (err: any) => {
         this.toast.error('Failed to create task: ' + (err.message || 'Error'));
+        this.isCreating.set(false);
       }
     });
   }

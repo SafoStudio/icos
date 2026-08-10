@@ -6,6 +6,7 @@ import com.safo.icos.modules.workflow.tasks.domain.model.Task;
 import com.safo.icos.modules.workflow.tasks.domain.model.enums.TaskStatus;
 import com.safo.icos.modules.workflow.tasks.domain.repository.TaskRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -68,10 +69,18 @@ public class TaskService {
   }
 
   @Transactional(readOnly = true)
-  public java.util.List<Task> getTasksByAssignee(UUID assigneeId) {
+  public List<Task> getTasksByAssignee(UUID assigneeId) {
     if (assigneeId == null) {
       return taskRepository.findAll();
     }
     return taskRepository.findByAssigneeId(assigneeId);
+  }
+
+  @Transactional(readOnly = true)
+  public List<Task> getTasksByDepartment(UUID departmentId) {
+    if (departmentId == null) {
+      return taskRepository.findAll();
+    }
+    return taskRepository.findByDepartmentId(departmentId);
   }
 }

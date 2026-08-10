@@ -37,7 +37,7 @@ export class LoginComponent {
       password: 'password123'
     },
     MEMBER: {
-      email: 'john.doe@acme.com',
+      email: 'bob.wilson@acme.com',
       password: 'password123'
     }
   };

@@ -5,7 +5,13 @@
         <ng-icon name="tablerClipboardList" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
         <span class="badge-text">Work Management</span>
       </div>
-      <p class="header-subtitle">Manage daily workflow tasks.</p>
+      <p class="header-subtitle">
+        @if (hasDepartment()) {
+        All department tasks
+        } @else {
+        Your personal tasks
+        }
+      </p>
     </div>
 
     <div class="header-actions">
@@ -77,7 +83,7 @@
   @if (isLoading()) {
   <div class="loading-state">
     <div class="spinner" aria-hidden="true"></div>
-    <span>Loading employee tasks...</span>
+    <span>Loading tasks...</span>
   </div>
   }
 
@@ -102,8 +108,8 @@
           <div class="card-top">
             <span class="task-id">#{{ task.id.substring(0, 8) }}</span>
             <span class="status-pill" [class]="'status-' + task.status.toLowerCase()">
-              {{ task.status === 'IN_PROGRESS' ? 'PROGRESS' : task.status }}
-            </span>
+                    {{ task.status === 'IN_PROGRESS' ? 'PROGRESS' : task.status }}
+                  </span>
           </div>
 
           <h4 class="task-title">{{ task.title }}</h4>
@@ -115,7 +121,7 @@
           <div class="card-bottom">
             <div class="assignee-tag">
               <ng-icon name="tablerUser" size="14" aria-hidden="true"></ng-icon>
-              <span>Assignee: {{ task.assigneeId.substring(0, 8) }}...</span>
+              <span>{{ getUserName()(task.assigneeId) }}</span>
             </div>
 
             <div class="horizontal-actions" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
@@ -168,32 +174,79 @@
   >
     <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2 id="createTaskModalTitle">Create Employee Task</h2>
+        <h2>Create Task</h2>
         <button type="button" class="close-btn" (click)="closeCreateModal()" aria-label="Close modal">
           <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
         </button>
       </div>
+
       <div class="modal-body">
         <div class="form-group">
           <label for="taskTitleInput">Task Title *</label>
-          <input id="taskTitleInput" type="text" [(ngModel)]="taskForm.title" placeholder="e.g. Implement user profile API" />
+          <input
+            id="taskTitleInput"
+            type="text"
+            [(ngModel)]="taskForm.title"
+            placeholder="e.g. Implement user profile API"
+          />
         </div>
+
         <div class="form-group">
           <label for="taskDescInput">Description</label>
-          <textarea id="taskDescInput" rows="3" [(ngModel)]="taskForm.description" placeholder="Add task details and acceptance criteria..."></textarea>
+          <textarea
+            id="taskDescInput"
+            rows="3"
+            [(ngModel)]="taskForm.description"
+            placeholder="Add task details and acceptance criteria..."
+          ></textarea>
         </div>
+
         <div class="form-group">
-          <label for="taskAssigneeInput">Assignee ID *</label>
-          <input id="taskAssigneeInput" type="text" [(ngModel)]="taskForm.assigneeId" placeholder="UUID of assignee" />
+          <label for="taskAssigneeSelect">Assignee</label>
+          @if (hasDepartment()) {
+          <select id="taskAssigneeSelect" [(ngModel)]="taskForm.assigneeId">
+            <option value="">Unassigned</option>
+            @for (member of departmentMembers(); track member.userId) {
+            <option [value]="member.userId">
+              {{ member.firstName }} {{ member.lastName }}
+              @if (member.positionName) {
+              ({{ member.positionName }})
+              }
+            </option>
+            }
+          </select>
+          } @else {
+          <div class="assignee-info">
+            <ng-icon name="tablerUser" size="16" aria-hidden="true"></ng-icon>
+            <span>{{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</span>
+          </div>
+          }
+          <small class="form-hint">Leave empty to keep task unassigned</small>
         </div>
-        <div class="form-group">
-          <label for="taskDepartmentInput">Department ID *</label>
-          <input id="taskDepartmentInput" type="text" [(ngModel)]="taskForm.departmentId" placeholder="UUID of department" />
+
+        @if (hasDepartment()) {
+        <div class="department-info">
+          <ng-icon name="tablerBuilding" size="16" aria-hidden="true"></ng-icon>
+          <span>Task will be created in your current department</span>
         </div>
+        }
       </div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitCreateTask()">Create Task</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submitCreateTask()"
+          [disabled]="isCreating()"
+        >
+          @if (isCreating()) {
+          <span class="spinner-small" aria-hidden="true"></span>
+          Creating...
+          } @else {
+          Create Task
+          }
+        </button>
       </div>
     </div>
   </dialog>
