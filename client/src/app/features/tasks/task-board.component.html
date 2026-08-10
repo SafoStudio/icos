@@ -5,13 +5,7 @@
         <ng-icon name="tablerClipboardList" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
         <span class="badge-text">Work Management</span>
       </div>
-      <p class="header-subtitle">
-        @if (hasDepartment()) {
-        All department tasks
-        } @else {
-        Your personal tasks
-        }
-      </p>
+      <p class="header-subtitle">Manage daily workflow tasks.</p>
     </div>
 
     <div class="header-actions">
@@ -102,14 +96,21 @@
         <span class="lane-count-badge">{{ getTasksForLane(lane.key).length }}</span>
       </div>
 
-      <div class="lane-cards-row">
+      <div
+        cdkDropList
+        [id]="lane.key"
+        [cdkDropListData]="getTasksForLane(lane.key)"
+        [cdkDropListConnectedTo]="['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE']"
+        class="lane-cards-row"
+        (cdkDropListDropped)="dropTask($event)"
+      >
         @for (task of getTasksForLane(lane.key); track task.id) {
-        <div class="task-card-horizontal">
+        <div class="task-card-horizontal" cdkDrag [cdkDragData]="task">
           <div class="card-top">
             <span class="task-id">#{{ task.id.substring(0, 8) }}</span>
             <span class="status-pill" [class]="'status-' + task.status.toLowerCase()">
-                    {{ task.status === 'IN_PROGRESS' ? 'PROGRESS' : task.status }}
-                  </span>
+              {{ task.status === 'IN_PROGRESS' ? 'PROGRESS' : task.status }}
+            </span>
           </div>
 
           <h4 class="task-title">{{ task.title }}</h4>

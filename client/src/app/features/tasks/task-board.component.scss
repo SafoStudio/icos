@@ -1,41 +1,64 @@
 .task-board-container {
-  max-width: 1600px;
-  margin: 0 auto;
   padding: 1.5rem 2rem;
 }
 
+
 .board-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
 
   .header-left {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    .title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald, #34d399);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .header-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-primary, #f8fafc);
+
+      .layout-tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+    }
+
+    .header-subtitle {
+      margin: 0.35rem 0 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary, #94a3b8);
+    }
   }
 
-  .title-badge {
+  .header-actions {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-
-    .badge-icon {
-      color: var(--accent-emerald, #10b981);
-    }
-
-    .badge-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary, #f8fafc);
-    }
-  }
-
-  .header-subtitle {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary, #94a3b8);
+    gap: 0.75rem;
   }
 }
 

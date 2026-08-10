@@ -5,6 +5,8 @@ import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ToastService } from '@services';
 import { TaskBoardService, TaskItem } from './task-board.service';
 import { type DepartmentMember } from '@models';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 export interface TaskStatusLane {
   key: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
@@ -16,7 +18,7 @@ export interface TaskStatusLane {
 @Component({
   selector: 'app-task-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, DragDropModule],
   templateUrl: './task-board.component.html',
   styleUrls: ['./task-board.component.scss']
 })
@@ -167,6 +169,30 @@ export class TaskBoardComponent implements OnInit {
         this.toast.error('Failed to move task: ' + (err.message || 'Error'));
       }
     });
+  }
+
+  dropTask(event: CdkDragDrop<TaskItem[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      const task = event.previousContainer.data[event.previousIndex];
+      const newStatus = event.container.id as 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
+
+      this.taskService.moveTask(task.id, newStatus).subscribe({
+        next: () => {
+          this.toast.success(`Task moved to ${newStatus}`);
+          this.loadTasks();
+        },
+        error: (err: any) => {
+          this.toast.error('Failed to move task: ' + (err.message || 'Error'));
+          this.loadTasks();
+        }
+      });
+    }
   }
 
   openCreateModal(): void {
