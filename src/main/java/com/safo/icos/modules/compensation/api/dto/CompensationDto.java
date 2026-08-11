@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CompensationDto {
-    private final UUID id;
-    private final UUID userId;
-    private final BigDecimal baseSalary;
-    private final String currency;
-    private final String payFrequency;
-    private final LocalDate effectiveDate;
+  private final UUID id;
+  private final UUID userId;
+  private final BigDecimal baseSalary;
+  private final String currency;
+  private final String payFrequency;
+  private final LocalDate effectiveDate;
 }

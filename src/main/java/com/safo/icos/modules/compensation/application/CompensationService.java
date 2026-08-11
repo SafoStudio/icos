@@ -16,44 +16,33 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CompensationService {
+  private final CompensationRepository compensationRepository;
 
-    private final CompensationRepository compensationRepository;
+  @Transactional
+  public CompensationRecord setInitialSalary(UUID userId, BigDecimal salary, String currency,
+                                             PayFrequency frequency, LocalDate effectiveDate) {
+    CompensationRecord compensationRecord = CompensationRecord.create(userId, salary, currency, frequency, effectiveDate);
+    return compensationRepository.save(compensationRecord);
+  }
 
-    @Transactional
-    public CompensationRecord setInitialSalary(UUID userId, BigDecimal salary, String currency, PayFrequency frequency, LocalDate effectiveDate) {
-        CompensationRecord record = CompensationRecord.create(userId, salary, currency, frequency, effectiveDate);
-        return compensationRepository.save(record);
-    }
+  @Transactional
+  public CompensationRecord updateSalary(UUID userId, BigDecimal newSalary, String reason,
+                                         LocalDate effectiveDate, UUID approvedBy) {
+    CompensationRecord current = compensationRepository.findByUserId(userId)
+            .orElseThrow(() -> new NotFoundException("Compensation record not found"));
+    SalaryRevision revision = SalaryRevision.create(userId, current.getBaseSalary(), newSalary,
+            reason, effectiveDate, approvedBy);
+    compensationRepository.saveRevision(revision);
+    CompensationRecord updated = current.toBuilder().baseSalary(newSalary).effectiveDate(effectiveDate).build();
+    return compensationRepository.save(updated);
+  }
 
-    @Transactional
-    public CompensationRecord updateSalary(UUID userId, BigDecimal newSalary, String reason, LocalDate effectiveDate, UUID approvedBy) {
-        CompensationRecord current = compensationRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Compensation record not found"));
+  public List<SalaryRevision> getSalaryHistory(UUID userId) {
+    return compensationRepository.findRevisionsByUserId(userId);
+  }
 
-        SalaryRevision revision = SalaryRevision.create(
-                userId,
-                current.getBaseSalary(),
-                newSalary,
-                reason,
-                effectiveDate,
-                approvedBy
-        );
-        compensationRepository.saveRevision(revision);
-
-        CompensationRecord updated = current.toBuilder()
-                .baseSalary(newSalary)
-                .effectiveDate(effectiveDate)
-                .build();
-
-        return compensationRepository.save(updated);
-    }
-
-    public List<SalaryRevision> getSalaryHistory(UUID userId) {
-        return compensationRepository.findRevisionsByUserId(userId);
-    }
-
-    public CompensationRecord getCompensation(UUID userId) {
-        return compensationRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("Compensation record not found"));
-    }
+  public CompensationRecord getCompensation(UUID userId) {
+    return compensationRepository.findByUserId(userId)
+            .orElseThrow(() -> new NotFoundException("Compensation record not found"));
+  }
 }

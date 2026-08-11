@@ -17,20 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PayrollService {
+  private final CompensationRepository compensationRepository;
+  private final PayrollRepository payrollRepository;
+  private final UserProvider userProvider;
 
-    private final CompensationRepository compensationRepository;
-    private final PayrollRepository payrollRepository;
-    private final UserProvider userProvider;
+  public List<PayrollEntryDto> calculatePayroll(UUID companyId, LocalDate startDate, LocalDate endDate) {
+    return new ArrayList<>();
+  }
 
-    public List<PayrollEntryDto> calculatePayroll(UUID companyId, LocalDate startDate, LocalDate endDate) {
-        // Since UserProvider doesn't have findAllByCompanyId, this logic needs adjustment
-        // For demonstration, we assume we can filter or fetch differently
-        return new ArrayList<>();
-    }
-
-    @Transactional
-    public Bonus awardBonus(UUID userId, BigDecimal amount, String type, String description, LocalDate paymentDate) {
-        Bonus bonus = Bonus.create(userId, amount, type, description, paymentDate);
-        return payrollRepository.saveBonus(bonus);
-    }
+  @Transactional
+  public Bonus awardBonus(UUID userId, BigDecimal amount, String type, String description, LocalDate paymentDate) {
+    Bonus bonus = Bonus.create(userId, amount, type, description, paymentDate);
+    return payrollRepository.saveBonus(bonus);
+  }
 }
