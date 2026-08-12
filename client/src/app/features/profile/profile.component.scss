@@ -32,7 +32,6 @@
   align-items: flex-start;
 }
 
-// ===== Sidebar =====
 .profile-sidebar {
   flex: 0 0 260px;
   min-width: 260px;
@@ -312,7 +311,6 @@
   }
 }
 
-// ===== Responsive =====
 @media (max-width: 768px) {
   .profile-page {
     padding: 16px;
