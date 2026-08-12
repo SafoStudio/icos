@@ -13,6 +13,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class KanbanColumnDto {
-  private final VacancyStage stage;
-  private final List<Application> applications;
+  private final VacancyStageDto stage;
+  private final List<ApplicationDto> applications;
 }

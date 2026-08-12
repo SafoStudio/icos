@@ -17,6 +17,8 @@ public class ApplicationDto {
   private final UUID vacancyId;
   /** Current pipeline stage. */
   private final UUID currentStageId;
+  private final String rejectionReason;
   private final ApplicationStatus status;
   private final LocalDateTime createdAt;
+  private final LocalDateTime updatedAt;
 }

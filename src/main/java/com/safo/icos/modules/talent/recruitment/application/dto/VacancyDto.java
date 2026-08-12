@@ -21,5 +21,7 @@ public class VacancyDto {
   private final String description;
   private final String requirements;
   private final VacancyStatus status;
+  private final UUID createdBy;
   private final LocalDateTime createdAt;
+  private final LocalDateTime updatedAt;
 }

@@ -19,11 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Application service for vacancy management.
- * Creates vacancies with a default recruitment pipeline
- * and provides lookup by company.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -56,7 +51,7 @@ public class VacancyService {
     Vacancy savedVacancy = vacancyRepository.save(vacancy);
     createDefaultStages(savedVacancy.getId());
 
-    return toDto(savedVacancy);
+    return mapper.toDto(savedVacancy);
   }
 
   /**
@@ -67,7 +62,7 @@ public class VacancyService {
    */
   public List<VacancyDto> getVacanciesByCompany(UUID companyId) {
     return vacancyRepository.findByCompanyId(companyId).stream()
-            .map(this::toDto)
+            .map(mapper::toDto)
             .toList();
   }
 
@@ -80,7 +75,7 @@ public class VacancyService {
    */
   public VacancyDto getVacancy(UUID vacancyId) {
     return vacancyRepository.findById(vacancyId)
-            .map(this::toDto)
+            .map(mapper::toDto)
             .orElseThrow(() -> new BusinessException(
                     "Vacancy not found", RecruitmentErrorCode.VACANCY_NOT_FOUND));
   }
@@ -103,19 +98,5 @@ public class VacancyService {
             VacancyStage.create(vacancyId, "Offer", PipelineStageType.OFFER, 4)
     );
     defaultStages.forEach(stage -> vacancyStageJpaRepository.save(mapper.toEntity(stage)));
-  }
-
-  private VacancyDto toDto(Vacancy vacancy) {
-    return VacancyDto.builder()
-            .id(vacancy.getId())
-            .companyId(vacancy.getCompanyId())
-            .departmentId(vacancy.getDepartmentId())
-            .positionId(vacancy.getPositionId())
-            .title(vacancy.getTitle())
-            .description(vacancy.getDescription())
-            .requirements(vacancy.getRequirements())
-            .status(vacancy.getStatus())
-            .createdAt(vacancy.getCreatedAt())
-            .build();
   }
 }

@@ -1,5 +1,9 @@
 package com.safo.icos.modules.talent.recruitment.infrastructure.mapper;
 
+import com.safo.icos.modules.talent.recruitment.api.dto.CandidateDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.ApplicationDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.VacancyDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.VacancyStageDto;
 import com.safo.icos.modules.talent.recruitment.domain.model.Application;
 import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
 import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
@@ -13,129 +17,175 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecruitmentMapper {
 
-    // --- Vacancy ---
+  public Vacancy toDomain(VacancyJpaEntity entity) {
+    if (entity == null) return null;
+    return Vacancy.builder()
+            .id(entity.getId())
+            .companyId(entity.getCompanyId())
+            .departmentId(entity.getDepartmentId())
+            .positionId(entity.getPositionId())
+            .title(entity.getTitle())
+            .description(entity.getDescription())
+            .requirements(entity.getRequirements())
+            .status(entity.getStatus())
+            .createdBy(entity.getCreatedBy())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+  }
 
-    public Vacancy toDomain(VacancyJpaEntity entity) {
-        if (entity == null) return null;
-        return Vacancy.builder()
-                .id(entity.getId())
-                .companyId(entity.getCompanyId())
-                .departmentId(entity.getDepartmentId())
-                .positionId(entity.getPositionId())
-                .title(entity.getTitle())
-                .description(entity.getDescription())
-                .requirements(entity.getRequirements())
-                .status(entity.getStatus())
-                .createdBy(entity.getCreatedBy())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
+  public VacancyJpaEntity toEntity(Vacancy domain) {
+    if (domain == null) return null;
+    return VacancyJpaEntity.builder()
+            .id(domain.getId())
+            .companyId(domain.getCompanyId())
+            .departmentId(domain.getDepartmentId())
+            .positionId(domain.getPositionId())
+            .title(domain.getTitle())
+            .description(domain.getDescription())
+            .requirements(domain.getRequirements())
+            .status(domain.getStatus())
+            .createdBy(domain.getCreatedBy())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    public VacancyJpaEntity toEntity(Vacancy domain) {
-        if (domain == null) return null;
-        return VacancyJpaEntity.builder()
-                .id(domain.getId())
-                .companyId(domain.getCompanyId())
-                .departmentId(domain.getDepartmentId())
-                .positionId(domain.getPositionId())
-                .title(domain.getTitle())
-                .description(domain.getDescription())
-                .requirements(domain.getRequirements())
-                .status(domain.getStatus())
-                .createdBy(domain.getCreatedBy())
-                .createdAt(domain.getCreatedAt())
-                .updatedAt(domain.getUpdatedAt())
-                .build();
-    }
+  public Candidate toDomain(CandidateJpaEntity entity) {
+    if (entity == null) return null;
+    return Candidate.builder()
+            .id(entity.getId())
+            .firstName(entity.getFirstName())
+            .lastName(entity.getLastName())
+            .email(entity.getEmail())
+            .phone(entity.getPhone())
+            .source(entity.getSource())
+            .resumeUrl(entity.getResumeUrl())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+  }
 
-    // --- Candidate ---
+  public CandidateJpaEntity toEntity(Candidate domain) {
+    if (domain == null) return null;
+    return CandidateJpaEntity.builder()
+            .id(domain.getId())
+            .firstName(domain.getFirstName())
+            .lastName(domain.getLastName())
+            .email(domain.getEmail())
+            .phone(domain.getPhone())
+            .source(domain.getSource())
+            .resumeUrl(domain.getResumeUrl())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    public Candidate toDomain(CandidateJpaEntity entity) {
-        if (entity == null) return null;
-        return Candidate.builder()
-                .id(entity.getId())
-                .firstName(entity.getFirstName())
-                .lastName(entity.getLastName())
-                .email(entity.getEmail())
-                .phone(entity.getPhone())
-                .source(entity.getSource())
-                .resumeUrl(entity.getResumeUrl())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
+  public CandidateDto toDto(Candidate domain) {
+    if (domain == null) return null;
+    return CandidateDto.builder()
+            .id(domain.getId())
+            .firstName(domain.getFirstName())
+            .lastName(domain.getLastName())
+            .email(domain.getEmail())
+            .phone(domain.getPhone())
+            .source(domain.getSource())
+            .resumeUrl(domain.getResumeUrl())
+            .build();
+  }
 
-    public CandidateJpaEntity toEntity(Candidate domain) {
-        if (domain == null) return null;
-        return CandidateJpaEntity.builder()
-                .id(domain.getId())
-                .firstName(domain.getFirstName())
-                .lastName(domain.getLastName())
-                .email(domain.getEmail())
-                .phone(domain.getPhone())
-                .source(domain.getSource())
-                .resumeUrl(domain.getResumeUrl())
-                .createdAt(domain.getCreatedAt())
-                .updatedAt(domain.getUpdatedAt())
-                .build();
-    }
+  public Application toDomain(ApplicationJpaEntity entity) {
+    if (entity == null) return null;
+    return Application.builder()
+            .id(entity.getId())
+            .candidateId(entity.getCandidateId())
+            .vacancyId(entity.getVacancyId())
+            .currentStageId(entity.getCurrentStageId())
+            .status(entity.getStatus())
+            .rejectionReason(entity.getRejectionReason())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+  }
 
-    // --- Application ---
+  public ApplicationDto toDto(Application domain) {
+    if (domain == null) return null;
+    return ApplicationDto.builder()
+            .id(domain.getId())
+            .candidateId(domain.getCandidateId())
+            .vacancyId(domain.getVacancyId())
+            .currentStageId(domain.getCurrentStageId())
+            .status(domain.getStatus())
+            .rejectionReason(domain.getRejectionReason())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    public Application toDomain(ApplicationJpaEntity entity) {
-        if (entity == null) return null;
-        return Application.builder()
-                .id(entity.getId())
-                .candidateId(entity.getCandidateId())
-                .vacancyId(entity.getVacancyId())
-                .currentStageId(entity.getCurrentStageId())
-                .status(entity.getStatus())
-                .rejectionReason(entity.getRejectionReason())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
+  public ApplicationJpaEntity toEntity(Application domain) {
+    if (domain == null) return null;
+    return ApplicationJpaEntity.builder()
+            .id(domain.getId())
+            .candidateId(domain.getCandidateId())
+            .vacancyId(domain.getVacancyId())
+            .currentStageId(domain.getCurrentStageId())
+            .status(domain.getStatus())
+            .rejectionReason(domain.getRejectionReason())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    public ApplicationJpaEntity toEntity(Application domain) {
-        if (domain == null) return null;
-        return ApplicationJpaEntity.builder()
-                .id(domain.getId())
-                .candidateId(domain.getCandidateId())
-                .vacancyId(domain.getVacancyId())
-                .currentStageId(domain.getCurrentStageId())
-                .status(domain.getStatus())
-                .rejectionReason(domain.getRejectionReason())
-                .createdAt(domain.getCreatedAt())
-                .updatedAt(domain.getUpdatedAt())
-                .build();
-    }
+  public VacancyDto toDto(Vacancy domain) {
+    if (domain == null) return null;
+    return VacancyDto.builder()
+            .id(domain.getId())
+            .companyId(domain.getCompanyId())
+            .departmentId(domain.getDepartmentId())
+            .positionId(domain.getPositionId())
+            .title(domain.getTitle())
+            .description(domain.getDescription())
+            .requirements(domain.getRequirements())
+            .status(domain.getStatus())
+            .createdBy(domain.getCreatedBy())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    // --- VacancyStage ---
+  public VacancyStage toDomain(VacancyStageJpaEntity entity) {
+    if (entity == null) return null;
+    return VacancyStage.builder()
+            .id(entity.getId())
+            .vacancyId(entity.getVacancyId())
+            .name(entity.getName())
+            .type(entity.getType())
+            .orderIndex(entity.getOrderIndex())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
+  }
 
-    public VacancyStage toDomain(VacancyStageJpaEntity entity) {
-        if (entity == null) return null;
-        return VacancyStage.builder()
-                .id(entity.getId())
-                .vacancyId(entity.getVacancyId())
-                .name(entity.getName())
-                .type(entity.getType())
-                .orderIndex(entity.getOrderIndex())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
-    }
+  public VacancyStageJpaEntity toEntity(VacancyStage domain) {
+    if (domain == null) return null;
+    return VacancyStageJpaEntity.builder()
+            .id(domain.getId())
+            .vacancyId(domain.getVacancyId())
+            .name(domain.getName())
+            .type(domain.getType())
+            .orderIndex(domain.getOrderIndex())
+            .createdAt(domain.getCreatedAt())
+            .updatedAt(domain.getUpdatedAt())
+            .build();
+  }
 
-    public VacancyStageJpaEntity toEntity(VacancyStage domain) {
-        if (domain == null) return null;
-        return VacancyStageJpaEntity.builder()
-                .id(domain.getId())
-                .vacancyId(domain.getVacancyId())
-                .name(domain.getName())
-                .type(domain.getType())
-                .orderIndex(domain.getOrderIndex())
-                .createdAt(domain.getCreatedAt())
-                .updatedAt(domain.getUpdatedAt())
-                .build();
-    }
+  public VacancyStageDto toDto(VacancyStage domain) {
+    if (domain == null) return null;
+    return VacancyStageDto.builder()
+            .id(domain.getId())
+            .name(domain.getName())
+            .type(String.valueOf(domain.getType()))
+            .orderIndex(domain.getOrderIndex())
+            .build();
+  }
 }

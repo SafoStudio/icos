@@ -1,5 +1,6 @@
 package com.safo.icos.modules.talent.recruitment.presentation;
 
+import com.safo.icos.modules.talent.recruitment.api.dto.CandidateDto;
 import com.safo.icos.modules.talent.recruitment.application.ApplicationService;
 import com.safo.icos.modules.talent.recruitment.application.CandidateService;
 import com.safo.icos.modules.talent.recruitment.application.VacancyService;
@@ -52,10 +53,10 @@ public class RecruitmentGraphQLResolver {
         return applicationService.getKanbanBoard(vacancyId);
     }
 
-    @SchemaMapping(typeName = "Application")
-    public Candidate candidate(Application application) {
-        return candidateRepository.findById(application.getCandidateId()).orElse(null);
-    }
+  @SchemaMapping(typeName = "Application")
+  public CandidateDto candidate(ApplicationDto application) {
+    return candidateService.getCandidate(application.getCandidateId());
+  }
 
     @MutationMapping
     @RequirePermission("recruitment:manage")
@@ -91,7 +92,6 @@ public class RecruitmentGraphQLResolver {
         return applicationService.getApplication(applicationId);
     }
 
-    // Input DTO for GraphQL
     public record CandidateInput(
             String firstName,
             String lastName,

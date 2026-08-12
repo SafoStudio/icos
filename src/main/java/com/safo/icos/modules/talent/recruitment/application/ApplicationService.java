@@ -7,6 +7,7 @@ import com.safo.icos.modules.talent.recruitment.api.event.CandidateStageChangedE
 import com.safo.icos.modules.talent.recruitment.application.dto.ApplicationDto;
 import com.safo.icos.modules.talent.recruitment.application.dto.KanbanBoardDto;
 import com.safo.icos.modules.talent.recruitment.application.dto.KanbanColumnDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.VacancyStageDto;
 import com.safo.icos.modules.talent.recruitment.domain.model.Application;
 import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
@@ -62,7 +63,7 @@ public class ApplicationService {
     Application application = Application.create(candidateId, vacancyId, initialStage.getId());
     Application saved = applicationRepository.save(application);
 
-    return toDto(saved);
+    return mapper.toDto(saved);
   }
 
   /**
@@ -73,21 +74,27 @@ public class ApplicationService {
    * @return the Kanban board with columns and applications
    */
   public KanbanBoardDto getKanbanBoard(UUID vacancyId) {
-    List<VacancyStage> stages = vacancyStageJpaRepository
+    List<VacancyStageDto> stages = vacancyStageJpaRepository
             .findByVacancyIdOrderByOrderIndexAsc(vacancyId)
             .stream()
             .map(mapper::toDomain)
+            .map(mapper::toDto)
             .toList();
 
     List<Application> applications = applicationRepository.findByVacancyId(vacancyId);
 
     List<KanbanColumnDto> columns = stages.stream()
-            .map(stage -> KanbanColumnDto.builder()
-                    .stage(stage)
-                    .applications(applications.stream()
-                            .filter(app -> stage.getId().equals(app.getCurrentStageId()))
-                            .toList())
-                    .build())
+            .map(stageDto -> {
+              List<ApplicationDto> applicationDtos = applications.stream()
+                      .filter(app -> stageDto.getId().equals(app.getCurrentStageId()))
+                      .map(mapper::toDto)
+                      .toList();
+
+              return KanbanColumnDto.builder()
+                      .stage(stageDto)
+                      .applications(applicationDtos)
+                      .build();
+            })
             .toList();
 
     return KanbanBoardDto.builder()
@@ -105,7 +112,7 @@ public class ApplicationService {
    */
   public ApplicationDto getApplication(UUID applicationId) {
     return applicationRepository.findById(applicationId)
-            .map(this::toDto)
+            .map(mapper::toDto)
             .orElseThrow(() -> new BusinessException(
                     APPLICATION_NOT_FOUND_MESSAGE,
                     RecruitmentErrorCode.APPLICATION_NOT_FOUND));
@@ -186,16 +193,5 @@ public class ApplicationService {
             vacancy.getCompanyId(),
             userId
     ));
-  }
-
-  private ApplicationDto toDto(Application application) {
-    return ApplicationDto.builder()
-            .id(application.getId())
-            .candidateId(application.getCandidateId())
-            .vacancyId(application.getVacancyId())
-            .currentStageId(application.getCurrentStageId())
-            .status(application.getStatus())
-            .createdAt(application.getCreatedAt())
-            .build();
   }
 }
