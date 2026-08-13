@@ -3,11 +3,13 @@ package com.safo.icos.modules.timeoff.application.listener;
 import com.safo.icos.modules.calendar.application.CalendarService;
 import com.safo.icos.modules.timeoff.api.event.LeaveRequestApprovedEvent;
 import com.safo.icos.modules.timeoff.domain.model.LeaveRequest;
+import com.safo.icos.modules.timeoff.domain.model.LeaveType;
 import com.safo.icos.modules.timeoff.domain.repository.LeaveTypeRepository;
 
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,7 @@ public class LeaveCalendarListener {
     log.info("Creating calendar event for approved leave: {}", request.getId());
 
     String leaveTypeName = leaveTypeRepository.findById(request.getLeaveTypeId())
-            .map(lt -> lt.getName())
+            .map(LeaveType::getName)
             .orElse("Leave");
 
     OffsetDateTime start = request.getStartDate().atStartOfDay().atOffset(ZoneOffset.UTC);
@@ -44,6 +46,8 @@ public class LeaveCalendarListener {
             "Time Off: " + leaveTypeName,
             request.getReason(),
             start,
-            end);
+            end,
+            List.of(request.getUserId())
+    );
   }
 }
