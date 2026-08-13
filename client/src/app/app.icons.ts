@@ -50,6 +50,7 @@ import {
   tablerUpload,
   tablerFocus2,
   tablerSun,
+  tablerCalendarClock,
   tablerMoon
 } from '@ng-icons/tabler-icons';
 
@@ -104,5 +105,6 @@ export const APP_ICONS = provideIcons({
   tablerUpload,
   tablerFocus2,
   tablerSun,
+  tablerCalendarClock,
   tablerMoon
 });

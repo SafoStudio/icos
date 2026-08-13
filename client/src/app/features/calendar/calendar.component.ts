@@ -2,7 +2,8 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
-import { CalendarService, CalendarEvent, ToastService } from '@services';
+import { ToastService } from '@services';
+import { CalendarService, CalendarEvent } from './calendar.service';
 
 export interface CalendarDay {
   date: Date;
@@ -177,11 +178,14 @@ export class CalendarComponent implements OnInit {
     const startISO = new Date(`${this.eventForm.date}T${this.eventForm.startTime}:00`).toISOString();
     const endISO = new Date(`${this.eventForm.date}T${this.eventForm.endTime}:00`).toISOString();
 
+    const description = this.eventForm.description.trim() || null;
+
     this.calendarService.createCalendarEvent(
       this.eventForm.title,
-      this.eventForm.description,
+      description,
       startISO,
-      endISO
+      endISO,
+      []
     ).subscribe({
       next: (res) => {
         this.toast.success(`Event "${res.createCalendarEvent.title}" scheduled successfully!`);

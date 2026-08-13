@@ -58,6 +58,7 @@ export class SidebarComponent {
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
+    { label: 'Calendar', icon: 'tablerCalendarClock', route: '/calendar' },
     { label: 'Recruitment (Vertical)', icon: 'tablerBriefcase', route: '/recruitment' },
     { label: 'Tasks (Horizontal)', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },

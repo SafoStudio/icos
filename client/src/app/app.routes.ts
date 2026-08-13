@@ -13,11 +13,13 @@ import { authGuard, publicGuard } from './core/guards/auth.guard';
 
 import { RecruitmentBoardComponent } from './features/recruitment/recruitment-board.component';
 import { TaskBoardComponent } from './features/tasks/task-board.component';
+import { CalendarComponent } from './features/calendar/calendar.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [publicGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+  { path: 'calendar', component: CalendarComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
