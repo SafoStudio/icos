@@ -38,14 +38,23 @@ class CalendarServiceTest {
 
     OffsetDateTime start = OffsetDateTime.now();
     OffsetDateTime end = start.plusHours(1);
+    List<UUID> participants = List.of(USER_ID, UUID.randomUUID()); // ← добавляем участников
 
-    Event result = calendarService.createEvent(USER_ID, "Interview", "Tech interview", start, end);
+    Event result = calendarService.createEvent(
+            USER_ID,
+            "Interview",
+            "Tech interview",
+            start,
+            end,
+            participants
+    );
 
     assertThat(result.getUserId()).isEqualTo(USER_ID);
     assertThat(result.getTitle()).isEqualTo("Interview");
     assertThat(result.getDescription()).isEqualTo("Tech interview");
     assertThat(result.getStartAt()).isEqualTo(start);
     assertThat(result.getEndAt()).isEqualTo(end);
+    assertThat(result.getParticipantIds()).containsExactlyInAnyOrderElementsOf(participants);
 
     verify(eventRepository).save(any());
 
@@ -60,6 +69,47 @@ class CalendarServiceTest {
   }
 
   @Test
+  void shouldCreateEventAndAddOrganizerAsParticipantIfNotInList() {
+    when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    OffsetDateTime start = OffsetDateTime.now();
+    OffsetDateTime end = start.plusHours(1);
+    UUID otherParticipant = UUID.randomUUID();
+    List<UUID> participants = List.of(otherParticipant);
+
+    Event result = calendarService.createEvent(
+            USER_ID,
+            "Meeting",
+            "Team meeting",
+            start,
+            end,
+            participants
+    );
+
+    assertThat(result.getParticipantIds())
+            .containsExactlyInAnyOrder(USER_ID, otherParticipant);
+  }
+
+  @Test
+  void shouldCreateEventWithOnlyOrganizerWhenNoParticipantsProvided() {
+    when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    OffsetDateTime start = OffsetDateTime.now();
+    OffsetDateTime end = start.plusHours(1);
+
+    Event result = calendarService.createEvent(
+            USER_ID,
+            "Personal Task",
+            "Work on project",
+            start,
+            end,
+            null
+    );
+
+    assertThat(result.getParticipantIds()).containsExactly(USER_ID);
+  }
+
+  @Test
   void shouldReturnEventsForDateRange() {
     OffsetDateTime start = OffsetDateTime.now();
     OffsetDateTime end = start.plusDays(7);
@@ -67,10 +117,12 @@ class CalendarServiceTest {
     Event event1 = Event.builder()
             .id(UUID.randomUUID()).userId(USER_ID)
             .title("Event 1").startAt(start.plusDays(1)).endAt(start.plusDays(1).plusHours(1))
+            .participantIds(List.of(USER_ID))
             .build();
     Event event2 = Event.builder()
             .id(UUID.randomUUID()).userId(USER_ID)
             .title("Event 2").startAt(start.plusDays(3)).endAt(start.plusDays(3).plusHours(2))
+            .participantIds(List.of(USER_ID))
             .build();
 
     when(eventRepository.findByUserIdAndDateRange(USER_ID, start, end))
