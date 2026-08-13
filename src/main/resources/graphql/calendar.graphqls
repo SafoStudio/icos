@@ -5,6 +5,12 @@ type Event {
     description: String
     startAt: String!
     endAt: String!
+    type: String
+    source: String
+    visibility: String
+    participantIds: [ID!]!
+    participants: [User!]!
+    organizer: User
 }
 
 extend type Query {
@@ -12,7 +18,14 @@ extend type Query {
 }
 
 extend type Mutation {
-    createCalendarEvent(title: String!, description: String, start: String!, end: String!): Event!
+    createCalendarEvent(
+        title: String!,
+        description: String,
+        start: String!,
+        end: String!,
+        participantIds: [ID!]
+    ): Event!
+    deleteCalendarEvent(id: ID!): Boolean!
 }
 
 
