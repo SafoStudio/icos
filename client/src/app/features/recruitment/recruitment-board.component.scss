@@ -38,28 +38,6 @@
       border: 1px solid rgba(99, 102, 241, 0.3);
     }
 
-    .header-title {
-      font-size: 1.85rem;
-      font-weight: 800;
-      margin: 0;
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: var(--text-primary, #f8fafc);
-
-      .layout-tag {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.6rem;
-        border-radius: 6px;
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-      }
-    }
-
     .header-subtitle {
       margin: 0.35rem 0 0;
       font-size: 0.95rem;

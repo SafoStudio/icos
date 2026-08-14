@@ -1,16 +1,34 @@
 .org-page {
   padding: 24px 32px;
-  }
+}
 
 .page-header {
   margin-bottom: 24px;
 
-  h1 {
-    margin: 0 0 8px 0;
-    color: #1a1a2e;
-    font-size: 28px;
+  .title-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent-indigo, #6366f1);
+    font-size: 0.8rem;
     font-weight: 600;
-    letter-spacing: -0.5px;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    letter-spacing: 0.3px;
+
+    .badge-icon {
+      display: flex;
+      align-items: center;
+    }
+
+    .badge-text {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
+    }
   }
 
   .subtitle {
@@ -34,10 +52,6 @@
   }
 
   .page-header {
-    h1 {
-      font-size: 24px;
-    }
-
     .subtitle {
       font-size: 14px;
     }

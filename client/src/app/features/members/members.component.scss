@@ -27,6 +27,34 @@
     font-size: 0.95rem;
   }
 
+.header-text {
+  .title-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent-indigo, #6366f1);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    letter-spacing: 0.3px;
+
+    .badge-icon {
+      display: flex;
+      align-items: center;
+    }
+
+    .badge-text {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
   .header-right {
     display: flex;
     align-items: center;

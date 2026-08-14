@@ -2,11 +2,12 @@ import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { TabsComponent, type TabItem } from '@components';
+import { NgIconComponent } from '@ng-icons/core';
 
 @Component({
   selector: 'app-organization',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, TabsComponent],
+  imports: [CommonModule, RouterOutlet, TabsComponent, NgIconComponent],
   templateUrl: './organization.component.html',
   styleUrls: ['./organization.component.scss']
 })
