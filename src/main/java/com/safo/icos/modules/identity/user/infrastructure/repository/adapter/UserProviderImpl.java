@@ -21,6 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -92,6 +93,7 @@ public class UserProviderImpl implements UserProvider {
     }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<UserPrincipalDto> findPrincipal(UUID userId, UUID companyId) {
     return membershipJpaRepository.findActiveByUserIdAndCompanyId(userId, companyId)
             .map(membership -> {
