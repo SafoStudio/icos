@@ -26,12 +26,12 @@
         </select>
       </div>
 
-      <button type="button" class="btn btn-secondary" (click)="openVacancyModal()">
+      <button type="button" class="btn btn-secondary" (click)="openVacancySidebar()">
         <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
         <span>New Vacancy</span>
       </button>
 
-      <button type="button" class="btn btn-primary" (click)="openApplyModal()">
+      <button type="button" class="btn btn-primary" (click)="openApplySidebar()">
         <ng-icon name="tablerUserCheck" size="18" aria-hidden="true"></ng-icon>
         <span>Add Candidate</span>
       </button>
@@ -162,165 +162,163 @@
   </div>
   }
 
-  @if (showApplyModal()) {
-  <dialog
-    class="modal-backdrop"
-    [open]="showApplyModal()"
-    (click)="closeModalOnBackdrop($event, 'apply')"
+  <!-- Overlay -->
+  @if (showApplySidebar() || showVacancySidebar() || selectedApplication()) {
+  <div
+    class="sidebar-overlay"
+    (click)="onOverlayClick()"
     (keydown)="onModalKeydown($event)"
-  >
-    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 id="applyModalTitle">Add Candidate to {{ selectedVacancy()?.title || 'Pipeline' }}</h2>
-        <button type="button" class="close-btn" (click)="closeApplyModal()" aria-label="Close modal">
-          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstNameInput">First Name *</label>
-            <input id="firstNameInput" type="text" [(ngModel)]="candidateForm.firstName" placeholder="e.g. Alex" />
-          </div>
-          <div class="form-group">
-            <label for="lastNameInput">Last Name *</label>
-            <input id="lastNameInput" type="text" [(ngModel)]="candidateForm.lastName" placeholder="e.g. Morgan" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="emailInput">Email Address *</label>
-          <input id="emailInput" type="email" [(ngModel)]="candidateForm.email" placeholder="e.g. alex.morgan@example.com" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="phoneInput">Phone Number</label>
-            <input id="phoneInput" type="tel" [(ngModel)]="candidateForm.phone" placeholder="+1 (555) 000-0000" />
-          </div>
-          <div class="form-group">
-            <label for="sourceSelect">Source</label>
-            <select id="sourceSelect" [(ngModel)]="candidateForm.source">
-              <option value="LinkedIn">LinkedIn</option>
-              <option value="Referral">Referral</option>
-              <option value="Career Site">Career Site</option>
-              <option value="Agency">Agency</option>
-              <option value="Direct Application">Direct Application</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="resumeUrlInput">Resume Link / URL</label>
-          <input id="resumeUrlInput" type="url" [(ngModel)]="candidateForm.resumeUrl" placeholder="https://..." />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeApplyModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitApply()">Submit Application</button>
-      </div>
-    </div>
-  </dialog>
+  ></div>
   }
 
-  @if (showVacancyModal()) {
-  <dialog
-    class="modal-backdrop"
-    [open]="showVacancyModal()"
-    (click)="closeModalOnBackdrop($event, 'vacancy')"
-    (keydown)="onModalKeydown($event)"
-  >
-    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 id="vacancyModalTitle">Create New Vacancy</h2>
-        <button type="button" class="close-btn" (click)="closeVacancyModal()" aria-label="Close modal">
-          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
-        </button>
-      </div>
-      <div class="modal-body">
+  <!-- Add Candidate Sidebar -->
+  <div class="sidebar" [class.open]="showApplySidebar()">
+    <div class="sidebar-header">
+      <h2>Add Candidate to {{ selectedVacancy()?.title || 'Pipeline' }}</h2>
+      <button type="button" class="close-btn" (click)="closeApplySidebar()" aria-label="Close sidebar">
+        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="form-row">
         <div class="form-group">
-          <label for="vacancyTitleInput">Vacancy Title *</label>
-          <input id="vacancyTitleInput" type="text" [(ngModel)]="vacancyForm.title" placeholder="e.g. Senior Frontend Developer" />
+          <label for="firstNameInput">First Name *</label>
+          <input id="firstNameInput" type="text" [(ngModel)]="candidateForm.firstName" placeholder="e.g. Alex" />
         </div>
         <div class="form-group">
-          <label for="vacancyDescInput">Description</label>
-          <textarea id="vacancyDescInput" rows="3" [(ngModel)]="vacancyForm.description" placeholder="Describe the position responsibilities..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="vacancyReqInput">Requirements</label>
-          <textarea id="vacancyReqInput" rows="3" [(ngModel)]="vacancyForm.requirements" placeholder="List key requirements and qualifications..."></textarea>
+          <label for="lastNameInput">Last Name *</label>
+          <input id="lastNameInput" type="text" [(ngModel)]="candidateForm.lastName" placeholder="e.g. Morgan" />
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeVacancyModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitVacancy()">Create Vacancy</button>
+
+      <div class="form-group">
+        <label for="emailInput">Email Address *</label>
+        <input id="emailInput" type="email" [(ngModel)]="candidateForm.email" placeholder="e.g. alex.morgan@example.com" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phoneInput">Phone Number</label>
+          <input id="phoneInput" type="tel" [(ngModel)]="candidateForm.phone" placeholder="+1 (555) 000-0000" />
+        </div>
+        <div class="form-group">
+          <label for="sourceSelect">Source</label>
+          <select id="sourceSelect" [(ngModel)]="candidateForm.source">
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Referral">Referral</option>
+            <option value="Career Site">Career Site</option>
+            <option value="Agency">Agency</option>
+            <option value="Direct Application">Direct Application</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="resumeUrlInput">Resume Link / URL</label>
+        <input id="resumeUrlInput" type="url" [(ngModel)]="candidateForm.resumeUrl" placeholder="https://..." />
       </div>
     </div>
-  </dialog>
-  }
 
+    <div class="sidebar-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeApplySidebar()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submitApply()">Submit Application</button>
+    </div>
+  </div>
+
+  <!-- Create Vacancy Sidebar -->
+  <div class="sidebar" [class.open]="showVacancySidebar()">
+    <div class="sidebar-header">
+      <h2>Create New Vacancy</h2>
+      <button type="button" class="close-btn" (click)="closeVacancySidebar()" aria-label="Close sidebar">
+        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="form-group">
+        <label for="vacancyTitleInput">Vacancy Title *</label>
+        <input id="vacancyTitleInput" type="text" [(ngModel)]="vacancyForm.title" placeholder="e.g. Senior Frontend Developer" />
+      </div>
+
+      <div class="form-group">
+        <label for="vacancyDescInput">Description</label>
+        <textarea id="vacancyDescInput" rows="3" [(ngModel)]="vacancyForm.description" placeholder="Describe the position responsibilities..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="vacancyReqInput">Requirements</label>
+        <textarea id="vacancyReqInput" rows="3" [(ngModel)]="vacancyForm.requirements" placeholder="List key requirements and qualifications..."></textarea>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeVacancySidebar()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submitVacancy()">Create Vacancy</button>
+    </div>
+  </div>
+
+  <!-- Candidate Detail Sidebar -->
   @if (selectedApplication()) {
-  <dialog
-    class="modal-backdrop"
-    [open]="!!selectedApplication()"
-    (click)="closeModalOnBackdrop($event, 'detail')"
-    (keydown)="onModalKeydown($event)"
-  >
-    <div class="modal-card detail-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="modal-header">
-        <div class="header-candidate">
-          <div class="avatar-large" aria-hidden="true">
-            {{ getInitials(selectedApplication()!.candidate.firstName, selectedApplication()!.candidate.lastName) }}
-          </div>
-          <div>
-            <h2 id="detailModalTitle">{{ selectedApplication()!.candidate.firstName }} {{ selectedApplication()!.candidate.lastName }}</h2>
-            <span class="subtitle-email">{{ selectedApplication()!.candidate.email }}</span>
-          </div>
+  <div class="sidebar detail-sidebar" [class.open]="!!selectedApplication()">
+    <div class="sidebar-header">
+      <div class="header-candidate">
+        <div class="avatar-large" aria-hidden="true">
+          {{ getInitials(selectedApplication()!.candidate.firstName, selectedApplication()!.candidate.lastName) }}
         </div>
-        <button type="button" class="close-btn" (click)="closeCandidateDetail()" aria-label="Close candidate details">
-          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="detail-section">
-          <h4>Contact & Info</h4>
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="label">Phone</span>
-              <span class="value">{{ selectedApplication()!.candidate.phone || 'N/A' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Source</span>
-              <span class="value">{{ selectedApplication()!.candidate.source || 'N/A' }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Status</span>
-              <span class="value badge-value">{{ selectedApplication()!.status }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Applied Date</span>
-              <span class="value">{{ selectedApplication()!.createdAt | date:'mediumDate' }}</span>
-            </div>
-          </div>
+        <div>
+          <h2>{{ selectedApplication()!.candidate.firstName }} {{ selectedApplication()!.candidate.lastName }}</h2>
+          <span class="subtitle-email">{{ selectedApplication()!.candidate.email }}</span>
         </div>
-
-        @if (selectedApplication()!.candidate.resumeUrl) {
-        <div class="detail-section">
-          <h4>Resume</h4>
-          <a [href]="selectedApplication()!.candidate.resumeUrl" target="_blank" class="resume-link" rel="noopener noreferrer">
-            <ng-icon name="tablerFile" size="18" aria-hidden="true"></ng-icon>
-            View Resume / CV
-          </a>
-        </div>
-        }
       </div>
-      <div class="modal-footer">
-        @if (selectedApplication()!.status !== 'HIRED') {
-        <button type="button" class="btn btn-primary" (click)="hireCandidate(selectedApplication()!); closeCandidateDetail()">
-          <ng-icon name="tablerCheck" size="18" aria-hidden="true"></ng-icon>
-          Hire Candidate
-        </button>
-        }
-        <button type="button" class="btn btn-secondary" (click)="closeCandidateDetail()">Close</button>
-      </div>
+      <button type="button" class="close-btn" (click)="closeCandidateDetail()" aria-label="Close candidate details">
+        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      </button>
     </div>
-  </dialog>
+
+    <div class="sidebar-body">
+      <div class="detail-section">
+        <h4>Contact & Info</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Phone</span>
+            <span class="value">{{ selectedApplication()!.candidate.phone || 'N/A' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Source</span>
+            <span class="value">{{ selectedApplication()!.candidate.source || 'N/A' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Status</span>
+            <span class="value badge-value">{{ selectedApplication()!.status }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Applied Date</span>
+            <span class="value">{{ selectedApplication()!.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+
+      @if (selectedApplication()!.candidate.resumeUrl) {
+      <div class="detail-section">
+        <h4>Resume</h4>
+        <a [href]="selectedApplication()!.candidate.resumeUrl" target="_blank" class="resume-link" rel="noopener noreferrer">
+          <ng-icon name="tablerFile" size="18" aria-hidden="true"></ng-icon>
+          View Resume / CV
+        </a>
+      </div>
+      }
+    </div>
+
+    <div class="sidebar-footer">
+      @if (selectedApplication()!.status !== 'HIRED') {
+      <button type="button" class="btn btn-primary" (click)="hireCandidate(selectedApplication()!); closeCandidateDetail()">
+        <ng-icon name="tablerCheck" size="18" aria-hidden="true"></ng-icon>
+        Hire Candidate
+      </button>
+      }
+      <button type="button" class="btn btn-secondary" (click)="closeCandidateDetail()">Close</button>
+    </div>
+  </div>
   }
 </div>

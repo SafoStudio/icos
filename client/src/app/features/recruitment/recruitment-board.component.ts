@@ -32,8 +32,8 @@ export class RecruitmentBoardComponent implements OnInit {
   public isLoading = signal<boolean>(false);
   public searchQuery = signal<string>('');
 
-  public showApplyModal = signal<boolean>(false);
-  public showVacancyModal = signal<boolean>(false);
+  public showApplySidebar = signal<boolean>(false);
+  public showVacancySidebar = signal<boolean>(false);
   public selectedApplication = signal<Application | null>(null);
 
   public candidateForm: CandidateInput = {
@@ -162,6 +162,7 @@ export class RecruitmentBoardComponent implements OnInit {
       next: () => {
         this.toast.success(`Candidate ${app.candidate.firstName} ${app.candidate.lastName} hired successfully!`);
         this.loadKanbanBoard(this.selectedVacancyId());
+        this.closeCandidateDetail();
       },
       error: (err) => {
         this.toast.error('Failed to hire candidate: ' + (err.message || 'Error'));
@@ -169,7 +170,9 @@ export class RecruitmentBoardComponent implements OnInit {
     });
   }
 
-  public openApplyModal(): void {
+  public openApplySidebar(): void {
+    this.closeVacancySidebar();
+    this.closeCandidateDetail();
     this.candidateForm = {
       firstName: '',
       lastName: '',
@@ -178,11 +181,11 @@ export class RecruitmentBoardComponent implements OnInit {
       source: 'LinkedIn',
       resumeUrl: ''
     };
-    this.showApplyModal.set(true);
+    this.showApplySidebar.set(true);
   }
 
-  public closeApplyModal(): void {
-    this.showApplyModal.set(false);
+  public closeApplySidebar(): void {
+    this.showApplySidebar.set(false);
   }
 
   public submitApply(): void {
@@ -199,7 +202,7 @@ export class RecruitmentBoardComponent implements OnInit {
     this.recruitmentService.applyToVacancy(vId, this.candidateForm).subscribe({
       next: () => {
         this.toast.success('Candidate registered successfully!');
-        this.closeApplyModal();
+        this.closeApplySidebar();
         this.loadKanbanBoard(vId);
       },
       error: (err) => {
@@ -208,17 +211,19 @@ export class RecruitmentBoardComponent implements OnInit {
     });
   }
 
-  public openVacancyModal(): void {
+  public openVacancySidebar(): void {
+    this.closeApplySidebar();
+    this.closeCandidateDetail();
     this.vacancyForm = {
       title: '',
       description: '',
       requirements: ''
     };
-    this.showVacancyModal.set(true);
+    this.showVacancySidebar.set(true);
   }
 
-  public closeVacancyModal(): void {
-    this.showVacancyModal.set(false);
+  public closeVacancySidebar(): void {
+    this.showVacancySidebar.set(false);
   }
 
   public submitVacancy(): void {
@@ -243,7 +248,7 @@ export class RecruitmentBoardComponent implements OnInit {
     this.recruitmentService.createVacancy(payload).subscribe({
       next: (res) => {
         this.toast.success(`Vacancy "${res.createVacancy.title}" created successfully!`);
-        this.closeVacancyModal();
+        this.closeVacancySidebar();
         this.loadVacancies();
       },
       error: (err) => {
@@ -253,6 +258,8 @@ export class RecruitmentBoardComponent implements OnInit {
   }
 
   public openCandidateDetail(app: Application): void {
+    this.closeApplySidebar();
+    this.closeVacancySidebar();
     this.selectedApplication.set(app);
   }
 
@@ -264,24 +271,19 @@ export class RecruitmentBoardComponent implements OnInit {
     return `${firstName ? firstName.charAt(0) : ''}${lastName ? lastName.charAt(0) : ''}`.toUpperCase();
   }
 
-  public closeModalOnBackdrop(event: MouseEvent, modalType: 'apply' | 'vacancy' | 'detail'): void {
-    const dialog = event.target as HTMLDialogElement;
-    if (dialog.tagName === 'DIALOG') {
-      if (modalType === 'apply') this.closeApplyModal();
-      else if (modalType === 'vacancy') this.closeVacancyModal();
-      else if (modalType === 'detail') this.closeCandidateDetail();
-    }
+  public closeAllSidebars(): void {
+    this.closeApplySidebar();
+    this.closeVacancySidebar();
+    this.closeCandidateDetail();
+  }
+
+  public onOverlayClick(): void {
+    this.closeAllSidebars();
   }
 
   public onModalKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
-      if (this.showApplyModal()) {
-        this.closeApplyModal();
-      } else if (this.showVacancyModal()) {
-        this.closeVacancyModal();
-      } else if (this.selectedApplication()) {
-        this.closeCandidateDetail();
-      }
+      this.closeAllSidebars();
     }
   }
 }
