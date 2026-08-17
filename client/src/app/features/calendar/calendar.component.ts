@@ -29,7 +29,7 @@ export class CalendarComponent implements OnInit {
   events = signal<CalendarEvent[]>([]);
   isLoading = signal<boolean>(false);
 
-  showCreateModal = signal<boolean>(false);
+  showCreateSidebar = signal<boolean>(false);
   selectedEvent = signal<CalendarEvent | null>(null);
 
   eventForm = {
@@ -153,7 +153,8 @@ export class CalendarComponent implements OnInit {
     this.loadMonthEvents();
   }
 
-  openCreateModal(dateStr?: string): void {
+  openCreateSidebar(dateStr?: string): void {
+    this.closeEventDetail();
     const targetDate = dateStr || this.formatDate(new Date());
     this.eventForm = {
       title: '',
@@ -162,11 +163,11 @@ export class CalendarComponent implements OnInit {
       startTime: '09:00',
       endTime: '10:00'
     };
-    this.showCreateModal.set(true);
+    this.showCreateSidebar.set(true);
   }
 
-  closeCreateModal(): void {
-    this.showCreateModal.set(false);
+  closeCreateSidebar(): void {
+    this.showCreateSidebar.set(false);
   }
 
   submitCreateEvent(): void {
@@ -189,7 +190,7 @@ export class CalendarComponent implements OnInit {
     ).subscribe({
       next: (res) => {
         this.toast.success(`Event "${res.createCalendarEvent.title}" scheduled successfully!`);
-        this.closeCreateModal();
+        this.closeCreateSidebar();
         this.loadMonthEvents();
       },
       error: (err) => {
@@ -200,6 +201,7 @@ export class CalendarComponent implements OnInit {
 
   viewEvent(event: CalendarEvent, e: MouseEvent): void {
     e.stopPropagation();
+    this.closeCreateSidebar();
     this.selectedEvent.set(event);
   }
 
@@ -224,24 +226,18 @@ export class CalendarComponent implements OnInit {
     }
   }
 
-  closeModalOnBackdrop(event: MouseEvent, type: 'create' | 'detail'): void {
-    const dialog = event.target as HTMLDialogElement;
-    if (dialog.tagName === 'DIALOG') {
-      if (type === 'create') {
-        this.closeCreateModal();
-      } else if (type === 'detail') {
-        this.closeEventDetail();
-      }
-    }
+  closeAllSidebars(): void {
+    this.closeCreateSidebar();
+    this.closeEventDetail();
   }
 
-  onModalKeydown(event: KeyboardEvent): void {
+  onOverlayClick(): void {
+    this.closeAllSidebars();
+  }
+
+  onSidebarKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
-      if (this.showCreateModal()) {
-        this.closeCreateModal();
-      } else if (this.selectedEvent()) {
-        this.closeEventDetail();
-      }
+      this.closeAllSidebars();
     }
   }
 }

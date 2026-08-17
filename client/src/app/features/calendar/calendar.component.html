@@ -21,7 +21,7 @@
 
       <button type="button" class="btn btn-secondary" (click)="goToToday()">Today</button>
 
-      <button type="button" class="btn btn-primary" (click)="openCreateModal()">
+      <button type="button" class="btn btn-primary" (click)="openCreateSidebar()">
         <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
         <span>Add Event</span>
       </button>
@@ -50,7 +50,7 @@
         class="day-cell"
         [class.other-month]="!day.isCurrentMonth"
         [class.is-today]="day.isToday"
-        (click)="openCreateModal(day.dateString)"
+        (click)="openCreateSidebar(day.dateString)"
         [attr.aria-label]="'Day ' + day.dayNumber + ' ' + (day.isCurrentMonth ? '' : 'from other month')"
       >
         <div class="cell-top">
@@ -77,93 +77,90 @@
   </div>
   }
 
-  @if (showCreateModal()) {
-  <dialog
-    class="modal-backdrop"
-    [open]="showCreateModal()"
-    (click)="closeModalOnBackdrop($event, 'create')"
-    (keydown)="onModalKeydown($event)"
-  >
-    <div class="modal-card" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 id="createEventModalTitle">Schedule Calendar Event</h2>
-        <button type="button" class="close-btn" (click)="closeCreateModal()" aria-label="Close modal">
-          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="eventTitleInput">Event Title *</label>
-          <input id="eventTitleInput" type="text" [(ngModel)]="eventForm.title" placeholder="e.g. Weekly Product Sync" />
-        </div>
-
-        <div class="form-group">
-          <label for="eventDescInput">Description</label>
-          <textarea id="eventDescInput" rows="3" [(ngModel)]="eventForm.description" placeholder="Agenda or meeting links..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="eventDateInput">Date *</label>
-          <input id="eventDateInput" type="date" [(ngModel)]="eventForm.date" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="eventStartTimeInput">Start Time *</label>
-            <input id="eventStartTimeInput" type="time" [(ngModel)]="eventForm.startTime" />
-          </div>
-          <div class="form-group">
-            <label for="eventEndTimeInput">End Time *</label>
-            <input id="eventEndTimeInput" type="time" [(ngModel)]="eventForm.endTime" />
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitCreateEvent()">Create Event</button>
-      </div>
-    </div>
-  </dialog>
+  <!-- Overlay -->
+  @if (showCreateSidebar() || selectedEvent()) {
+  <div
+    class="sidebar-overlay"
+    (click)="onOverlayClick()"
+    (keydown)="onSidebarKeydown($event)"
+  ></div>
   }
 
-  @if (selectedEvent()) {
-  <dialog
-    class="modal-backdrop"
-    [open]="!!selectedEvent()"
-    (click)="closeModalOnBackdrop($event, 'detail')"
-    (keydown)="onModalKeydown($event)"
-  >
-    <div class="modal-card detail-modal" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2 id="eventDetailModalTitle">{{ selectedEvent()?.title }}</h2>
-        <button type="button" class="close-btn" (click)="closeEventDetail()" aria-label="Close event details">
-          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
-        </button>
+  <!-- Create Event Sidebar -->
+  <div class="sidebar" [class.open]="showCreateSidebar()">
+    <div class="sidebar-header">
+      <h2>Schedule Calendar Event</h2>
+      <button type="button" class="close-btn" (click)="closeCreateSidebar()" aria-label="Close sidebar">
+        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="form-group">
+        <label for="eventTitleInput">Event Title *</label>
+        <input id="eventTitleInput" type="text" [(ngModel)]="eventForm.title" placeholder="e.g. Weekly Product Sync" />
       </div>
 
-      <div class="modal-body">
-        <div class="detail-time-box">
-          <ng-icon name="tablerCalendarEvent" size="18" class="time-icon" aria-hidden="true"></ng-icon>
-          <div>
-            <span class="detail-date">{{ selectedEvent()?.startAt | date:'fullDate' }}</span>
-            <span class="detail-time">{{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}</span>
-          </div>
-        </div>
-
-        @if (selectedEvent()?.description) {
-        <div class="detail-description">
-          <h4>Description / Agenda</h4>
-          <p>{{ selectedEvent()?.description }}</p>
-        </div>
-        }
+      <div class="form-group">
+        <label for="eventDescInput">Description</label>
+        <textarea id="eventDescInput" rows="3" [(ngModel)]="eventForm.description" placeholder="Agenda or meeting links..."></textarea>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeEventDetail()">Close</button>
+      <div class="form-group">
+        <label for="eventDateInput">Date *</label>
+        <input id="eventDateInput" type="date" [(ngModel)]="eventForm.date" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eventStartTimeInput">Start Time *</label>
+          <input id="eventStartTimeInput" type="time" [(ngModel)]="eventForm.startTime" />
+        </div>
+        <div class="form-group">
+          <label for="eventEndTimeInput">End Time *</label>
+          <input id="eventEndTimeInput" type="time" [(ngModel)]="eventForm.endTime" />
+        </div>
       </div>
     </div>
-  </dialog>
+
+    <div class="sidebar-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeCreateSidebar()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submitCreateEvent()">Create Event</button>
+    </div>
+  </div>
+
+  <!-- Event Detail Sidebar -->
+  @if (selectedEvent()) {
+  <div class="sidebar detail-sidebar" [class.open]="!!selectedEvent()">
+    <div class="sidebar-header">
+      <div>
+        <h2>{{ selectedEvent()?.title }}</h2>
+        <span class="subtitle-date">{{ selectedEvent()?.startAt | date:'fullDate' }}</span>
+      </div>
+      <button type="button" class="close-btn" (click)="closeEventDetail()" aria-label="Close sidebar">
+        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="detail-time-box">
+        <ng-icon name="tablerClock" size="18" class="time-icon" aria-hidden="true"></ng-icon>
+        <div>
+          <span class="detail-time">{{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}</span>
+        </div>
+      </div>
+
+      @if (selectedEvent()?.description) {
+      <div class="detail-description">
+        <h4>Description / Agenda</h4>
+        <p>{{ selectedEvent()?.description }}</p>
+      </div>
+      }
+    </div>
+
+    <div class="sidebar-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeEventDetail()">Close</button>
+    </div>
+  </div>
   }
 </div>
