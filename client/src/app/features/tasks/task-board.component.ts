@@ -5,7 +5,7 @@ import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ToastService } from '@services';
 import { TaskBoardService, TaskItem } from './task-board.service';
 import { type DepartmentMember } from '@models';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 export interface TaskStatusLane {
@@ -18,7 +18,7 @@ export interface TaskStatusLane {
 @Component({
   selector: 'app-task-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, DragDropModule],
+  imports: [CommonModule, FormsModule, NgIconComponent, DragDropModule, CdkDropList, CdkDrag],
   templateUrl: './task-board.component.html',
   styleUrls: ['./task-board.component.scss']
 })
@@ -33,7 +33,10 @@ export class TaskBoardComponent implements OnInit {
   isCreating = signal<boolean>(false);
   searchQuery = signal<string>('');
   selectedStatusFilter = signal<string>('ALL');
-  showCreateModal = signal<boolean>(false);
+
+  showCreateSidebar = signal<boolean>(false);
+  showDetailSidebar = signal<boolean>(false);
+  selectedTask = signal<TaskItem | null>(null);
 
   taskForm = {
     title: '',
@@ -195,17 +198,18 @@ export class TaskBoardComponent implements OnInit {
     }
   }
 
-  openCreateModal(): void {
+  openCreateSidebar(): void {
+    this.closeDetailSidebar();
     this.taskForm = {
       title: '',
       description: '',
       assigneeId: ''
     };
-    this.showCreateModal.set(true);
+    this.showCreateSidebar.set(true);
   }
 
-  closeCreateModal(): void {
-    this.showCreateModal.set(false);
+  closeCreateSidebar(): void {
+    this.showCreateSidebar.set(false);
     this.isCreating.set(false);
   }
 
@@ -234,7 +238,7 @@ export class TaskBoardComponent implements OnInit {
     ).subscribe({
       next: (res: any) => {
         this.toast.success(`Task "${res.createTask.title}" created successfully!`);
-        this.closeCreateModal();
+        this.closeCreateSidebar();
         this.loadTasks();
         this.isCreating.set(false);
       },
@@ -243,6 +247,17 @@ export class TaskBoardComponent implements OnInit {
         this.isCreating.set(false);
       }
     });
+  }
+
+  openTaskDetail(task: TaskItem): void {
+    this.closeCreateSidebar();
+    this.selectedTask.set(task);
+    this.showDetailSidebar.set(true);
+  }
+
+  closeDetailSidebar(): void {
+    this.showDetailSidebar.set(false);
+    this.selectedTask.set(null);
   }
 
   getNextStatus(currentStatus: string): string | null {
@@ -259,16 +274,18 @@ export class TaskBoardComponent implements OnInit {
     return null;
   }
 
-  closeModalOnBackdrop(event: MouseEvent): void {
-    const dialog = event.target as HTMLDialogElement;
-    if (dialog.tagName === 'DIALOG') {
-      this.closeCreateModal();
-    }
+  closeAllSidebars(): void {
+    this.closeCreateSidebar();
+    this.closeDetailSidebar();
   }
 
-  onModalKeydown(event: KeyboardEvent): void {
+  onOverlayClick(): void {
+    this.closeAllSidebars();
+  }
+
+  onSidebarKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
-      this.closeCreateModal();
+      this.closeAllSidebars();
     }
   }
 }
