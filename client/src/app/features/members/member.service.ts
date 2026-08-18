@@ -12,6 +12,14 @@ export interface Member {
   departmentId?: string;
   departmentName?: string;
   status: string;
+  profile?: {
+    avatarPath?: string;
+    phoneNumber?: string;
+    address?: string;
+    birthDate?: string;
+    hireDate?: string;
+    userId?: string;
+  };
 }
 
 export interface InviteInput {
@@ -53,6 +61,14 @@ export class MemberService {
           role
           departmentId
           status
+          profile {
+            avatarPath
+            phoneNumber
+            address
+            birthDate
+            hireDate
+            userId
+          }
         }
       }
     `;

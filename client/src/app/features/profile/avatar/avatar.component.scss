@@ -1,19 +1,20 @@
 .avatar-wrapper {
-  display: inline-block;
+  display: block;
+  width: 100%;
 }
 
 .avatar-card {
   position: relative;
-  width: 140px;
-  height: 175px;
-  margin: 0 auto 16px;
+  width: 100%;
+  height: 260px;
+  margin: 0 auto 20px;
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
-  overflow: visible; // allows corner button to rest on corner cleanly
+  overflow: visible;
   user-select: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
@@ -41,7 +42,7 @@
   }
 
   .avatar-letter {
-    font-size: 56px;
+    font-size: 80px;
     font-weight: 700;
     color: white;
     text-transform: uppercase;

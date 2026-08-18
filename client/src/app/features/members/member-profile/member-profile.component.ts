@@ -85,6 +85,15 @@ export class MemberProfileComponent implements OnInit {
     return m?.department?.name || 'Unassigned / General';
   });
 
+  readonly avatarUrl = computed(() => {
+    const member = this.member();
+    if (!member?.profile?.avatarPath) return null;
+    if (member.profile.avatarPath.startsWith('http')) {
+      return member.profile.avatarPath;
+    }
+    return member.profile.avatarPath;
+  });
+
   editUser: Partial<User> & { role?: string; departmentId?: string } = {};
   editProfile: Partial<UserProfile> = {};
 

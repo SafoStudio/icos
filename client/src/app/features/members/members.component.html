@@ -191,7 +191,8 @@
               (click)="onMemberClick(member)"
               (keydown.enter)="onMemberClick(member)"
               (keydown.space)="$event.preventDefault(); onMemberClick(member)"
-              [style.background-image]="'url(' + getMemberPhotoUrl(member) + ')'"
+              [style.background-image]="getAvatarUrl(member) ? 'url(' + getAvatarUrl(member) + ')' : 'none'"
+              [style.background-color]="getAvatarUrl(member) ? 'transparent' : '#e0e7ff'"
               [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
         <div class="card-overlay">
           <div class="card-top">
@@ -205,23 +206,23 @@
             <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
             <p class="member-email">{{ member.email }}</p>
             <div class="card-tags">
-                      <span class="badge badge-role"
-                            [class]="'role-' + member.role.toLowerCase()"
-                            [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
-                        {{ getRoleLabel(member.role) }}
-                      </span>
+            <span class="badge badge-role"
+                  [class]="'role-' + member.role.toLowerCase()"
+                  [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
+              {{ getRoleLabel(member.role) }}
+            </span>
               <span class="tag-dept"
                     [attr.aria-label]="'Department: ' + member.departmentName">
-                        <ng-icon name="tablerBuilding" size="14"></ng-icon>
-                        {{ member.departmentName }}
-                      </span>
+              <ng-icon name="tablerBuilding" size="14"></ng-icon>
+              {{ member.departmentName }}
+            </span>
             </div>
           </div>
           <div class="card-footer">
-                    <span class="btn-profile-link">
-                      <span>View Profile</span>
-                      <ng-icon name="tablerChevronRight" size="16"></ng-icon>
-                    </span>
+          <span class="btn-profile-link">
+            <span>View Profile</span>
+            <ng-icon name="tablerChevronRight" size="16"></ng-icon>
+          </span>
           </div>
         </div>
       </button>

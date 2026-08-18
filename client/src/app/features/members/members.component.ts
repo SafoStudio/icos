@@ -7,7 +7,7 @@ import { NgIconComponent } from '@ng-icons/core';
 import { MemberInviteComponent } from './member-invite/member-invite.component';
 import { MemberService, Member } from './member.service';
 import { MembersStateService } from './members-state.service';
-import { type Department, getRoleShortLabel, ALL_ROLES, type UserRole, ROLES  } from '@models';
+import { type Department, getRoleShortLabel, ALL_ROLES, type UserRole, ROLES } from '@models';
 
 export type ViewMode = 'grid' | 'list';
 export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
@@ -205,16 +205,16 @@ export class MembersComponent implements OnInit {
   }
 
   navigateToProfile(memberId: string): void {
-      this.router.navigate(['/members', memberId], {
-        queryParams: { returnUrl: '/members' }
-      });
-    }
+    this.router.navigate(['/members', memberId], {
+      queryParams: { returnUrl: '/members' }
+    });
+  }
 
-    onMemberClick(member: Member): void {
-      this.router.navigate(['/members', member.id], {
-        queryParams: { returnUrl: '/members' }
-      });
-    }
+  onMemberClick(member: Member): void {
+    this.router.navigate(['/members', member.id], {
+      queryParams: { returnUrl: '/members' }
+    });
+  }
 
   openInviteModal(): void {
     if (!this.canInvite()) return;
@@ -255,31 +255,16 @@ export class MembersComponent implements OnInit {
   }
 
   getRoleLabel(role: string): string {
-     return getRoleShortLabel(role as UserRole) || role;
+    return getRoleShortLabel(role as UserRole) || role;
   }
 
-  getMemberPhotoUrl(member: Member): string {
-    const photos = [
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80'
-    ];
-
-    let hash = 0;
-    const str = member.id || member.email || member.firstName;
-    for (let i = 0; i < str.length; i++) {
-      const codePoint = str.codePointAt(i) || 0;
-      hash = codePoint + ((hash << 5) - hash);
+  getAvatarUrl(member: Member): string | null {
+    if (member.profile?.avatarPath) {
+      if (member.profile.avatarPath.startsWith('http')) {
+        return member.profile.avatarPath;
+      }
+      return member.profile.avatarPath;
     }
-    const index = Math.abs(hash) % photos.length;
-    return photos[index];
+    return null;
   }
-
 }
