@@ -10,7 +10,7 @@
     "address": "123 Innovation Way, Tech City",
     "hireDate": "2026-01-15",
     "birthDate": "1990-05-20",
-    "avatarPath": "/avatars/john_doe.png",
+    "avatarPath": "/avatars/photo_1.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -25,7 +25,7 @@
     "address": "456 Developer Ave, Tech City",
     "hireDate": "2026-03-01",
     "birthDate": "1993-08-12",
-    "avatarPath": "/avatars/jane_smith.png",
+    "avatarPath": "/avatars/photo_2.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -40,7 +40,7 @@
     "address": "789 Code Lane, Tech City",
     "hireDate": "2026-02-01",
     "birthDate": "1988-11-03",
-    "avatarPath": "/avatars/alice_johnson.png",
+    "avatarPath": "/avatars/photo_3.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -55,7 +55,7 @@
     "address": "101 Backend Blvd, Tech City",
     "hireDate": "2026-03-15",
     "birthDate": "1991-09-17",
-    "avatarPath": "/avatars/bob_wilson.png",
+    "avatarPath": "/avatars/photo_4.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -70,7 +70,7 @@
     "address": "202 HR Tower, Tech City",
     "hireDate": "2026-04-10",
     "birthDate": "1992-02-28",
-    "avatarPath": "/avatars/carol_davis.png",
+    "avatarPath": "/avatars/photo_5.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -85,7 +85,7 @@
     "address": "303 Finance St, Tech City",
     "hireDate": "2026-05-20",
     "birthDate": "1987-07-14",
-    "avatarPath": "/avatars/dave_miller.png",
+    "avatarPath": "/avatars/photo_6.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -100,7 +100,7 @@
     "address": "404 Marketing Ave, Tech City",
     "hireDate": "2026-06-05",
     "birthDate": "1994-04-25",
-    "avatarPath": "/avatars/eve_brown.png",
+    "avatarPath": "/avatars/photo_7.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -115,7 +115,7 @@
     "address": "505 Support Lane, Tech City",
     "hireDate": "2026-07-01",
     "birthDate": "1995-10-08",
-    "avatarPath": "/avatars/frank_taylor.png",
+    "avatarPath": "/avatars/photo_8.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -130,7 +130,7 @@
     "address": "606 QA Road, Tech City",
     "hireDate": "2026-07-10",
     "birthDate": "1996-06-19",
-    "avatarPath": "/avatars/grace_martinez.png",
+    "avatarPath": "/avatars/photo_9.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -145,7 +145,7 @@
     "address": "707 Devops St, Tech City",
     "hireDate": "2026-07-15",
     "birthDate": "1989-12-01",
-    "avatarPath": "/avatars/hank_anderson.png",
+    "avatarPath": "/avatars/photo_10.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -160,7 +160,7 @@
     "address": "808 Design Blvd, Tech City",
     "hireDate": "2026-07-20",
     "birthDate": "1991-07-22",
-    "avatarPath": "/avatars/irene_white.png",
+    "avatarPath": "/avatars/photo_11.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -175,7 +175,7 @@
     "address": "909 Cloud Ave, Tech City",
     "hireDate": "2026-07-25",
     "birthDate": "1990-10-10",
-    "avatarPath": "/avatars/jack_black.png",
+    "avatarPath": "/avatars/photo_12.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -190,7 +190,7 @@
     "address": "1010 Data Street, Tech City",
     "hireDate": "2026-07-28",
     "birthDate": "1994-03-15",
-    "avatarPath": "/avatars/karen_green.png",
+    "avatarPath": "/avatars/photo_13.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -205,7 +205,7 @@
     "address": "1111 Cloud Lane, Tech City",
     "hireDate": "2026-07-30",
     "birthDate": "1992-11-01",
-    "avatarPath": "/avatars/leo_brown.png",
+    "avatarPath": "/avatars/photo_14.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -220,7 +220,7 @@
     "address": "1212 DevOps Road, Tech City",
     "hireDate": "2026-08-01",
     "birthDate": "1989-06-23",
-    "avatarPath": "/avatars/maria_garcia.png",
+    "avatarPath": "/avatars/photo_15.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -235,7 +235,7 @@
     "address": "1313 Testing Ave, Tech City",
     "hireDate": "2026-08-05",
     "birthDate": "1995-09-30",
-    "avatarPath": "/avatars/nina_rodriguez.png",
+    "avatarPath": "/avatars/photo_16.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -250,7 +250,7 @@
     "address": "1414 DevOps Street, Tech City",
     "hireDate": "2026-08-08",
     "birthDate": "1993-04-17",
-    "avatarPath": "/avatars/oscar_martin.png",
+    "avatarPath": "/avatars/photo_17.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -265,7 +265,7 @@
     "address": "1515 Support Road, Tech City",
     "hireDate": "2026-08-10",
     "birthDate": "1990-12-04",
-    "avatarPath": "/avatars/paula_lee.png",
+    "avatarPath": "/avatars/photo_18.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -280,7 +280,7 @@
     "address": "1616 Marketing Street, Tech City",
     "hireDate": "2026-08-12",
     "birthDate": "1996-02-12",
-    "avatarPath": "/avatars/quinn_king.png",
+    "avatarPath": "/avatars/photo_19.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -295,7 +295,7 @@
     "address": "1717 Design Road, Tech City",
     "hireDate": "2026-08-15",
     "birthDate": "1991-07-08",
-    "avatarPath": "/avatars/rachel_wright.png",
+    "avatarPath": "/avatars/photo_20.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -310,7 +310,7 @@
     "address": "1818 HR Ave, Tech City",
     "hireDate": "2026-08-18",
     "birthDate": "1994-05-19",
-    "avatarPath": "/avatars/steve_adams.png",
+    "avatarPath": "/avatars/photo_21.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -325,7 +325,7 @@
     "address": "1919 DevOps Road, Tech City",
     "hireDate": "2026-08-20",
     "birthDate": "1992-09-21",
-    "avatarPath": "/avatars/tom_harris.png",
+    "avatarPath": "/avatars/photo_22.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -340,7 +340,7 @@
     "address": "2020 QA Street, Tech City",
     "hireDate": "2026-08-22",
     "birthDate": "1990-03-14",
-    "avatarPath": "/avatars/ulrich_schmidt.png",
+    "avatarPath": "/avatars/photo_23.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -355,7 +355,7 @@
     "address": "2121 Support Lane, Tech City",
     "hireDate": "2026-08-25",
     "birthDate": "1996-11-07",
-    "avatarPath": "/avatars/victoria_park.png",
+    "avatarPath": "/avatars/photo_24.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -370,7 +370,7 @@
     "address": "2222 Finance Ave, Tech City",
     "hireDate": "2026-08-28",
     "birthDate": "1993-06-02",
-    "avatarPath": "/avatars/william_clark.png",
+    "avatarPath": "/avatars/photo_25.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -385,7 +385,7 @@
     "address": "2323 Marketing Road, Tech City",
     "hireDate": "2026-08-30",
     "birthDate": "1995-08-26",
-    "avatarPath": "/avatars/xenia_koval.png",
+    "avatarPath": "/avatars/photo_26.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -400,7 +400,7 @@
     "address": "2424 Engineering Blvd, Tech City",
     "hireDate": "2026-09-01",
     "birthDate": "1988-10-30",
-    "avatarPath": "/avatars/yuri_petrov.png",
+    "avatarPath": "/avatars/photo_27.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -415,7 +415,7 @@
     "address": "2525 Design Street, Tech City",
     "hireDate": "2026-09-03",
     "birthDate": "1991-04-18",
-    "avatarPath": "/avatars/zoe_walker.png",
+    "avatarPath": "/avatars/photo_28.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -430,7 +430,7 @@
     "address": "2626 Cloud Lane, Tech City",
     "hireDate": "2026-09-05",
     "birthDate": "1994-01-25",
-    "avatarPath": "/avatars/adam_morgan.png",
+    "avatarPath": "/avatars/photo_29.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -445,7 +445,7 @@
     "address": "2727 Data Street, Tech City",
     "hireDate": "2026-09-07",
     "birthDate": "1990-07-29",
-    "avatarPath": "/avatars/betty_foster.png",
+    "avatarPath": "/avatars/photo_30.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -460,7 +460,7 @@
     "address": "2828 Mobile Road, Tech City",
     "hireDate": "2026-09-10",
     "birthDate": "1996-03-12",
-    "avatarPath": "/avatars/charlie_barnes.png",
+    "avatarPath": "/avatars/photo_31.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -475,7 +475,7 @@
     "address": "2929 Security Ave, Tech City",
     "hireDate": "2026-09-12",
     "birthDate": "1992-09-09",
-    "avatarPath": "/avatars/diana_hughes.png",
+    "avatarPath": "/avatars/photo_32.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -490,7 +490,7 @@
     "address": "3030 Mobile Blvd, Tech City",
     "hireDate": "2026-09-15",
     "birthDate": "1995-05-05",
-    "avatarPath": "/avatars/edward_reed.png",
+    "avatarPath": "/avatars/photo_33.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -505,7 +505,7 @@
     "address": "3131 AI Road, Tech City",
     "hireDate": "2026-09-18",
     "birthDate": "1993-11-11",
-    "avatarPath": "/avatars/fiona_butler.png",
+    "avatarPath": "/avatars/photo_34.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -520,7 +520,7 @@
     "address": "3232 QA Street, Tech City",
     "hireDate": "2026-09-20",
     "birthDate": "1991-02-28",
-    "avatarPath": "/avatars/george_fisher.png",
+    "avatarPath": "/avatars/photo_35.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -535,7 +535,7 @@
     "address": "3333 DevOps Street, Tech City",
     "hireDate": "2026-09-22",
     "birthDate": "1994-10-15",
-    "avatarPath": "/avatars/helen_stone.png",
+    "avatarPath": "/avatars/photo_36.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -550,7 +550,7 @@
     "address": "3434 Marketing Street, Tech City",
     "hireDate": "2026-09-25",
     "birthDate": "1992-08-14",
-    "avatarPath": "/avatars/michael_ross.png",
+    "avatarPath": "/avatars/photo_37.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -565,7 +565,7 @@
     "address": "3535 Finance Street, Tech City",
     "hireDate": "2026-09-28",
     "birthDate": "1993-03-22",
-    "avatarPath": "/avatars/sarah_parker.png",
+    "avatarPath": "/avatars/photo_38.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -580,7 +580,7 @@
     "address": "3636 Support Road, Tech City",
     "hireDate": "2026-10-01",
     "birthDate": "1995-07-18",
-    "avatarPath": "/avatars/james_collins.png",
+    "avatarPath": "/avatars/photo_39.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -595,7 +595,7 @@
     "address": "3737 Engineering Blvd, Tech City",
     "hireDate": "2026-10-03",
     "birthDate": "1991-09-10",
-    "avatarPath": "/avatars/laura_bennett.png",
+    "avatarPath": "/avatars/photo_40.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   },
@@ -610,7 +610,7 @@
     "address": "3838 Devops Lane, Tech City",
     "hireDate": "2026-10-05",
     "birthDate": "1996-12-01",
-    "avatarPath": "/avatars/kevin_murphy.png",
+    "avatarPath": "/avatars/photo_41.webp",
     "createdAt": "2026-07-07T12:00:00",
     "updatedAt": "2026-07-07T12:00:00"
   }

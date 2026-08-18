@@ -6,6 +6,7 @@ import com.safo.icos.modules.identity.user.infrastructure.repository.entity.User
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserProfileJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserProfileJpaRepository;
+import com.safo.icos.modules.storage.api.StorageProvider;
 import com.safo.icos.seeder.dto.UserSeedDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -25,17 +26,20 @@ public class UserSeeder extends AbstractJsonSeeder<UserSeedDto> {
   private final UserProfileJpaRepository profileRepository;
   private final AuthCredentialsJpaRepository credentialsRepository;
   private final PasswordEncoder passwordEncoder;
+  private final StorageProvider storageProvider;
 
   public UserSeeder(
           UserJpaRepository userRepository,
           UserProfileJpaRepository profileRepository,
           AuthCredentialsJpaRepository credentialsRepository,
-          PasswordEncoder passwordEncoder) {
+          PasswordEncoder passwordEncoder,
+          StorageProvider storageProvider) {
     super("seed/users.json", UserSeedDto[].class);
     this.userRepository = userRepository;
     this.profileRepository = profileRepository;
     this.credentialsRepository = credentialsRepository;
     this.passwordEncoder = passwordEncoder;
+    this.storageProvider = storageProvider;
   }
 
   @Override
@@ -46,8 +50,27 @@ public class UserSeeder extends AbstractJsonSeeder<UserSeedDto> {
       return;
     }
 
+    int processedCount = 0;
     for (UserSeedDto dto : dtos) {
       UUID userId = parseUuid(String.valueOf(dto.getId()));
+
+      String avatarPath = dto.getAvatarPath();
+      if (avatarPath != null && !avatarPath.isBlank()) {
+        boolean exists = false;
+        try (var is = storageProvider.getFile(avatarPath)) {
+          if (is != null) {
+            exists = true;
+          }
+        } catch (Exception e) {
+          log.warn("Avatar file not found in MinIO for user {}: {}", dto.getEmail(), avatarPath);
+          avatarPath = null;
+        }
+
+        if (!exists) {
+          log.warn("Avatar file not found in MinIO for user {}: {}", dto.getEmail(), avatarPath);
+          avatarPath = null;
+        }
+      }
 
       LocalDate hireDate = parseDate(dto.getHireDate());
       LocalDate birthDate = parseDate(dto.getBirthDate());
@@ -70,7 +93,7 @@ public class UserSeeder extends AbstractJsonSeeder<UserSeedDto> {
               .address(dto.getAddress())
               .hireDate(hireDate)
               .birthDate(birthDate)
-              .avatarPath(dto.getAvatarPath())
+              .avatarPath(avatarPath)
               .build();
       profileRepository.save(profile);
 
@@ -81,9 +104,11 @@ public class UserSeeder extends AbstractJsonSeeder<UserSeedDto> {
               .passwordHash(hashedPassword)
               .build();
       credentialsRepository.save(credentials);
+
+      processedCount++;
     }
 
-    log.info("Successfully seeded {} users (along with their profiles and credentials).", dtos.size());
+    log.info("Successfully seeded {} users (along with their profiles and credentials).", processedCount);
   }
 
   @Override

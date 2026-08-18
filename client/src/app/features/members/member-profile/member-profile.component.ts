@@ -91,7 +91,7 @@ export class MemberProfileComponent implements OnInit {
     if (member.profile.avatarPath.startsWith('http')) {
       return member.profile.avatarPath;
     }
-    return member.profile.avatarPath;
+    return `/api/storage/avatar/${member.id}`;
   });
 
   editUser: Partial<User> & { role?: string; departmentId?: string } = {};
