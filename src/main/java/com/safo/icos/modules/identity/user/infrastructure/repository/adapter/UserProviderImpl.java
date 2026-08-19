@@ -5,6 +5,8 @@ import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
+import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
+import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.application.service.UserService;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.MembershipJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
@@ -26,71 +28,85 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class UserProviderImpl implements UserProvider {
-    private final UserService userService;
-    private final MembershipJpaRepository membershipJpaRepository;
+  private final UserService userService;
+  private final MembershipJpaRepository membershipJpaRepository;
   private final PermissionJpaRepository permissionJpaRepository;
   private final DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
-    private final RoleJpaRepository roleJpaRepository;
-    private final UserJpaRepository userJpaRepository;
+  private final RoleJpaRepository roleJpaRepository;
+  private final UserJpaRepository userJpaRepository;
 
-    @Override
-    public Optional<UserDto> findByEmail(String email) {
-        return userService.findByEmail(email);
-    }
+  @Override
+  public Optional<UserDto> findByEmail(String email) {
+    return userService.findByEmail(email);
+  }
 
-    @Override
-    public Optional<UserDto> findById(UUID userId) {
-        return userService.findById(userId);
-    }
+  @Override
+  public Optional<UserDto> findById(UUID userId) {
+    return userService.findById(userId);
+  }
 
-    @Override
-    public UserDto createUser(UserCreateDto data) {
-        return userService.createUserFromAuth(data);
+  @Override
+  public Optional<UserResponseDto> findByIdWithProfile(UUID userId) {
+    try {
+      return Optional.of(userService.getUserById(userId));
+    } catch (Exception e) {
+      return Optional.empty();
     }
+  }
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return userService.existsByEmail(email);
-    }
+  @Override
+  public Optional<UserProfileDto> findProfileByUserId(UUID userId) {
+    return userService.findProfileByUserId(userId);
+  }
 
-    @Override
-    public void updateUserStatus(UUID userId, String status) {
-        userService.updateUserStatus(userId, status);
-    }
+  @Override
+  public UserDto createUser(UserCreateDto data) {
+    return userService.createUserFromAuth(data);
+  }
 
-    @Override
-    public Optional<UserDto> findManagerByDepartmentId(UUID departmentId) {
-        return roleJpaRepository.findByName("HEAD")
-                .flatMap(role -> membershipJpaRepository.findFirstByDepartmentIdAndRoleIdAndActiveTrue(departmentId, role.getId()))
-                .map(MembershipJpaEntity::getUserId)
-                .flatMap(userJpaRepository::findById)
-                .map(entity -> UserDto.builder()
-                        .id(entity.getId())
-                        .email(entity.getEmail())
-                        .firstName(entity.getFirstName())
-                        .lastName(entity.getLastName())
-                        .build());
-    }
+  @Override
+  public boolean existsByEmail(String email) {
+    return userService.existsByEmail(email);
+  }
 
-    @Override
-    public Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId) {
-        return userService.findActiveMembership(userId, companyId);
-    }
+  @Override
+  public void updateUserStatus(UUID userId, String status) {
+    userService.updateUserStatus(userId, status);
+  }
 
-    @Override
-    public Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId) {
-        return userService.findFirstActiveMembershipByUserId(userId);
-    }
+  @Override
+  public Optional<UserDto> findManagerByDepartmentId(UUID departmentId) {
+    return roleJpaRepository.findByName("HEAD")
+            .flatMap(role -> membershipJpaRepository.findFirstByDepartmentIdAndRoleIdAndActiveTrue(departmentId, role.getId()))
+            .map(MembershipJpaEntity::getUserId)
+            .flatMap(userJpaRepository::findById)
+            .map(entity -> UserDto.builder()
+                    .id(entity.getId())
+                    .email(entity.getEmail())
+                    .firstName(entity.getFirstName())
+                    .lastName(entity.getLastName())
+                    .build());
+  }
 
-    @Override
-    public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId) {
-        return userService.createMembership(userId, companyId, roleId, departmentId, managerId);
-    }
+  @Override
+  public Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId) {
+    return userService.findActiveMembership(userId, companyId);
+  }
 
-    @Override
-    public Optional<MembershipDto> findMembershipById(UUID membershipId) {
-        return userService.findMembershipById(membershipId);
-    }
+  @Override
+  public Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId) {
+    return userService.findFirstActiveMembershipByUserId(userId);
+  }
+
+  @Override
+  public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId) {
+    return userService.createMembership(userId, companyId, roleId, departmentId, managerId);
+  }
+
+  @Override
+  public Optional<MembershipDto> findMembershipById(UUID membershipId) {
+    return userService.findMembershipById(membershipId);
+  }
 
   @Override
   @Transactional(readOnly = true)

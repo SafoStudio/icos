@@ -26,6 +26,7 @@ public class UserDto {
   /** Permission keys granted to the user. */
   private final List<String> permissions;
   private final String status;
+  private final UserProfileDto profile;
   private final LocalDateTime createdAt;
   private final LocalDateTime updatedAt;
 }

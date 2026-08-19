@@ -3,6 +3,7 @@ package com.safo.icos.modules.identity.user.application.service;
 import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
+import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
 import com.safo.icos.modules.identity.user.application.dto.DocumentResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.ProfileResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.ProfileUpdateDto;
@@ -33,12 +34,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Application service for user and membership management.
- * Implements the {@link com.safo.icos.modules.identity.user.api.UserProvider}
- * contract (via a separate adapter) and provides additional user operations
- * such as profile updates and document management.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -51,12 +46,6 @@ public class UserService {
   private final UserDocumentJpaRepository documentRepository;
   private final UserDomainService userDomainService;
 
-  /**
-   * Creates a new user during authentication (self-registration or invite acceptance).
-   *
-   * @param data user creation payload
-   * @return the created user as a DTO
-   */
   public UserDto createUserFromAuth(UserCreateDto data) {
     User user = userDomainService.createUser(
             UserName.of(data.getFirstName(), data.getLastName()),
@@ -67,91 +56,49 @@ public class UserService {
     return toUserDto(saved);
   }
 
-  /**
-   * Finds a user by email address.
-   *
-   * @param email the user's email
-   * @return the user if found
-   */
   public Optional<UserDto> findByEmail(String email) {
     return userRepository.findByEmail(Email.of(email)).map(this::toUserDto);
   }
 
-  /**
-   * Finds a user by their unique identifier.
-   *
-   * @param userId the user's UUID
-   * @return the user if found
-   */
   public Optional<UserDto> findById(UUID userId) {
     return userRepository.findById(userId).map(this::toUserDto);
   }
 
-  /**
-   * Checks if a user with the given email already exists.
-   *
-   * @param email the email to check
-   * @return {@code true} if the email is in use
-   */
+  public Optional<UserProfileDto> findProfileByUserId(UUID userId) {
+    return profileRepository.findById(userId)
+            .map(entity -> UserProfileDto.builder()
+                    .avatarPath(entity.getAvatarPath())
+                    .phoneNumber(entity.getPhoneNumber())
+                    .address(entity.getAddress())
+                    .birthDate(entity.getBirthDate())
+                    .hireDate(entity.getHireDate())
+                    .build());
+  }
+
   public boolean existsByEmail(String email) {
     return userRepository.existsByEmail(Email.of(email));
   }
 
-  /**
-   * Updates the status of a user.
-   *
-   * @param userId the user's UUID
-   * @param status the new status value
-   */
   public void updateUserStatus(UUID userId, String status) {
     User user = userDomainService.updateStatus(UserId.fromUUID(userId), status);
     userRepository.save(user);
   }
 
-  /**
-   * Finds an active membership for a user in a specific company.
-   *
-   * @param userId    the user's UUID
-   * @param companyId the company UUID
-   * @return the membership if found and active
-   */
   public Optional<MembershipDto> findActiveMembership(UUID userId, UUID companyId) {
     return membershipRepository.findActiveByUserIdAndCompanyId(userId, companyId)
             .map(this::toMembershipDto);
   }
 
-  /**
-   * Finds the first active membership for a user across all companies.
-   *
-   * @param userId the user's UUID
-   * @return the first active membership found
-   */
   public Optional<MembershipDto> findFirstActiveMembershipByUserId(UUID userId) {
     return membershipRepository.findFirstByUserIdAndActiveTrue(userId)
             .map(this::toMembershipDto);
   }
 
-  /**
-   * Finds a membership by its unique identifier.
-   *
-   * @param membershipId the membership UUID
-   * @return the membership if found
-   */
   public Optional<MembershipDto> findMembershipById(UUID membershipId) {
     return membershipRepository.findById(membershipId)
             .map(this::toMembershipDto);
   }
 
-  /**
-   * Creates a new membership linking a user to a company.
-   *
-   * @param userId       the user's UUID
-   * @param companyId    the company UUID
-   * @param roleId       the role UUID
-   * @param departmentId optional department assignment
-   * @param managerId    optional manager assignment
-   * @return the created membership
-   */
   public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId,
                                         UUID departmentId, UUID managerId) {
     Membership membership = Membership.create(userId, companyId, roleId, departmentId, managerId);
@@ -159,25 +106,12 @@ public class UserService {
     return toMembershipDto(saved);
   }
 
-  /**
-   * Finds a user by ID with full profile, documents, and membership data.
-   *
-   * @param userId the user's UUID
-   * @return the user's full response DTO
-   * @throws RuntimeException if the user is not found
-   */
   public UserResponseDto getUserById(UUID userId) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
     return toResponseDto(user);
   }
 
-  /**
-   * Returns all users belonging to a given company.
-   *
-   * @param companyId the company UUID
-   * @return list of users with their membership details
-   */
   public List<UserResponseDto> getUsersByCompanyId(UUID companyId) {
     List<Membership> memberships = membershipRepository.findAllByCompanyId(companyId);
     return memberships.stream()
@@ -188,22 +122,10 @@ public class UserService {
             .toList();
   }
 
-  /**
-   * Deletes a user by ID.
-   *
-   * @param userId the user's UUID
-   */
   public void deleteUser(UUID userId) {
     userRepository.deleteById(userId);
   }
 
-  /**
-   * Updates a user's name fields. Requires {@code user:edit} permission.
-   *
-   * @param userId the user's UUID
-   * @param input  the fields to update
-   * @return the updated user
-   */
   @RequirePermission("user:edit")
   public UserResponseDto updateUser(UUID userId, UserUpdateDto input) {
     User user = userRepository.findById(userId)
@@ -239,13 +161,6 @@ public class UserService {
     return toResponseDto(saved);
   }
 
-  /**
-   * Updates a user's profile fields. Requires {@code profile:edit} permission.
-   *
-   * @param userId the user's UUID
-   * @param input  the profile fields to update
-   * @return the updated profile
-   */
   @RequirePermission("profile:edit")
   public ProfileResponseDto updateProfile(UUID userId, ProfileUpdateDto input) {
     UserProfileJpaEntity profile = profileRepository.findById(userId)
@@ -260,12 +175,6 @@ public class UserService {
     return toProfileResponseDto(saved);
   }
 
-  /**
-   * Updates the avatar file path for a user.
-   *
-   * @param userId the user's UUID
-   * @param path   the file path to the avatar image
-   */
   public void updateAvatarPath(UUID userId, String path) {
     UserProfileJpaEntity profile = profileRepository.findById(userId)
             .orElse(UserProfileJpaEntity.builder().userId(userId).build());
@@ -273,16 +182,6 @@ public class UserService {
     profileRepository.save(profile);
   }
 
-  /**
-   * Saves or updates document metadata for a user.
-   *
-   * @param userId      the user's UUID
-   * @param type        document type (e.g., "passport", "diploma")
-   * @param filename    original filename
-   * @param path        storage file path
-   * @param contentType MIME type
-   * @param size        file size in bytes
-   */
   public void saveDocumentMetadata(UUID userId, String type, String filename,
                                    String path, String contentType, long size) {
     documentRepository.findByUserIdAndTypeAndFilename(userId, type, filename)
@@ -307,13 +206,6 @@ public class UserService {
             );
   }
 
-  /**
-   * Deletes document metadata for a user.
-   *
-   * @param userId   the user's UUID
-   * @param type     document type
-   * @param filename document filename
-   */
   public void deleteDocumentMetadata(UUID userId, String type, String filename) {
     documentRepository.deleteByUserIdAndTypeAndFilename(userId, type, filename);
   }

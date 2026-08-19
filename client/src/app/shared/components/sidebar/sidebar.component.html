@@ -6,8 +6,15 @@
     [attr.aria-label]="'Go to profile of ' + userName()"
   >
     <div class="avatar">
-      <span class="avatar-letter">{{ userAvatar() }}</span>
-      <span class="status-dot online"></span>
+      @if (hasAvatar()) {
+      <img
+        [src]="userAvatarUrl()"
+        [alt]="userName()"
+        class="avatar-image"
+      />
+      } @else {
+      <span class="avatar-letter">{{ userInitial() }}</span>
+      }
     </div>
     <div class="user-info">
       <div class="user-name">{{ userName() }}</div>
@@ -99,11 +106,11 @@
       <div class="theme-btn-inner">
         <ng-icon [name]="isDark() ? 'tablerSun' : 'tablerMoon'" class="theme-icon" size="20"></ng-icon>
         @if (!isCollapsed()) {
-          <span>{{ isDark() ? 'Light Theme' : 'Dark Theme' }}</span>
+        <span>{{ isDark() ? 'Light Theme' : 'Dark Theme' }}</span>
         }
       </div>
       @if (!isCollapsed()) {
-        <span class="theme-pill" [class.dark]="isDark()">{{ isDark() ? 'DARK' : 'LIGHT' }}</span>
+      <span class="theme-pill" [class.dark]="isDark()">{{ isDark() ? 'DARK' : 'LIGHT' }}</span>
       }
     </button>
 

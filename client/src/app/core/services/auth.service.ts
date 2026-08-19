@@ -82,6 +82,13 @@ export class AuthService {
             role
             departmentId
             permissions
+            profile {
+              avatarPath
+              phoneNumber
+              address
+              birthDate
+              hireDate
+            }
           }
         }
       }
@@ -108,6 +115,13 @@ export class AuthService {
             role
             departmentId
             permissions
+            profile {
+              avatarPath
+              phoneNumber
+              address
+              birthDate
+              hireDate
+            }
           }
         }
       }
@@ -172,6 +186,45 @@ export class AuthService {
     }
     this.clearSession();
     return of(null);
+  }
+
+  refreshUser(): void {
+    const user = this.currentUser();
+    if (!user) return;
+
+    const query = `
+      query GetUser($id: ID!) {
+        user(id: $id) {
+          id
+          email
+          firstName
+          lastName
+          role
+          companyId
+          departmentId
+          permissions
+          profile {
+            avatarPath
+            phoneNumber
+            address
+            birthDate
+            hireDate
+          }
+        }
+      }
+    `;
+
+    this.api.graphql<{ user: User }>(query, { id: user.id })
+      .subscribe({
+        next: (response) => {
+          const updatedUser = response.user;
+          localStorage.setItem('current_user', JSON.stringify(updatedUser));
+          this.currentUser.set(updatedUser);
+        },
+        error: (err) => {
+          console.error('Failed to refresh user:', err);
+        }
+      });
   }
 
   private scheduleRefresh(expiresInSeconds: number): void {

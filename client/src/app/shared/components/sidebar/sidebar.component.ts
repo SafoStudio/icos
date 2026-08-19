@@ -45,9 +45,24 @@ export class SidebarComponent {
     return user ? user.email : '';
   });
 
-  userAvatar = computed(() => {
+  userInitial = computed(() => {
     const user = this.authService.currentUser();
     return user ? user.firstName.charAt(0).toUpperCase() : '?';
+  });
+
+  userAvatarUrl = computed(() => {
+    const user = this.authService.currentUser();
+    if (user?.profile?.avatarPath) {
+      if (user.profile.avatarPath.startsWith('http')) {
+        return user.profile.avatarPath;
+      }
+      return `/api/storage/avatar/${user.id}`;
+    }
+    return null;
+  });
+
+  hasAvatar = computed(() => {
+    return !!this.userAvatarUrl();
   });
 
   mainLinks: MainLink[] = [

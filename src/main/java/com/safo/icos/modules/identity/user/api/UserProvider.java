@@ -4,7 +4,9 @@ import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
+import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
 
+import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +33,22 @@ public interface UserProvider {
    * @return the user if found
    */
   Optional<UserDto> findById(UUID userId);
+
+  /**
+   * Finds a user by their unique identifier with full profile.
+   *
+   * @param userId the user's UUID
+   * @return the user with profile if found
+   */
+  Optional<UserResponseDto> findByIdWithProfile(UUID userId);
+
+  /**
+   * Finds a user profile by user ID.
+   *
+   * @param userId the user's UUID
+   * @return the user profile if found
+   */
+  Optional<UserProfileDto> findProfileByUserId(UUID userId);
 
   /**
    * Creates a new user.

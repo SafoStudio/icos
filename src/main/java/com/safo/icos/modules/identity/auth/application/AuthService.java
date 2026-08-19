@@ -25,6 +25,7 @@ import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
 import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
+import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
@@ -44,13 +45,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Application service for authentication operations.
- * Orchestrates user registration, login, token refresh, and logout.
- * Delegates token generation to {@link AuthTokenProvider} and
- * refresh token management to {@link AuthDomainService}.
- * All public methods run within a single transaction.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -72,14 +66,6 @@ public class AuthService {
   @Value("${app.auth.refresh-token-ttl:30d}")
   private Duration refreshTokenTtl;
 
-  /**
-   * Registers a new user with their own company and OWNER membership.
-   *
-   * @param request    registration details
-   * @param deviceInfo client device information for refresh token tracking
-   * @return authentication response with tokens and user profile
-   * @throws UserAlreadyExistsException if a user with the given email already exists
-   */
   public AuthResponseDto register(RegisterRequestDto request, String deviceInfo) {
     log.debug("Registering new user with email: {}", request.getEmail());
 
@@ -91,7 +77,7 @@ public class AuthService {
     savePassword(user.getId(), request.getPassword());
     CompanyDto company = companyService.createCompanyInternal(request.getCompanyName(), null);
     MembershipDto membership = createOwnerMembership(user.getId(), company.getId());
-    UserDto userWithCompany = enrichUserWithCompany(user, membership);
+    UserDto userWithCompany = enrichUserWithCompanyAndProfile(user, membership);
 
     RefreshTokenCreationResult rtResult = authDomainService.createRefreshToken(
             membership.getId(), deviceInfo, refreshTokenTtl);
@@ -108,15 +94,6 @@ public class AuthService {
             .build();
   }
 
-  /**
-   * Authenticates a user by email and password.
-   *
-   * @param request    login credentials
-   * @param deviceInfo client device information
-   * @return authentication response with tokens and user profile
-   * @throws InvalidCredentialsException if credentials are invalid
-   * @throws BusinessException           if the user has no active membership
-   */
   public AuthResponseDto login(LoginRequestDto request, String deviceInfo) {
     log.debug("Login attempt for email: {}", request.getEmail());
 
@@ -134,7 +111,7 @@ public class AuthService {
     refreshTokenRepository.save(rtResult.entity());
 
     AuthTokenDto tokens = authTokenProvider.generateAccessToken(user.getId(), membership.getCompanyId());
-    UserDto userWithCompany = enrichUserWithCompany(user, membership);
+    UserDto userWithCompany = enrichUserWithCompanyAndProfile(user, membership);
 
     return AuthResponseDto.builder()
             .accessToken(tokens.getAccessToken())
@@ -145,15 +122,6 @@ public class AuthService {
             .build();
   }
 
-  /**
-   * Refreshes the access token using a valid refresh token.
-   * The old refresh token is revoked and a new one is issued (rotation).
-   *
-   * @param refreshTokenValue raw refresh token from client (cookie or argument)
-   * @param deviceInfo        current client device information
-   * @return new access token and rotated refresh token
-   * @throws BusinessException if the refresh token is invalid or not found
-   */
   public RefreshResponseDto refresh(String refreshTokenValue, String deviceInfo) {
     log.debug("Refreshing token");
 
@@ -183,27 +151,12 @@ public class AuthService {
             .build();
   }
 
-  /**
-   * Revokes the given refresh token.
-   *
-   * @param refreshTokenValue raw refresh token to revoke
-   */
   public void logout(String refreshTokenValue) {
     TokenValue tokenHash = TokenValue.fromRaw(refreshTokenValue);
     refreshTokenRepository.findByTokenHash(tokenHash)
             .ifPresent(token -> refreshTokenRepository.save(token.revoke()));
   }
 
-  /**
-   * Registers a new user from an invitation.
-   * The user is assigned the role and company specified in the invite.
-   *
-   * @param invite     the invitation domain object
-   * @param request    registration details (name, password)
-   * @param deviceInfo client device information
-   * @return authentication response with tokens and user profile
-   * @throws UserAlreadyExistsException if a user with the invite email already exists
-   */
   public AuthResponseDto registerFromInvite(Invite invite, InviteAcceptDto request, String deviceInfo) {
     log.debug("Registering user from invite for email: {}", invite.getEmail());
 
@@ -220,7 +173,7 @@ public class AuthService {
 
     MembershipDto membership = userProvider.createMembership(
             user.getId(), invite.getCompanyId(), roleId, invite.getDepartmentId(), invite.getManagerId());
-    UserDto userWithCompany = enrichUserWithCompany(user, membership);
+    UserDto userWithCompany = enrichUserWithCompanyAndProfile(user, membership);
 
     invite.accept();
     inviteRepository.save(invite);
@@ -292,13 +245,11 @@ public class AuthService {
 
     Set<String> permissions = new HashSet<>();
 
-    // OWNER or ADMIN - all permissions
     if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
       permissions = permissionJpaRepository.findAll().stream()
               .map(PermissionJpaEntity::getName)
               .collect(Collectors.toSet());
     }
-    // other roles - permissions from department_permissions
     else if (membership.getDepartmentId() != null) {
       permissions = departmentPermissionJpaRepository
               .findByDepartmentIdAndRoleName(membership.getDepartmentId(), roleName)
@@ -317,6 +268,44 @@ public class AuthService {
             .departmentId(membership.getDepartmentId())
             .permissions(new ArrayList<>(permissions))
             .status(user.getStatus())
+            .createdAt(user.getCreatedAt())
+            .updatedAt(user.getUpdatedAt())
+            .build();
+  }
+
+  private UserDto enrichUserWithCompanyAndProfile(UserDto user, MembershipDto membership) {
+    String roleName = roleJpaRepository.findById(membership.getRoleId())
+            .map(RoleJpaEntity::getName)
+            .orElse("");
+
+    Set<String> permissions = new HashSet<>();
+
+    if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
+      permissions = permissionJpaRepository.findAll().stream()
+              .map(PermissionJpaEntity::getName)
+              .collect(Collectors.toSet());
+    }
+    else if (membership.getDepartmentId() != null) {
+      permissions = departmentPermissionJpaRepository
+              .findByDepartmentIdAndRoleName(membership.getDepartmentId(), roleName)
+              .stream()
+              .map(dp -> dp.getPermission().getName())
+              .collect(Collectors.toSet());
+    }
+
+    UserProfileDto profile = userProvider.findProfileByUserId(user.getId()).orElse(null);
+
+    return UserDto.builder()
+            .id(user.getId())
+            .email(user.getEmail())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .companyId(membership.getCompanyId().toString())
+            .role(roleName)
+            .departmentId(membership.getDepartmentId())
+            .permissions(new ArrayList<>(permissions))
+            .status(user.getStatus())
+            .profile(profile)
             .createdAt(user.getCreatedAt())
             .updatedAt(user.getUpdatedAt())
             .build();
