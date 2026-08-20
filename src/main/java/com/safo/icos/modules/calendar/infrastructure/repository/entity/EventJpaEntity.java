@@ -69,9 +69,8 @@ public class EventJpaEntity {
         name = "event_participants",
         joinColumns = @JoinColumn(name = "event_id")
     )
-    @Column(name = "user_id")
     @Builder.Default
-    private Set<UUID> participantIds = new HashSet<>();
+    private Set<EventParticipantEmbeddable> participants = new HashSet<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

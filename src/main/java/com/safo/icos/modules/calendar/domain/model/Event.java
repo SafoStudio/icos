@@ -15,7 +15,7 @@ import lombok.Getter;
  * Domain entity representing a calendar event.
  */
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class Event {
   private final UUID id;
   private final UUID userId;
@@ -27,5 +27,10 @@ public class Event {
   private final OffsetDateTime startAt;
   private final OffsetDateTime endAt;
   private final Visibility visibility;
-  private final List<UUID> participantIds;
+  private final List<EventParticipant> participants;
+
+  public List<UUID> getParticipantIds() {
+    if (participants == null) return List.of();
+    return participants.stream().map(EventParticipant::getUserId).toList();
+  }
 }
