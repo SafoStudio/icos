@@ -26,4 +26,5 @@ public class EventDto {
   private final OffsetDateTime endAt;
   private final Visibility visibility;
   private final List<UUID> participantIds;
+  private final List<EventParticipantDto> participantDetails;
 }
