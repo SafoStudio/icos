@@ -2,14 +2,18 @@ package com.safo.icos.modules.calendar.application;
 
 import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.calendar.domain.model.Event;
+import com.safo.icos.modules.calendar.domain.model.EventParticipant;
 import com.safo.icos.modules.calendar.domain.model.enums.EventType;
+import com.safo.icos.modules.calendar.domain.model.enums.ParticipantStatus;
 import com.safo.icos.modules.calendar.domain.model.enums.SourceType;
 import com.safo.icos.modules.calendar.domain.model.enums.Visibility;
 import com.safo.icos.modules.calendar.domain.repository.EventRepository;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for calendar event management.
- * Provides operations for creating, retrieving, and deleting calendar events.
+ * Provides operations for creating, retrieving, updating, and deleting calendar events.
  */
 @Service
 @RequiredArgsConstructor
@@ -43,7 +47,8 @@ public class CalendarService {
 
   /**
    * Creates a new calendar event and publishes a {@link CalendarEventCreatedEvent}.
-   * The event organizer is automatically added as a participant if not already in the list.
+   * The event organizer is automatically added as an ACCEPTED participant.
+   * Other participants are added with PENDING status.
    *
    * @param userId         the UUID of the event organizer/owner
    * @param title          the title of the event
@@ -57,9 +62,22 @@ public class CalendarService {
   public Event createEvent(UUID userId, String title, String description,
                            OffsetDateTime start, OffsetDateTime end,
                            List<UUID> participantIds) {
-    List<UUID> participants = participantIds != null ? new ArrayList<>(participantIds) : new ArrayList<>();
-    if (!participants.contains(userId)) {
-      participants.add(userId);
+    List<EventParticipant> participants = new ArrayList<>();
+    // Creator is always an ACCEPTED participant
+    participants.add(EventParticipant.builder()
+            .userId(userId)
+            .status(ParticipantStatus.ACCEPTED)
+            .build());
+
+    if (participantIds != null) {
+      for (UUID pId : participantIds) {
+        if (!pId.equals(userId)) {
+          participants.add(EventParticipant.builder()
+                  .userId(pId)
+                  .status(ParticipantStatus.PENDING)
+                  .build());
+        }
+      }
     }
 
     Event event = Event.builder()
@@ -72,7 +90,7 @@ public class CalendarService {
             .visibility(Visibility.PUBLIC)
             .startAt(start)
             .endAt(end)
-            .participantIds(participants)
+            .participants(participants)
             .build();
 
     Event saved = eventRepository.save(event);
@@ -84,8 +102,129 @@ public class CalendarService {
   }
 
   /**
+   * Updates an existing calendar event. Only the organizer (creator) can update the event.
+   * Preserves existing RSVP statuses for retained participants.
+   *
+   * @param userId         the UUID of the requesting user (must be organizer)
+   * @param eventId        the UUID of the event to update
+   * @param title          the updated title
+   * @param description    the updated description
+   * @param start          the updated start time
+   * @param end            the updated end time
+   * @param participantIds the updated list of participant UUIDs
+   * @return the updated {@link Event}
+   */
+  @Transactional
+  public Event updateEvent(UUID userId, UUID eventId, String title, String description,
+                           OffsetDateTime start, OffsetDateTime end,
+                           List<UUID> participantIds) {
+    Event existing = eventRepository.findById(eventId)
+            .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + eventId));
+
+    if (!existing.getUserId().equals(userId)) {
+      throw new IllegalStateException("Only the event organizer can update the event.");
+    }
+
+    // Map existing participant statuses to retain RSVP responses
+    Map<UUID, ParticipantStatus> existingStatuses = new HashMap<>();
+    if (existing.getParticipants() != null) {
+      for (EventParticipant p : existing.getParticipants()) {
+        existingStatuses.put(p.getUserId(), p.getStatus());
+      }
+    }
+
+    List<EventParticipant> updatedParticipants = new ArrayList<>();
+    // Creator is always ACCEPTED
+    updatedParticipants.add(EventParticipant.builder()
+            .userId(userId)
+            .status(ParticipantStatus.ACCEPTED)
+            .build());
+
+    if (participantIds != null) {
+      for (UUID pId : participantIds) {
+        if (!pId.equals(userId)) {
+          ParticipantStatus currentStatus = existingStatuses.getOrDefault(pId, ParticipantStatus.PENDING);
+          updatedParticipants.add(EventParticipant.builder()
+                  .userId(pId)
+                  .status(currentStatus)
+                  .build());
+        }
+      }
+    }
+
+    Event updated = Event.builder()
+            .id(existing.getId())
+            .userId(existing.getUserId())
+            .title(title)
+            .description(description)
+            .type(existing.getType() != null ? existing.getType() : EventType.MEETING)
+            .source(existing.getSource() != null ? existing.getSource() : SourceType.MANUAL)
+            .visibility(existing.getVisibility() != null ? existing.getVisibility() : Visibility.PUBLIC)
+            .startAt(start)
+            .endAt(end)
+            .participants(updatedParticipants)
+            .build();
+
+    return eventRepository.save(updated);
+  }
+
+  /**
+   * Updates attendance RSVP status for a participant in the event (e.g. ACCEPTED or DECLINED).
+   *
+   * @param userId  the UUID of the attendee
+   * @param eventId the UUID of the event
+   * @param status  the new RSVP status
+   * @return the updated {@link Event}
+   */
+  @Transactional
+  public Event updateAttendance(UUID userId, UUID eventId, ParticipantStatus status) {
+    Event existing = eventRepository.findById(eventId)
+            .orElseThrow(() -> new IllegalArgumentException("Event not found with ID: " + eventId));
+
+    List<EventParticipant> participants = new ArrayList<>();
+    boolean found = false;
+
+    if (existing.getParticipants() != null) {
+      for (EventParticipant p : existing.getParticipants()) {
+        if (p.getUserId().equals(userId)) {
+          participants.add(EventParticipant.builder()
+                  .userId(userId)
+                  .status(status)
+                  .build());
+          found = true;
+        } else {
+          participants.add(p);
+        }
+      }
+    }
+
+    if (!found) {
+      // If user was organizer or invited without entry
+      participants.add(EventParticipant.builder()
+              .userId(userId)
+              .status(status)
+              .build());
+    }
+
+    Event updated = Event.builder()
+            .id(existing.getId())
+            .userId(existing.getUserId())
+            .title(existing.getTitle())
+            .description(existing.getDescription())
+            .type(existing.getType())
+            .source(existing.getSource())
+            .visibility(existing.getVisibility())
+            .startAt(existing.getStartAt())
+            .endAt(existing.getEndAt())
+            .participants(participants)
+            .build();
+
+    return eventRepository.save(updated);
+  }
+
+  /**
    * Deletes a calendar event by its ID.
-   * The deletion is only performed if the event exists.
+   * Only the organizer can delete the event.
    *
    * @param userId  the UUID of the user requesting deletion (for authorization)
    * @param eventId the UUID of the event to delete
@@ -94,6 +233,9 @@ public class CalendarService {
   @Transactional
   public boolean deleteEvent(UUID userId, UUID eventId) {
     return eventRepository.findById(eventId).map(event -> {
+      if (!event.getUserId().equals(userId)) {
+        throw new IllegalStateException("Only the event organizer can delete the event.");
+      }
       eventRepository.deleteById(eventId);
       return true;
     }).orElse(false);

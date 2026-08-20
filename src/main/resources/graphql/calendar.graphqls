@@ -1,3 +1,9 @@
+type EventParticipant {
+    userId: ID!
+    status: String!
+    user: User
+}
+
 type Event {
     id: ID!
     userId: ID!
@@ -10,7 +16,9 @@ type Event {
     visibility: String
     participantIds: [ID!]!
     participants: [User!]!
+    participantDetails: [EventParticipant!]!
     organizer: User
+    currentUserStatus: String
 }
 
 extend type Query {
@@ -25,7 +33,17 @@ extend type Mutation {
         end: String!,
         participantIds: [ID!]
     ): Event!
+    updateCalendarEvent(
+        id: ID!,
+        title: String!,
+        description: String,
+        start: String!,
+        end: String!,
+        participantIds: [ID!]
+    ): Event!
+    updateEventAttendance(
+        eventId: ID!,
+        status: String!
+    ): Event!
     deleteCalendarEvent(id: ID!): Boolean!
 }
-
-

@@ -1,7 +1,9 @@
 package com.safo.icos.modules.calendar.presentation;
 
 import com.safo.icos.modules.calendar.api.dto.EventDto;
+import com.safo.icos.modules.calendar.api.dto.EventParticipantDto;
 import com.safo.icos.modules.calendar.application.CalendarService;
+import com.safo.icos.modules.calendar.domain.model.enums.ParticipantStatus;
 import com.safo.icos.modules.calendar.infrastructure.mapper.EventMapper;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.application.service.UserService;
@@ -60,6 +62,42 @@ public class CalendarGraphQLResolver {
     }
 
     @MutationMapping
+    public EventDto updateCalendarEvent(
+            @AuthenticationPrincipal IcosUserPrincipal principal,
+            @Argument UUID id,
+            @Argument String title,
+            @Argument String description,
+            @Argument String start,
+            @Argument String end,
+            @Argument List<String> participantIds) {
+        List<UUID> participants = participantIds != null
+                ? participantIds.stream().map(UUID::fromString).toList()
+                : List.of();
+        return mapper.toDto(calendarService.updateEvent(
+                principal.getUserId(),
+                id,
+                title,
+                description,
+                OffsetDateTime.parse(start),
+                OffsetDateTime.parse(end),
+                participants
+        ));
+    }
+
+    @MutationMapping
+    public EventDto updateEventAttendance(
+            @AuthenticationPrincipal IcosUserPrincipal principal,
+            @Argument UUID eventId,
+            @Argument String status) {
+        ParticipantStatus participantStatus = ParticipantStatus.valueOf(status.trim().toUpperCase());
+        return mapper.toDto(calendarService.updateAttendance(
+                principal.getUserId(),
+                eventId,
+                participantStatus
+        ));
+    }
+
+    @MutationMapping
     public Boolean deleteCalendarEvent(
             @AuthenticationPrincipal IcosUserPrincipal principal,
             @Argument UUID id) {
@@ -91,5 +129,44 @@ public class CalendarGraphQLResolver {
                 })
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    @SchemaMapping(typeName = "Event", field = "participantDetails")
+    public List<EventParticipantDto> getParticipantDetails(EventDto event) {
+        if (event.getParticipantDetails() == null || event.getParticipantDetails().isEmpty()) {
+            return List.of();
+        }
+        return event.getParticipantDetails();
+    }
+
+    @SchemaMapping(typeName = "EventParticipant", field = "user")
+    public UserResponseDto getParticipantUser(EventParticipantDto participant) {
+        if (participant.getUserId() == null) return null;
+        try {
+            return userService.getUserById(participant.getUserId());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @SchemaMapping(typeName = "Event", field = "currentUserStatus")
+    public String getCurrentUserStatus(
+            EventDto event,
+            @AuthenticationPrincipal IcosUserPrincipal principal) {
+        if (principal == null || principal.getUserId() == null) {
+            return null;
+        }
+        UUID currentUserId = principal.getUserId();
+        if (event.getUserId() != null && event.getUserId().equals(currentUserId)) {
+            return ParticipantStatus.ACCEPTED.name();
+        }
+        if (event.getParticipantDetails() != null) {
+            for (EventParticipantDto p : event.getParticipantDetails()) {
+                if (p.getUserId() != null && p.getUserId().equals(currentUserId)) {
+                    return p.getStatus() != null ? p.getStatus().name() : ParticipantStatus.PENDING.name();
+                }
+            }
+        }
+        return ParticipantStatus.PENDING.name();
     }
 }
