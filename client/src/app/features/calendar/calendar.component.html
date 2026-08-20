@@ -62,12 +62,21 @@
           <button
             type="button"
             class="event-pill"
+            [class.rsvp-accepted]="getCurrentUserStatus(evt) === 'ACCEPTED'"
+            [class.rsvp-declined]="getCurrentUserStatus(evt) === 'DECLINED'"
+            [class.rsvp-pending]="getCurrentUserStatus(evt) === 'PENDING' && !isOrganizer(evt)"
             (click)="viewEvent(evt, $event)"
             [attr.aria-label]="evt.title + ' at ' + formatTime(evt.startAt)"
             [title]="evt.title + ' (' + formatTime(evt.startAt) + ')'"
           >
             <span class="event-time">{{ formatTime(evt.startAt) }}</span>
             <span class="event-title">{{ evt.title }}</span>
+            @if (evt.participantIds && evt.participantIds.length > 1) {
+            <span class="event-attendees-badge" title="{{ evt.participantIds.length }} participants">
+              <ng-icon name="tablerUsers" size="12" aria-hidden="true"></ng-icon>
+              {{ evt.participantIds.length }}
+            </span>
+            }
           </button>
           }
         </div>
@@ -78,7 +87,7 @@
   }
 
   <!-- Overlay -->
-  @if (showCreateSidebar() || selectedEvent()) {
+  @if (showCreateOrEditSidebar() || selectedEvent()) {
   <div
     class="sidebar-overlay"
     (click)="onOverlayClick()"
@@ -86,46 +95,167 @@
   ></div>
   }
 
-  <!-- Create Event Sidebar -->
-  <div class="sidebar" [class.open]="showCreateSidebar()">
+  <!-- Create / Edit Event Sidebar -->
+  <div class="sidebar form-sidebar" [class.open]="showCreateOrEditSidebar()">
     <div class="sidebar-header">
-      <h2>Schedule Calendar Event</h2>
-      <button type="button" class="close-btn" (click)="closeCreateSidebar()" aria-label="Close sidebar">
-        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      <div>
+        <h2>{{ isEditMode() ? 'Edit Calendar Event' : 'Schedule Calendar Event' }}</h2>
+        <p class="sidebar-subtitle">{{ isEditMode() ? 'Update meeting details and manage invited team members' : 'Fill details and invite colleagues to this event' }}</p>
+      </div>
+      <button type="button" class="close-btn" (click)="closeCreateOrEditSidebar()" aria-label="Close sidebar">
+        <ng-icon name="tablerX" size="22" aria-hidden="true"></ng-icon>
       </button>
     </div>
 
     <div class="sidebar-body">
       <div class="form-group">
-        <label for="eventTitleInput">Event Title *</label>
-        <input id="eventTitleInput" type="text" [(ngModel)]="eventForm.title" placeholder="e.g. Weekly Product Sync" />
+        <label for="eventTitleInput">Event Title <span class="required-star">*</span></label>
+        <input id="eventTitleInput" type="text" [(ngModel)]="eventForm.title" placeholder="e.g. Weekly Product Sync & Review" />
       </div>
 
       <div class="form-group">
-        <label for="eventDescInput">Description</label>
-        <textarea id="eventDescInput" rows="3" [(ngModel)]="eventForm.description" placeholder="Agenda or meeting links..."></textarea>
+        <label for="eventDescInput">Description / Agenda</label>
+        <textarea id="eventDescInput" rows="3" [(ngModel)]="eventForm.description" placeholder="Add meeting agenda, call link, or notes..."></textarea>
       </div>
 
       <div class="form-group">
-        <label for="eventDateInput">Date *</label>
+        <label for="eventDateInput">Date <span class="required-star">*</span></label>
         <input id="eventDateInput" type="date" [(ngModel)]="eventForm.date" />
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="eventStartTimeInput">Start Time *</label>
+          <label for="eventStartTimeInput">Start Time <span class="required-star">*</span></label>
           <input id="eventStartTimeInput" type="time" [(ngModel)]="eventForm.startTime" />
         </div>
         <div class="form-group">
-          <label for="eventEndTimeInput">End Time *</label>
+          <label for="eventEndTimeInput">End Time <span class="required-star">*</span></label>
           <input id="eventEndTimeInput" type="time" [(ngModel)]="eventForm.endTime" />
+        </div>
+      </div>
+
+      <!-- Invite Colleagues Section -->
+      <div class="form-section attendees-section">
+        <div class="section-title-row">
+          <div class="title-with-icon">
+            <ng-icon name="tablerUsers" size="18" class="section-icon" aria-hidden="true"></ng-icon>
+            <label class="section-label">Invite Colleagues</label>
+          </div>
+          <span class="selected-count-badge">
+            {{ selectedParticipantIds().length }} selected
+          </span>
+        </div>
+
+        <!-- Selected Members Chips -->
+        @if (selectedMembersList().length > 0) {
+        <div class="selected-chips-container">
+          @for (member of selectedMembersList(); track member.id) {
+          <div class="member-chip">
+            <div class="chip-avatar">
+              @if (member.profile?.avatarPath) {
+                <img [src]="member.profile.avatarPath" [alt]="getUserDisplayName(member)" />
+              } @else {
+                <span>{{ getUserInitials(member) }}</span>
+              }
+            </div>
+            <span class="chip-name">{{ getUserDisplayName(member) }}</span>
+            <button type="button" class="chip-remove-btn" (click)="removeParticipant(member.id)" title="Remove attendee" aria-label="Remove attendee">
+              <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+            </button>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Search Members -->
+        <div class="member-search-box">
+          <ng-icon name="tablerSearch" size="16" class="search-icon" aria-hidden="true"></ng-icon>
+          <input
+            type="text"
+            [ngModel]="memberSearchQuery()"
+            (ngModelChange)="memberSearchQuery.set($event)"
+            placeholder="Search colleagues by name, role or email..."
+            class="search-input"
+          />
+          @if (memberSearchQuery()) {
+          <button type="button" class="clear-search-btn" (click)="memberSearchQuery.set('')" aria-label="Clear search">
+            <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+          </button>
+          }
+        </div>
+
+        <!-- Available Members List -->
+        <div class="members-picker-list">
+          @if (filteredMembers().length === 0) {
+          <div class="empty-members">
+            <ng-icon name="tablerUser" size="24" class="empty-icon" aria-hidden="true"></ng-icon>
+            <p>No colleagues found matching your search</p>
+          </div>
+          }
+
+          @for (member of filteredMembers(); track member.id) {
+          <div
+            class="member-picker-item"
+            [class.selected]="isParticipantSelected(member.id)"
+            (click)="toggleParticipant(member.id)"
+          >
+            <div class="member-info-col">
+              <div class="picker-avatar">
+                @if (member.profile?.avatarPath) {
+                  <img [src]="member.profile.avatarPath" [alt]="getUserDisplayName(member)" />
+                } @else {
+                  <span>{{ getUserInitials(member) }}</span>
+                }
+              </div>
+              <div class="picker-text">
+                <span class="picker-name">{{ getUserDisplayName(member) }}</span>
+                <span class="picker-sub">{{ member.role || member.email }}</span>
+              </div>
+            </div>
+
+            <div class="picker-checkbox-wrapper">
+              <input
+                type="checkbox"
+                [checked]="isParticipantSelected(member.id)"
+                (click)="$event.stopPropagation(); toggleParticipant(member.id)"
+                aria-label="Invite colleague"
+              />
+            </div>
+          </div>
+          }
         </div>
       </div>
     </div>
 
     <div class="sidebar-footer">
-      <button type="button" class="btn btn-secondary" (click)="closeCreateSidebar()">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="submitCreateEvent()">Create Event</button>
+      <div class="footer-left">
+        @if (isEditMode()) {
+        <button
+          type="button"
+          class="btn btn-danger-outline"
+          (click)="deleteCurrentEditingEvent()"
+          [disabled]="isSubmitting()"
+        >
+          <ng-icon name="tablerTrash" size="16" aria-hidden="true"></ng-icon>
+          <span>Delete</span>
+        </button>
+        }
+      </div>
+
+      <div class="footer-right">
+        <button type="button" class="btn btn-secondary" (click)="closeCreateOrEditSidebar()" [disabled]="isSubmitting()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submitEventForm()" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="btn-spinner"></span>
+            <span>Saving...</span>
+          } @else {
+            <ng-icon [name]="isEditMode() ? 'tablerCheck' : 'tablerPlus'" size="16" aria-hidden="true"></ng-icon>
+            <span>{{ isEditMode() ? 'Save Changes' : 'Create Event' }}</span>
+          }
+        </button>
+      </div>
     </div>
   </div>
 
@@ -133,33 +263,246 @@
   @if (selectedEvent()) {
   <div class="sidebar detail-sidebar" [class.open]="!!selectedEvent()">
     <div class="sidebar-header">
-      <div>
+      <div class="header-title-container">
         <h2>{{ selectedEvent()?.title }}</h2>
-        <span class="subtitle-date">{{ selectedEvent()?.startAt | date:'fullDate' }}</span>
+        <span class="subtitle-date">{{ selectedEvent()?.startAt | date:'EEEE, MMMM d, y' }}</span>
       </div>
-      <button type="button" class="close-btn" (click)="closeEventDetail()" aria-label="Close sidebar">
-        <ng-icon name="tablerX" size="24" aria-hidden="true"></ng-icon>
+      <button type="button" class="close-btn" (click)="closeEventDetail()" aria-label="Close details">
+        <ng-icon name="tablerX" size="22" aria-hidden="true"></ng-icon>
       </button>
     </div>
 
     <div class="sidebar-body">
-      <div class="detail-time-box">
-        <ng-icon name="tablerClock" size="18" class="time-icon" aria-hidden="true"></ng-icon>
-        <div>
-          <span class="detail-time">{{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}</span>
+      <!-- Time Range Box -->
+      <div class="detail-card time-card">
+        <div class="card-icon-box">
+          <ng-icon name="tablerClock" size="20" class="card-icon" aria-hidden="true"></ng-icon>
+        </div>
+        <div class="card-content">
+          <span class="card-label">Time & Duration</span>
+          <span class="card-value">{{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}</span>
         </div>
       </div>
 
-      @if (selectedEvent()?.description) {
-      <div class="detail-description">
-        <h4>Description / Agenda</h4>
-        <p>{{ selectedEvent()?.description }}</p>
+      <!-- Organizer Card -->
+      <div class="detail-card organizer-card">
+        <div class="card-avatar">
+          @if (selectedEvent()?.organizer?.profile?.avatarPath) {
+            <img [src]="selectedEvent()!.organizer!.profile!.avatarPath" [alt]="getUserDisplayName(selectedEvent()?.organizer)" />
+          } @else {
+            <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
+          }
+        </div>
+        <div class="card-content">
+          <div class="organizer-header">
+            <span class="card-label">Organizer</span>
+            @if (isOrganizer(selectedEvent())) {
+              <span class="badge-self">You</span>
+            }
+          </div>
+          <span class="card-value">{{ getUserDisplayName(selectedEvent()?.organizer) }}</span>
+          <span class="card-sub">{{ selectedEvent()?.organizer?.email }}</span>
+        </div>
+      </div>
+
+      <!-- Description / Agenda -->
+      <div class="detail-section">
+        <h4 class="section-heading">Description / Agenda</h4>
+        @if (selectedEvent()?.description) {
+        <div class="description-box">
+          <p>{{ selectedEvent()?.description }}</p>
+        </div>
+        } @else {
+        <p class="empty-desc">No description provided for this event.</p>
+        }
+      </div>
+
+      <!-- RSVP Action for Invited Participant -->
+      @if (!isOrganizer(selectedEvent())) {
+      <div class="rsvp-action-card">
+        <div class="rsvp-header">
+          <span class="rsvp-title">Your Attendance</span>
+          <span
+            class="rsvp-current-status-badge"
+            [class.status-accepted]="getCurrentUserStatus(selectedEvent()) === 'ACCEPTED'"
+            [class.status-declined]="getCurrentUserStatus(selectedEvent()) === 'DECLINED'"
+            [class.status-pending]="getCurrentUserStatus(selectedEvent()) === 'PENDING'"
+          >
+            @if (getCurrentUserStatus(selectedEvent()) === 'ACCEPTED') {
+              ✓ Going
+            } @else if (getCurrentUserStatus(selectedEvent()) === 'DECLINED') {
+              ✕ Declined
+            } @else {
+              ? Awaiting Response
+            }
+          </span>
+        </div>
+
+        <p class="rsvp-prompt">Will you attend this meeting?</p>
+
+        <div class="rsvp-btn-group">
+          <button
+            type="button"
+            class="btn rsvp-btn btn-going"
+            [class.active]="getCurrentUserStatus(selectedEvent()) === 'ACCEPTED'"
+            (click)="submitAttendance('ACCEPTED')"
+            [disabled]="isSubmitting()"
+          >
+            <ng-icon name="tablerCheck" size="18" aria-hidden="true"></ng-icon>
+            <span>Going</span>
+          </button>
+
+          <button
+            type="button"
+            class="btn rsvp-btn btn-declined"
+            [class.active]="getCurrentUserStatus(selectedEvent()) === 'DECLINED'"
+            (click)="submitAttendance('DECLINED')"
+            [disabled]="isSubmitting()"
+          >
+            <ng-icon name="tablerX" size="18" aria-hidden="true"></ng-icon>
+            <span>Not Going</span>
+          </button>
+        </div>
       </div>
       }
+
+      <!-- Attendees List Section -->
+      <div class="detail-section attendees-detail-section">
+        <div class="section-title-row">
+          <h4 class="section-heading">
+            Attendees ({{ selectedEvent()?.participantDetails?.length || selectedEvent()?.participants?.length || 1 }})
+          </h4>
+        </div>
+
+        <div class="attendees-list">
+          <!-- Organizer in attendees list -->
+          <div class="attendee-item">
+            <div class="attendee-avatar">
+              @if (selectedEvent()?.organizer?.profile?.avatarPath) {
+                <img [src]="selectedEvent()!.organizer!.profile!.avatarPath" [alt]="getUserDisplayName(selectedEvent()?.organizer)" />
+              } @else {
+                <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
+              }
+            </div>
+            <div class="attendee-info">
+              <span class="attendee-name">
+                {{ getUserDisplayName(selectedEvent()?.organizer) }}
+                @if (isOrganizer(selectedEvent())) {
+                  <span class="you-tag">(You)</span>
+                }
+              </span>
+              <span class="attendee-sub">{{ selectedEvent()?.organizer?.email }}</span>
+            </div>
+            <div class="attendee-status">
+              <span class="badge-rsvp badge-accepted" title="Organizer (Accepted)">
+                Organizer
+              </span>
+            </div>
+          </div>
+
+          <!-- Other Participants -->
+          @if (selectedEvent()?.participantDetails && selectedEvent()!.participantDetails!.length > 0) {
+            @for (p of selectedEvent()!.participantDetails; track p.userId) {
+              @if (p.userId !== selectedEvent()?.userId) {
+              <div class="attendee-item">
+                <div class="attendee-avatar">
+                  @if (p.user?.profile?.avatarPath) {
+                    <img [src]="p.user.profile.avatarPath" [alt]="getUserDisplayName(p.user)" />
+                  } @else {
+                    <span>{{ getUserInitials(p.user) }}</span>
+                  }
+                </div>
+                <div class="attendee-info">
+                  <span class="attendee-name">
+                    {{ getUserDisplayName(p.user) }}
+                    @if (p.userId === currentUser()?.id) {
+                      <span class="you-tag">(You)</span>
+                    }
+                  </span>
+                  <span class="attendee-sub">{{ p.user?.email || p.user?.role }}</span>
+                </div>
+                <div class="attendee-status">
+                  <span
+                    class="badge-rsvp"
+                    [class.badge-accepted]="p.status === 'ACCEPTED'"
+                    [class.badge-declined]="p.status === 'DECLINED'"
+                    [class.badge-pending]="p.status === 'PENDING'"
+                  >
+                    @if (p.status === 'ACCEPTED') {
+                      Going
+                    } @else if (p.status === 'DECLINED') {
+                      Declined
+                    } @else {
+                      Pending
+                    }
+                  </span>
+                </div>
+              </div>
+              }
+            }
+          } @else if (selectedEvent()?.participants && selectedEvent()!.participants!.length > 0) {
+            @for (p of selectedEvent()!.participants; track p.id) {
+              @if (p.id !== selectedEvent()?.userId) {
+              <div class="attendee-item">
+                <div class="attendee-avatar">
+                  @if (p.profile?.avatarPath) {
+                    <img [src]="p.profile.avatarPath" [alt]="getUserDisplayName(p)" />
+                  } @else {
+                    <span>{{ getUserInitials(p) }}</span>
+                  }
+                </div>
+                <div class="attendee-info">
+                  <span class="attendee-name">
+                    {{ getUserDisplayName(p) }}
+                    @if (p.id === currentUser()?.id) {
+                      <span class="you-tag">(You)</span>
+                    }
+                  </span>
+                  <span class="attendee-sub">{{ p.email }}</span>
+                </div>
+                <div class="attendee-status">
+                  <span class="badge-rsvp badge-pending">
+                    Invited
+                  </span>
+                </div>
+              </div>
+              }
+            }
+          }
+        </div>
+      </div>
     </div>
 
     <div class="sidebar-footer">
-      <button type="button" class="btn btn-secondary" (click)="closeEventDetail()">Close</button>
+      <div class="footer-left">
+        @if (isOrganizer(selectedEvent())) {
+        <button
+          type="button"
+          class="btn btn-danger-outline"
+          (click)="deleteEvent(selectedEvent()!)"
+          [disabled]="isSubmitting()"
+        >
+          <ng-icon name="tablerTrash" size="16" aria-hidden="true"></ng-icon>
+          <span>Delete</span>
+        </button>
+        }
+      </div>
+
+      <div class="footer-right">
+        @if (isOrganizer(selectedEvent())) {
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="openEditSidebar(selectedEvent()!)"
+        >
+          <ng-icon name="tablerEdit" size="16" aria-hidden="true"></ng-icon>
+          <span>Edit Event</span>
+        </button>
+        }
+        <button type="button" class="btn btn-primary" (click)="closeEventDetail()">
+          Done
+        </button>
+      </div>
     </div>
   </div>
   }
