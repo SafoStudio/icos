@@ -2,6 +2,8 @@ package com.safo.icos.modules.calendar.application;
 
 import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.calendar.domain.model.Event;
+import com.safo.icos.modules.calendar.domain.model.EventParticipant;
+import com.safo.icos.modules.calendar.domain.model.enums.ParticipantStatus;
 import com.safo.icos.modules.calendar.domain.repository.EventRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +41,8 @@ class CalendarServiceTest {
 
     OffsetDateTime start = OffsetDateTime.now();
     OffsetDateTime end = start.plusHours(1);
-    List<UUID> participants = List.of(USER_ID, UUID.randomUUID()); // ← добавляем участников
+    UUID otherUserId = UUID.randomUUID();
+    List<UUID> participants = List.of(USER_ID, otherUserId);
 
     Event result = calendarService.createEvent(
             USER_ID,
@@ -54,7 +58,7 @@ class CalendarServiceTest {
     assertThat(result.getDescription()).isEqualTo("Tech interview");
     assertThat(result.getStartAt()).isEqualTo(start);
     assertThat(result.getEndAt()).isEqualTo(end);
-    assertThat(result.getParticipantIds()).containsExactlyInAnyOrderElementsOf(participants);
+    assertThat(result.getParticipantIds()).containsExactlyInAnyOrder(USER_ID, otherUserId);
 
     verify(eventRepository).save(any());
 
@@ -117,12 +121,12 @@ class CalendarServiceTest {
     Event event1 = Event.builder()
             .id(UUID.randomUUID()).userId(USER_ID)
             .title("Event 1").startAt(start.plusDays(1)).endAt(start.plusDays(1).plusHours(1))
-            .participantIds(List.of(USER_ID))
+            .participants(List.of(EventParticipant.builder().userId(USER_ID).status(ParticipantStatus.ACCEPTED).build()))
             .build();
     Event event2 = Event.builder()
             .id(UUID.randomUUID()).userId(USER_ID)
             .title("Event 2").startAt(start.plusDays(3)).endAt(start.plusDays(3).plusHours(2))
-            .participantIds(List.of(USER_ID))
+            .participants(List.of(EventParticipant.builder().userId(USER_ID).status(ParticipantStatus.ACCEPTED).build()))
             .build();
 
     when(eventRepository.findByUserIdAndDateRange(USER_ID, start, end))
@@ -132,5 +136,32 @@ class CalendarServiceTest {
 
     assertThat(events).hasSize(2);
     assertThat(events).extracting(Event::getTitle).containsExactly("Event 1", "Event 2");
+  }
+
+  @Test
+  void shouldUpdateAttendanceStatus() {
+    Event existing = Event.builder()
+            .id(EVENT_ID)
+            .userId(USER_ID)
+            .title("Team Standup")
+            .startAt(OffsetDateTime.now())
+            .endAt(OffsetDateTime.now().plusHours(1))
+            .participants(List.of(
+                    EventParticipant.builder().userId(USER_ID).status(ParticipantStatus.ACCEPTED).build(),
+                    EventParticipant.builder().userId(UUID.fromString("00000000-0000-0000-0000-000000000002")).status(ParticipantStatus.PENDING).build()
+            ))
+            .build();
+
+    when(eventRepository.findById(EVENT_ID)).thenReturn(Optional.of(existing));
+    when(eventRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    UUID attendeeId = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    Event updated = calendarService.updateAttendance(attendeeId, EVENT_ID, ParticipantStatus.ACCEPTED);
+
+    EventParticipant participant = updated.getParticipants().stream()
+            .filter(p -> p.getUserId().equals(attendeeId))
+            .findFirst()
+            .orElseThrow();
+    assertThat(participant.getStatus()).isEqualTo(ParticipantStatus.ACCEPTED);
   }
 }
