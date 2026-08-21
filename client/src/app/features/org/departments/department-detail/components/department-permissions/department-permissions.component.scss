@@ -11,10 +11,8 @@
   th {
     text-align: left;
     padding: 10px 12px;
-    background: #f8f9fa;
     font-weight: 600;
     color: #495057;
-    border-bottom: 2px solid #e9ecef;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -27,7 +25,6 @@
 
   td {
     padding: 8px 12px;
-    border-bottom: 1px solid #f1f3f5;
     font-size: 14px;
 
     &.center {
@@ -50,7 +47,6 @@
       align-items: center;
       justify-content: space-between;
       padding: 8px 12px;
-      background: #f5f6f8;
       border-bottom: 2px solid #e9ecef;
       border-top: 2px solid #e9ecef;
       font-weight: 600;

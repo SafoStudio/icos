@@ -73,7 +73,8 @@ export class SidebarComponent {
     { label: 'Recruitment', icon: 'tablerBriefcase', route: '/recruitment' },
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
-    { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' }
+    { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
+    { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
   ];
 
   toggleSidebar(): void {

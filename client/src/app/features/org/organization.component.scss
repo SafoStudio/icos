@@ -33,18 +33,21 @@
 
   .subtitle {
     margin: 0;
-    color: #6c757d;
+    color: var(--text-secondary, #6c757d);
     font-size: 16px;
     font-weight: 400;
   }
 }
 
 .detail-container {
-  background: white;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.08));
   padding: 24px;
+  color: var(--text-primary, #0f172a);
 }
+
 
 @media (max-width: 768px) {
   .organization-page {

@@ -1,12 +1,15 @@
 .tabs-container {
-  background: white;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.05));
 }
 
 .tabs-header {
   display: flex;
-  background: #f8f9fa;
-  border-bottom: 2px solid #e9ecef;
+  background: var(--bg-secondary, #f8f9fa);
+  border-bottom: 2px solid var(--border-color, #e9ecef);
   gap: 4px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -22,12 +25,12 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #667eea;
+    background: var(--accent-indigo, #667eea);
     border-radius: 2px;
   }
 
   scrollbar-width: thin;
-  scrollbar-color: #667eea transparent;
+  scrollbar-color: var(--accent-indigo, #667eea) transparent;
 }
 
 .tab-btn {
@@ -38,7 +41,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #6c757d;
+  color: var(--text-secondary, #6c757d);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -48,12 +51,12 @@
   flex-shrink: 0;
 
   &:hover:not(.disabled) {
-    color: #495057;
-    background: rgba(102, 126, 234, 0.05);
+    color: var(--text-primary, #495057);
+    background: var(--bg-surface-hover, rgba(102, 126, 234, 0.05));
   }
 
   &.active {
-    color: #667eea;
+    color: var(--accent-indigo, #667eea);
     font-weight: 600;
   }
 
@@ -67,7 +70,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid #667eea;
+    outline: 2px solid var(--accent-indigo, #667eea);
     outline-offset: -2px;
     border-radius: 4px;
   }
@@ -88,27 +91,28 @@
   min-height: auto;
   overflow-y: auto;
   max-height: calc(100vh - 300px);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #0f172a);
 
   &::-webkit-scrollbar {
     width: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #c1c7cd;
+    background: var(--border-color, #c1c7cd);
     border-radius: 3px;
 
     &:hover {
-      background: #a8afb6;
+      background: var(--text-muted, #a8afb6);
     }
   }
 
   scrollbar-width: thin;
-  scrollbar-color: #c1c7cd #f1f1f1;
+  scrollbar-color: var(--border-color, #c1c7cd) transparent;
 }
 
 @media (max-width: 768px) {
@@ -127,7 +131,7 @@
       top: 0;
       width: 20px;
       height: 100%;
-      background: linear-gradient(to right, transparent, #f8f9fa);
+      background: linear-gradient(to right, transparent, var(--bg-secondary, #f8f9fa));
       pointer-events: none;
       flex-shrink: 0;
     }
