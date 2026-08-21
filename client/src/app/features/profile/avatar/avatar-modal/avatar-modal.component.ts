@@ -7,11 +7,15 @@ import {
   ViewChild,
   inject,
   signal,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
   AfterViewInit,
   OnDestroy,
   HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { AvatarService } from '../avatar.service';
@@ -24,7 +28,7 @@ import { ToastService } from '@services';
   templateUrl: './avatar-modal.component.html',
   styleUrls: ['./avatar-modal.component.scss']
 })
-export class AvatarModalComponent implements AfterViewInit, OnDestroy {
+export class AvatarModalComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input({ required: true }) userId!: string;
   @Input() hasExistingAvatar = false;
   @Input() currentAvatarUrl: string | null = null;
@@ -38,6 +42,7 @@ export class AvatarModalComponent implements AfterViewInit, OnDestroy {
 
   private readonly avatarService = inject(AvatarService);
   private readonly toastService = inject(ToastService);
+  private readonly http = inject(HttpClient);
 
   readonly selectedFile = signal<File | null>(null);
   readonly imageLoaded = signal<boolean>(false);
@@ -57,8 +62,60 @@ export class AvatarModalComponent implements AfterViewInit, OnDestroy {
   private startPanY = 0;
   private animFrameId: number | null = null;
 
+  ngOnInit() {
+    if (this.hasExistingAvatar && this.currentAvatarUrl) {
+      this.loadExistingAvatar(this.currentAvatarUrl);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['currentAvatarUrl'] && !changes['currentAvatarUrl'].firstChange && this.hasExistingAvatar && this.currentAvatarUrl) {
+      this.loadExistingAvatar(this.currentAvatarUrl);
+    }
+  }
+
+  private loadExistingAvatar(url: string) {
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            this.sourceImage = img;
+            this.resetControls();
+            this.imageLoaded.set(true);
+            this.scheduleDraw();
+          };
+          img.src = e.target?.result as string;
+        };
+        reader.readAsDataURL(blob);
+      },
+      error: (err) => {
+        console.warn('Could not load avatar as blob, trying direct image url', err);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          this.sourceImage = img;
+          this.resetControls();
+          this.imageLoaded.set(true);
+          this.scheduleDraw();
+        };
+        img.onerror = () => {
+          this.imageLoaded.set(false);
+        };
+        img.src = url;
+      }
+    });
+  }
+
+  private scheduleDraw() {
+    setTimeout(() => this.drawPreview(), 30);
+  }
+
   ngAfterViewInit() {
-    // View initialized
+    if (this.imageLoaded()) {
+      this.drawPreview();
+    }
   }
 
   ngOnDestroy() {
@@ -114,7 +171,7 @@ export class AvatarModalComponent implements AfterViewInit, OnDestroy {
         this.sourceImage = img;
         this.resetControls();
         this.imageLoaded.set(true);
-        setTimeout(() => this.drawPreview(), 50);
+        this.scheduleDraw();
       };
       img.src = e.target?.result as string;
     };
@@ -139,6 +196,7 @@ export class AvatarModalComponent implements AfterViewInit, OnDestroy {
     this.zoomLevel.set(newZoom);
     this.drawPreview();
   }
+
 
   zoomOut() {
     const newZoom = Math.max(0.5, Number((this.zoomLevel() - 0.1).toFixed(2)));
@@ -202,10 +260,16 @@ export class AvatarModalComponent implements AfterViewInit, OnDestroy {
   }
 
   drawPreview() {
-    if (!this.cropCanvasRef || !this.sourceImage) return;
+    if (!this.cropCanvasRef?.nativeElement || !this.sourceImage) {
+      if (this.imageLoaded() && this.sourceImage) {
+        requestAnimationFrame(() => this.drawPreview());
+      }
+      return;
+    }
     const canvas = this.cropCanvasRef.nativeElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
 
     const size = canvas.width; // 300px viewport size
     ctx.clearRect(0, 0, size, size);

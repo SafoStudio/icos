@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ThemeService } from '@services';
+import { AvatarService } from '@features/profile/avatar/avatar.service';
 
 interface MainLink {
   label: string;
@@ -27,6 +28,7 @@ interface MenuItem {
 export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly avatarService = inject(AvatarService);
   readonly themeService = inject(ThemeService);
 
   private readonly isCollapsedSignal = signal(true);
@@ -52,13 +54,7 @@ export class SidebarComponent {
 
   userAvatarUrl = computed(() => {
     const user = this.authService.currentUser();
-    if (user?.profile?.avatarPath) {
-      if (user.profile.avatarPath.startsWith('http')) {
-        return user.profile.avatarPath;
-      }
-      return `/api/storage/avatar/${user.id}`;
-    }
-    return null;
+    return this.avatarService.getAvatarUrl(user?.id, user?.profile?.avatarPath);
   });
 
   hasAvatar = computed(() => {
@@ -74,11 +70,10 @@ export class SidebarComponent {
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
     { label: 'Calendar', icon: 'tablerCalendarClock', route: '/calendar' },
-    { label: 'Recruitment (Vertical)', icon: 'tablerBriefcase', route: '/recruitment' },
-    { label: 'Tasks (Horizontal)', icon: 'tablerClipboardList', route: '/tasks' },
+    { label: 'Recruitment', icon: 'tablerBriefcase', route: '/recruitment' },
+    { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
-    { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
-    { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
+    { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' }
   ];
 
   toggleSidebar(): void {
@@ -99,8 +94,9 @@ export class SidebarComponent {
   }
 
   isActive(route: string): boolean {
-    return this.router.url.includes(route);
+    return this.router.url === route || this.router.url.startsWith(route + '/') || this.router.url.startsWith(route + '?');
   }
+
 
   toggleTheme(): void {
     this.themeService.toggleTheme();

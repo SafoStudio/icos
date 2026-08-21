@@ -63,6 +63,7 @@ export class ProfileComponent implements OnInit {
     this.profileService.getMe().subscribe({
       next: (user) => {
         this.user.set(user);
+        this.authService.refreshUser();
         this.loading.set(false);
       },
       error: (error) => {
@@ -72,6 +73,7 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
+
 
   startEdit() {
     const user = this.user();
