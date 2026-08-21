@@ -7,6 +7,8 @@ export interface MembersState {
   selectedDepartmentFilter: string;
   selectedRoleFilter: string;
   sortBy: SortOption;
+  currentPage: number;
+  pageSize: number;
 }
 
 @Injectable({
@@ -18,7 +20,9 @@ export class MembersStateService {
     searchQuery: '',
     selectedDepartmentFilter: '',
     selectedRoleFilter: '',
-    sortBy: 'name-asc'
+    sortBy: 'name-asc',
+    currentPage: 1,
+    pageSize: 12
   });
 
   getState() {
@@ -45,13 +49,24 @@ export class MembersStateService {
     this.state.update(s => ({ ...s, sortBy: sort }));
   }
 
+  setCurrentPage(page: number): void {
+    this.state.update(s => ({ ...s, currentPage: page }));
+  }
+
+  setPageSize(pageSize: number): void {
+    this.state.update(s => ({ ...s, pageSize }));
+  }
+
   resetState(): void {
     this.state.set({
       viewMode: 'grid',
       searchQuery: '',
       selectedDepartmentFilter: '',
       selectedRoleFilter: '',
-      sortBy: 'name-asc'
+      sortBy: 'name-asc',
+      currentPage: 1,
+      pageSize: 12
     });
   }
 }
+

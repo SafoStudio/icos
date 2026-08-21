@@ -1,11 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100%;
+}
+
 .members-container {
   padding: 24px 32px;
   color: #1e293b;
   min-height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
+
+app-pagination {
+  margin-top: auto;
+  display: block;
+}
+
 
 .header {
   display: flex;

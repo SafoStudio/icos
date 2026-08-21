@@ -39,15 +39,15 @@
         id="search-input"
         type="text"
         [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
+        (ngModelChange)="searchQuery.set($event); currentPage.set(1)"
         placeholder="Search member by name or email..."
         (keydown.enter)="$event.preventDefault()"
       />
       @if (searchQuery()) {
       <button class="btn-clear-search"
-              (click)="searchQuery.set('')"
-              (keydown.enter)="searchQuery.set('')"
-              (keydown.space)="searchQuery.set('')"
+              (click)="searchQuery.set(''); currentPage.set(1)"
+              (keydown.enter)="searchQuery.set(''); currentPage.set(1)"
+              (keydown.space)="searchQuery.set(''); currentPage.set(1)"
               aria-label="Clear search">
         <ng-icon name="tablerX" size="16"></ng-icon>
       </button>
@@ -61,7 +61,7 @@
         <select
           id="department-filter"
           [ngModel]="selectedDepartmentFilter()"
-          (ngModelChange)="selectedDepartmentFilter.set($event)"
+          (ngModelChange)="selectedDepartmentFilter.set($event); currentPage.set(1)"
           (keydown.enter)="$event.preventDefault()"
         >
           <option value="">All Departments</option>
@@ -78,7 +78,7 @@
         <select
           id="role-filter"
           [ngModel]="selectedRoleFilter()"
-          (ngModelChange)="selectedRoleFilter.set($event)"
+          (ngModelChange)="selectedRoleFilter.set($event); currentPage.set(1)"
           (keydown.enter)="$event.preventDefault()"
         >
           <option value="">All Roles</option>
@@ -94,7 +94,7 @@
         <select
           id="sort-select"
           [ngModel]="sortBy()"
-          (ngModelChange)="sortBy.set($event)"
+          (ngModelChange)="sortBy.set($event); currentPage.set(1)"
           (keydown.enter)="$event.preventDefault()"
         >
           <option value="name-asc">Sort: Name (A – Z)</option>
@@ -185,7 +185,7 @@
   <!-- GRID VIEW -->
   @if (viewMode() === 'grid') {
   <ul class="members-grid" aria-label="Members in grid view">
-    @for (member of filteredMembers(); track member.id) {
+    @for (member of paginatedMembers(); track member.id) {
     <li class="member-card">
       <button class="card-button"
               (click)="onMemberClick(member)"
@@ -245,7 +245,7 @@
       </tr>
       </thead>
       <tbody>
-      @for (member of filteredMembers(); track member.id) {
+      @for (member of paginatedMembers(); track member.id) {
       <tr class="clickable-row">
         <td colspan="5" class="clickable-cell">
           <button class="row-button"
@@ -284,6 +284,16 @@
     </table>
   </div>
   }
+
+  <!-- PAGINATION -->
+  <app-pagination
+    [currentPage]="currentPage()"
+    [totalItems]="filteredMembers().length"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="pageSizeOptions"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
   }
   }
 
@@ -301,3 +311,4 @@
   ></app-member-invite>
   }
 </div>
+

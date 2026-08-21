@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService, ToastService } from '@services';
 import { NgIconComponent } from '@ng-icons/core';
+import { PaginationComponent } from '@components';
 import { MemberInviteComponent } from './member-invite/member-invite.component';
 import { MemberService, Member } from './member.service';
 import { MembersStateService } from './members-state.service';
@@ -20,6 +21,7 @@ export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
     ReactiveFormsModule,
     FormsModule,
     NgIconComponent,
+    PaginationComponent,
     MemberInviteComponent
   ],
   templateUrl: './members.component.html',
@@ -41,6 +43,9 @@ export class MembersComponent implements OnInit {
   selectedDepartmentFilter = signal<string>('');
   selectedRoleFilter = signal<string>('');
   sortBy = signal<SortOption>('name-asc');
+  currentPage = signal<number>(1);
+  pageSize = signal<number>(12);
+  readonly pageSizeOptions = [6, 12, 24, 48];
 
   showInviteModal = signal(false);
   isInviting = signal(false);
@@ -54,6 +59,8 @@ export class MembersComponent implements OnInit {
     this.selectedDepartmentFilter.set(savedState().selectedDepartmentFilter);
     this.selectedRoleFilter.set(savedState().selectedRoleFilter);
     this.sortBy.set(savedState().sortBy);
+    this.currentPage.set(savedState().currentPage || 1);
+    this.pageSize.set(savedState().pageSize || 12);
 
     effect(() => {
       this.stateService.setViewMode(this.viewMode());
@@ -73,6 +80,22 @@ export class MembersComponent implements OnInit {
 
     effect(() => {
       this.stateService.setSortBy(this.sortBy());
+    });
+
+    effect(() => {
+      this.stateService.setCurrentPage(this.currentPage());
+    });
+
+    effect(() => {
+      this.stateService.setPageSize(this.pageSize());
+    });
+
+    // Keep currentPage in valid bounds when filtered list changes
+    effect(() => {
+      const totalPages = Math.max(1, Math.ceil(this.filteredMembers().length / this.pageSize()));
+      if (this.currentPage() > totalPages) {
+        this.currentPage.set(totalPages);
+      }
     });
   }
 
@@ -97,8 +120,17 @@ export class MembersComponent implements OnInit {
     return this.applySorting(list);
   });
 
+  paginatedMembers = computed(() => {
+    const list = this.filteredMembers();
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return list.slice(start, start + size);
+  });
+
   totalCount = computed(() => this.members().length);
   activeCount = computed(() => this.members().filter(m => m.status === 'ACTIVE' || !m.status).length);
+
 
   ngOnInit(): void {
     this.loadData();
@@ -202,7 +234,18 @@ export class MembersComponent implements OnInit {
     this.selectedDepartmentFilter.set('');
     this.selectedRoleFilter.set('');
     this.sortBy.set('name-asc');
+    this.currentPage.set(1);
   }
+
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+  }
+
 
   navigateToProfile(memberId: string): void {
     this.router.navigate(['/members', memberId], {
