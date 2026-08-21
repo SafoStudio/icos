@@ -70,9 +70,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background 0.15s ease, color 0.15s ease;
 
         &:hover {
-          background: var(--sidebar-hover, rgba(51, 65, 85, 0.5));
+          background: var(--bg-surface-hover, rgba(51, 65, 85, 0.5));
           color: var(--text-primary, #fff);
         }
       }
@@ -205,7 +206,6 @@
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  transition: background 0.15s ease;
   overflow: hidden;
   background: transparent;
   border-left: none;
@@ -222,8 +222,8 @@
   }
 
   &.other-month {
-    opacity: 0.35;
-    background: rgba(0, 0, 0, 0.05);
+    opacity: 0.4;
+    background: rgba(0, 0, 0, 0.04);
   }
 
   &.is-today {
@@ -344,7 +344,7 @@
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--modal-backdrop, rgba(0, 0, 0, 0.6));
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   z-index: 999;
@@ -366,7 +366,7 @@
   height: 100vh;
   background: var(--modal-bg, #1e293b);
   border-left: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg, -10px 0 40px rgba(0, 0, 0, 0.5));
   z-index: 1000;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -470,6 +470,7 @@
         outline: none;
         width: 100%;
         box-sizing: border-box;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
         &:focus {
           border-color: var(--accent-indigo, #6366f1);
@@ -489,7 +490,7 @@
 
     /* Attendees Section in Create/Edit */
     .attendees-section {
-      background: rgba(15, 23, 42, 0.4);
+      background: var(--bg-surface-hover, rgba(15, 23, 42, 0.4));
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
       border-radius: 12px;
       padding: 1rem;
@@ -522,8 +523,8 @@
           font-size: 0.75rem;
           font-weight: 600;
           padding: 0.2rem 0.55rem;
-          background: rgba(99, 102, 241, 0.2);
-          color: var(--accent-indigo, #a5b4fc);
+          background: rgba(99, 102, 241, 0.15);
+          color: var(--accent-indigo, #818cf8);
           border-radius: 999px;
         }
       }
@@ -546,8 +547,8 @@
           color: var(--text-primary, #f8fafc);
 
           .chip-avatar {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: #4f46e5;
             color: #fff;
@@ -557,6 +558,7 @@
             font-size: 0.65rem;
             font-weight: 700;
             overflow: hidden;
+            flex-shrink: 0;
 
             img {
               width: 100%;
@@ -669,17 +671,17 @@
           justify-content: space-between;
           padding: 0.45rem 0.65rem;
           border-radius: 8px;
-          background: rgba(30, 41, 59, 0.4);
+          background: var(--bg-surface, rgba(30, 41, 59, 0.4));
+          border: 1px solid var(--border-color, transparent);
           cursor: pointer;
-          transition: background 0.15s ease;
 
           &:hover {
-            background: rgba(51, 65, 85, 0.5);
+            background: var(--bg-surface-hover, rgba(51, 65, 85, 0.5));
           }
 
           &.selected {
             background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.35);
           }
 
           .member-info-col {
@@ -754,7 +756,7 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      background: var(--bg-surface, rgba(15, 23, 42, 0.5));
+      background: var(--bg-surface-hover, rgba(15, 23, 42, 0.5));
       padding: 0.85rem 1.1rem;
       border-radius: 12px;
       border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
@@ -815,7 +817,7 @@
           font-size: 0.65rem;
           padding: 0.1rem 0.35rem;
           background: rgba(99, 102, 241, 0.2);
-          color: var(--accent-indigo, #a5b4fc);
+          color: var(--accent-indigo, #818cf8);
           border-radius: 4px;
           font-weight: 700;
         }
@@ -848,7 +850,7 @@
       }
 
       .description-box {
-        background: rgba(15, 23, 42, 0.4);
+        background: var(--bg-surface-hover, rgba(15, 23, 42, 0.4));
         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
         border-radius: 10px;
         padding: 0.85rem 1rem;
@@ -890,7 +892,7 @@
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: var(--accent-indigo, #a5b4fc);
+          color: var(--accent-indigo, #818cf8);
         }
 
         .rsvp-current-status-badge {
@@ -1002,7 +1004,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 0.5rem 0.75rem;
-          background: rgba(15, 23, 42, 0.4);
+          background: var(--bg-surface-hover, rgba(15, 23, 42, 0.4));
           border: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
           border-radius: 8px;
 
@@ -1128,6 +1130,355 @@
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   display: inline-block;
+}
+
+/* Light Theme Explicit Enhancements */
+:host-context(body.light-theme),
+:host-context([data-theme='light']) {
+  .calendar-container {
+    background: #f8fafc;
+    color: #0f172a;
+  }
+
+  .calendar-header {
+    .title-badge {
+      background: rgba(79, 70, 229, 0.08);
+      color: #4f46e5;
+      border-color: rgba(79, 70, 229, 0.2);
+    }
+    .header-subtitle {
+      color: #64748b;
+    }
+    .month-nav-group {
+      background: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+      .btn-nav {
+        color: #64748b;
+        &:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+        }
+      }
+      .month-display {
+        color: #0f172a;
+      }
+    }
+  }
+
+  .btn {
+    &.btn-secondary {
+      background: #ffffff;
+      color: #1e293b;
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+      &:hover:not(:disabled) {
+        background: #f8fafc;
+        border-color: #94a3b8;
+      }
+    }
+
+    &.btn-danger-outline {
+      background: #ffffff;
+      color: #dc2626;
+      border-color: #fca5a5;
+
+      &:hover:not(:disabled) {
+        background: #fef2f2;
+        border-color: #ef4444;
+      }
+    }
+  }
+
+  .calendar-grid-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+
+  .weekday-header-row {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+
+    .weekday-cell {
+      color: #64748b;
+    }
+  }
+
+  .day-cell {
+    border-right-color: #f1f5f9;
+    border-bottom-color: #f1f5f9;
+
+    &:hover {
+      background: #f8fafc;
+    }
+
+    &.other-month {
+      opacity: 0.45;
+      background: #fbfcfe;
+    }
+
+    &.is-today {
+      background: rgba(79, 70, 229, 0.04);
+    }
+
+    .cell-top .day-number {
+      color: #64748b;
+
+      &.today-pill {
+        background: #4f46e5;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
+      }
+    }
+  }
+
+  .event-pill {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    border-left-color: #4f46e5;
+    color: #1e293b;
+
+    .event-time {
+      color: #4338ca;
+    }
+
+    .event-attendees-badge {
+      background: rgba(79, 70, 229, 0.08);
+      color: #4f46e5;
+    }
+
+    &.rsvp-accepted {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      border-left-color: #059669;
+      .event-time { color: #047857; }
+    }
+
+    &.rsvp-declined {
+      background: #fef2f2;
+      border-color: #fecaca;
+      border-left-color: #dc2626;
+      .event-time { color: #b91c1c; }
+    }
+
+    &.rsvp-pending {
+      background: #fffbeb;
+      border-color: #fde68a;
+      border-left-color: #d97706;
+      .event-time { color: #b45309; }
+    }
+  }
+
+  .sidebar {
+    background: #ffffff;
+    border-left-color: #e2e8f0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+
+    .sidebar-header {
+      border-bottom-color: #f1f5f9;
+
+      h2 {
+        color: #0f172a;
+      }
+      .sidebar-subtitle {
+        color: #64748b;
+      }
+      .close-btn {
+        color: #64748b;
+        &:hover { color: #0f172a; }
+      }
+      .subtitle-date {
+        color: #4f46e5;
+      }
+    }
+
+    .sidebar-body {
+      .form-group {
+        label {
+          color: #334155;
+        }
+
+        input, textarea {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+
+          &:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+          }
+
+          &::placeholder {
+            color: #94a3b8;
+          }
+        }
+      }
+
+      .attendees-section {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+
+        .section-title-row {
+          .title-with-icon {
+            .section-icon { color: #4f46e5; }
+            .section-label { color: #0f172a; }
+          }
+          .selected-count-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+          }
+        }
+
+        .selected-chips-container .member-chip {
+          background: #e0e7ff;
+          border-color: #c7d2fe;
+          color: #3730a3;
+
+          .chip-remove-btn {
+            color: #6366f1;
+            &:hover { color: #dc2626; }
+          }
+        }
+
+        .member-search-box .search-input {
+          background: #ffffff;
+          border-color: #cbd5e1;
+          color: #0f172a;
+
+          &:focus {
+            border-color: #4f46e5;
+          }
+        }
+
+        .members-picker-list .member-picker-item {
+          background: #ffffff;
+          border-color: #e2e8f0;
+
+          &:hover {
+            background: #f1f5f9;
+          }
+
+          &.selected {
+            background: #e0e7ff;
+            border-color: #818cf8;
+          }
+
+          .member-info-col .picker-text {
+            .picker-name { color: #0f172a; }
+            .picker-sub { color: #64748b; }
+          }
+        }
+      }
+
+      .detail-card {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+
+        .card-icon-box {
+          background: #e0e7ff;
+          color: #4f46e5;
+        }
+
+        .card-content {
+          .card-label { color: #64748b; }
+          .card-value { color: #0f172a; }
+          .card-sub { color: #475569; }
+          .badge-self {
+            background: #e0e7ff;
+            color: #4338ca;
+          }
+        }
+      }
+
+      .detail-section {
+        .section-heading { color: #64748b; }
+        .description-box {
+          background: #f8fafc;
+          border-color: #e2e8f0;
+          p { color: #1e293b; }
+        }
+      }
+
+      .rsvp-action-card {
+        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+        border-color: #c7d2fe;
+
+        .rsvp-header .rsvp-title {
+          color: #4338ca;
+        }
+
+        .rsvp-prompt {
+          color: #0f172a;
+        }
+
+        .rsvp-btn-group .rsvp-btn {
+          &.btn-going {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+
+            &:hover { background: #d1fae5; }
+            &.active {
+              background: #059669;
+              color: #ffffff;
+              border-color: #059669;
+            }
+          }
+
+          &.btn-declined {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
+
+            &:hover { background: #fee2e2; }
+            &.active {
+              background: #dc2626;
+              color: #ffffff;
+              border-color: #dc2626;
+            }
+          }
+        }
+      }
+
+      .attendees-detail-section .attendees-list .attendee-item {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+
+        .attendee-info {
+          .attendee-name {
+            color: #0f172a;
+            .you-tag { color: #4f46e5; }
+          }
+          .attendee-sub { color: #64748b; }
+        }
+
+        .attendee-status .badge-rsvp {
+          &.badge-accepted {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+          }
+          &.badge-declined {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
+          }
+          &.badge-pending {
+            background: #fffbeb;
+            color: #d97706;
+            border-color: #fde68a;
+          }
+        }
+      }
+    }
+
+    .sidebar-footer {
+      border-top-color: #f1f5f9;
+    }
+  }
 }
 
 @media (max-width: 768px) {

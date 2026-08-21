@@ -152,8 +152,8 @@
           @for (member of selectedMembersList(); track member.id) {
           <div class="member-chip">
             <div class="chip-avatar">
-              @if (member.profile?.avatarPath) {
-                <img [src]="member.profile.avatarPath" [alt]="getUserDisplayName(member)" />
+              @if (getUserAvatarUrl(member)) {
+                <img [src]="getUserAvatarUrl(member)" [alt]="getUserDisplayName(member)" (error)="$any($event.target).style.display='none'" />
               } @else {
                 <span>{{ getUserInitials(member) }}</span>
               }
@@ -201,8 +201,8 @@
           >
             <div class="member-info-col">
               <div class="picker-avatar">
-                @if (member.profile?.avatarPath) {
-                  <img [src]="member.profile.avatarPath" [alt]="getUserDisplayName(member)" />
+                @if (getUserAvatarUrl(member)) {
+                  <img [src]="getUserAvatarUrl(member)" [alt]="getUserDisplayName(member)" (error)="$any($event.target).style.display='none'" />
                 } @else {
                   <span>{{ getUserInitials(member) }}</span>
                 }
@@ -287,8 +287,8 @@
       <!-- Organizer Card -->
       <div class="detail-card organizer-card">
         <div class="card-avatar">
-          @if (selectedEvent()?.organizer?.profile?.avatarPath) {
-            <img [src]="selectedEvent()!.organizer!.profile!.avatarPath" [alt]="getUserDisplayName(selectedEvent()?.organizer)" />
+          @if (getUserAvatarUrl(selectedEvent()?.organizer)) {
+            <img [src]="getUserAvatarUrl(selectedEvent()?.organizer)" [alt]="getUserDisplayName(selectedEvent()?.organizer)" (error)="$any($event.target).style.display='none'" />
           } @else {
             <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
           }
@@ -378,8 +378,8 @@
           <!-- Organizer in attendees list -->
           <div class="attendee-item">
             <div class="attendee-avatar">
-              @if (selectedEvent()?.organizer?.profile?.avatarPath) {
-                <img [src]="selectedEvent()!.organizer!.profile!.avatarPath" [alt]="getUserDisplayName(selectedEvent()?.organizer)" />
+              @if (getUserAvatarUrl(selectedEvent()?.organizer)) {
+                <img [src]="getUserAvatarUrl(selectedEvent()?.organizer)" [alt]="getUserDisplayName(selectedEvent()?.organizer)" (error)="$any($event.target).style.display='none'" />
               } @else {
                 <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
               }
@@ -406,8 +406,8 @@
               @if (p.userId !== selectedEvent()?.userId) {
               <div class="attendee-item">
                 <div class="attendee-avatar">
-                  @if (p.user?.profile?.avatarPath) {
-                    <img [src]="p.user.profile.avatarPath" [alt]="getUserDisplayName(p.user)" />
+                  @if (getUserAvatarUrl(p.user)) {
+                    <img [src]="getUserAvatarUrl(p.user)" [alt]="getUserDisplayName(p.user)" (error)="$any($event.target).style.display='none'" />
                   } @else {
                     <span>{{ getUserInitials(p.user) }}</span>
                   }
@@ -445,8 +445,8 @@
               @if (p.id !== selectedEvent()?.userId) {
               <div class="attendee-item">
                 <div class="attendee-avatar">
-                  @if (p.profile?.avatarPath) {
-                    <img [src]="p.profile.avatarPath" [alt]="getUserDisplayName(p)" />
+                  @if (getUserAvatarUrl(p)) {
+                    <img [src]="getUserAvatarUrl(p)" [alt]="getUserDisplayName(p)" (error)="$any($event.target).style.display='none'" />
                   } @else {
                     <span>{{ getUserInitials(p) }}</span>
                   }

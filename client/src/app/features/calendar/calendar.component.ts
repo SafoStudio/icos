@@ -272,7 +272,7 @@ export class CalendarComponent implements OnInit {
   }
 
   submitEventForm(): void {
-    if (!this.eventForm.title?.trim()) {
+    if (!this.eventForm.title || !this.eventForm.title.trim()) {
       this.toast.error('Event title is required');
       return;
     }
@@ -420,6 +420,17 @@ export class CalendarComponent implements OnInit {
       if (match) return match.status;
     }
     return 'PENDING';
+  }
+
+  getUserAvatarUrl(user?: CalendarParticipant | { id?: string; profile?: { avatarPath?: string } } | null): string | null {
+    if (!user?.profile?.avatarPath) return null;
+    if (user.profile.avatarPath.startsWith('http')) {
+      return user.profile.avatarPath;
+    }
+    if (user.id) {
+      return `/api/storage/avatar/${user.id}`;
+    }
+    return null;
   }
 
   getUserInitials(nameOrUser?: CalendarParticipant | { firstName?: string; lastName?: string; email?: string } | null): string {
