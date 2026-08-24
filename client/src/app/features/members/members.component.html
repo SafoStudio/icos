@@ -195,32 +195,23 @@
               [style.background-color]="getAvatarUrl(member) ? 'transparent' : '#e0e7ff'"
               [attr.aria-label]="'View profile of ' + member.firstName + ' ' + member.lastName">
         <div class="card-overlay">
-          <div class="card-top">
-            <output class="badge badge-status"
-                    [class]="'status-' + (member.status ? member.status.toLowerCase() : 'active')"
-                    [attr.aria-label]="'Status: ' + (member.status || 'ACTIVE')">
-              {{ member.status || 'ACTIVE' }}
-            </output>
+
+          <div class="card-top-right">
+          <span class="badge badge-role"
+                [class]="'role-' + member.role.toLowerCase()"
+                [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
+            {{ getRoleLabel(member.role) }}
+          </span>
+
+            <span class="tag-dept"
+                  [attr.aria-label]="'Department: ' + member.departmentName">
+            {{ member.departmentName }}
+          </span>
           </div>
-          <div class="card-info">
-            <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
-            <p class="member-email">{{ member.email }}</p>
-            <div class="card-tags">
-            <span class="badge badge-role"
-                  [class]="'role-' + member.role.toLowerCase()"
-                  [attr.aria-label]="'Role: ' + getRoleLabel(member.role)">
-              {{ getRoleLabel(member.role) }}
-            </span>
-              <span class="tag-dept"
-                    [attr.aria-label]="'Department: ' + member.departmentName">
-              <ng-icon name="tablerBuilding" size="14"></ng-icon>
-              {{ member.departmentName }}
-            </span>
-            </div>
-          </div>
-          <div class="card-footer">
+
+          <div class="card-bottom">
           <span class="btn-profile-link">
-            <span>View Profile</span>
+            <span class="profile-name">{{ member.firstName }} {{ member.lastName }}</span>
             <ng-icon name="tablerChevronRight" size="16"></ng-icon>
           </span>
           </div>

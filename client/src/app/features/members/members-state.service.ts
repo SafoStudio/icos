@@ -16,7 +16,7 @@ export interface MembersState {
 })
 export class MembersStateService {
   private readonly state = signal<MembersState>({
-    viewMode: 'grid',
+    viewMode: 'list',
     searchQuery: '',
     selectedDepartmentFilter: '',
     selectedRoleFilter: '',

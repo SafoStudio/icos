@@ -38,7 +38,7 @@ export class MembersComponent implements OnInit {
   departments = signal<Department[]>([]);
   isLoading = signal(false);
 
-  viewMode = signal<ViewMode>('grid');
+  viewMode = signal<ViewMode>('list');
   searchQuery = signal<string>('');
   selectedDepartmentFilter = signal<string>('');
   selectedRoleFilter = signal<string>('');
