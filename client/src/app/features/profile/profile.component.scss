@@ -1,6 +1,7 @@
 .profile-page {
   padding: 24px 32px;
   color: #212529;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .loading-state {
@@ -11,6 +12,7 @@
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  transition: color 0.3s ease;
 
   .spinner {
     width: 32px;
@@ -27,10 +29,12 @@
 }
 
 .profile-layout {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 32px;
+  width: 100%;
 }
+
 
 .profile-sidebar {
   flex: 0 0 340px;
@@ -43,12 +47,14 @@
     padding: 32px 24px 24px;
     text-align: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
     .photo-name {
       font-size: 1.5rem;
       font-weight: 700;
       color: #1e293b;
       margin: 0 0 8px 0;
+      transition: color 0.3s ease;
     }
 
     .badges-row {
@@ -69,6 +75,7 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  transition: color 0.3s ease, border-color 0.3s ease;
 
   &-role {
     &.role-admin {
@@ -109,6 +116,7 @@
   font-size: 0.875rem;
   color: #475569;
   text-align: left;
+  transition: border-color 0.3s ease, color 0.3s ease;
 
   .contact-item {
     display: flex;
@@ -119,11 +127,13 @@
     ng-icon {
       color: #94a3b8;
       flex-shrink: 0;
+      transition: color 0.3s ease;
     }
 
     .contact-link {
       color: #475569;
       text-decoration: none;
+      transition: color 0.3s ease;
 
       &:hover {
         color: #6366f1;
@@ -131,16 +141,6 @@
       }
     }
   }
-}
-
-.profile-details {
-  flex: 1;
-  min-width: 0;
-  min-height: 800px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
 }
 
 .tab-content {
@@ -152,6 +152,7 @@
   align-items: center;
   justify-content: flex-end;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: border-color 0.3s ease;
 
   .btn-edit {
     display: flex;
@@ -204,6 +205,7 @@
     gap: 4px;
     padding-bottom: 12px;
     border-bottom: 1px solid #f1f5f9;
+    transition: border-color 0.3s ease;
 
     .label {
       font-size: 12px;
@@ -211,6 +213,7 @@
       color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      transition: color 0.3s ease;
     }
 
     .value {
@@ -218,6 +221,7 @@
       color: #1e293b;
       padding: 4px 0;
       font-weight: 500;
+      transition: color 0.3s ease;
     }
   }
 }
@@ -241,6 +245,7 @@
       font-size: 13px;
       font-weight: 600;
       color: #475569;
+      transition: color 0.3s ease;
     }
 
     input {
@@ -250,7 +255,7 @@
       border-radius: 6px;
       font-size: 14px;
       color: #1e293b;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
       background: #fafafa;
       box-sizing: border-box;
 
@@ -276,6 +281,7 @@
   gap: 12px;
   padding: 16px 24px;
   border-top: 1px solid #e2e8f0;
+  transition: border-color 0.3s ease;
 
   .btn-cancel {
     padding: 8px 20px;
@@ -327,6 +333,7 @@
     text-align: center;
     color: #94a3b8;
     padding: 40px 0;
+    transition: color 0.3s ease;
   }
 }
 
@@ -380,6 +387,184 @@
       app-avatar {
         height: 180px;
       }
+    }
+  }
+}
+
+// ============================================
+// DARK THEME
+// ============================================
+:host-context([data-theme="dark"]),
+:host-context(body:not(.light-theme)) {
+  .profile-page {
+    background: var(--bg-primary, #0f172a);
+    color: var(--text-primary, #f8fafc);
+  }
+
+  .loading-state {
+    color: var(--text-secondary, #94a3b8);
+
+    .spinner {
+      border-color: rgba(99, 102, 241, 0.3);
+      border-top-color: var(--accent-indigo, #6366f1);
+    }
+  }
+
+  .profile-sidebar {
+    .photo-container {
+      background: var(--bg-surface, #1e293b);
+      border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+      box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.2));
+
+      .photo-name {
+        color: var(--text-primary, #f8fafc);
+      }
+    }
+  }
+
+  .badge {
+    &-role {
+      &.role-admin {
+        background: rgba(139, 92, 246, 0.2);
+        color: #a78bfa;
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+      &.role-owner {
+        background: rgba(236, 72, 153, 0.2);
+        color: #f472b6;
+        border-color: rgba(236, 72, 153, 0.3);
+      }
+      &.role-head {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+      &.role-specialist {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+    }
+
+    &-dept {
+      background: rgba(100, 116, 139, 0.2);
+      color: var(--text-secondary, #94a3b8);
+      border-color: rgba(100, 116, 139, 0.2);
+    }
+  }
+
+  .sidebar-contact-info {
+    border-top-color: var(--border-color, rgba(255, 255, 255, 0.08));
+    color: var(--text-secondary, #94a3b8);
+
+    .contact-item {
+      ng-icon {
+        color: var(--text-muted, #64748b);
+      }
+
+      .contact-link {
+        color: var(--text-secondary, #94a3b8);
+
+        &:hover {
+          color: var(--accent-indigo, #818cf8);
+        }
+      }
+    }
+  }
+
+  .profile-details {
+    background: var(--bg-surface, #1e293b);
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+    box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.2));
+  }
+
+  .section-header {
+    border-bottom-color: var(--border-color, rgba(255, 255, 255, 0.06));
+
+    .btn-edit {
+      color: var(--text-muted, #64748b);
+
+      &:hover {
+        background: var(--bg-surface-hover, rgba(30, 41, 59, 0.5));
+        color: var(--accent-indigo, #818cf8);
+      }
+    }
+
+    .btn-close-edit {
+      color: var(--text-muted, #64748b);
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+      }
+    }
+  }
+
+  .info-grid {
+    .info-item {
+      border-bottom-color: var(--border-color, rgba(255, 255, 255, 0.06));
+
+      .label {
+        color: var(--text-muted, #64748b);
+      }
+
+      .value {
+        color: var(--text-primary, #f8fafc);
+      }
+    }
+  }
+
+  .edit-form {
+    .form-group {
+      label {
+        color: var(--text-secondary, #94a3b8);
+      }
+
+      input {
+        background: var(--input-bg, rgba(15, 23, 42, 0.6));
+        border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+        color: var(--text-primary, #f8fafc);
+
+        &:focus {
+          border-color: var(--accent-indigo, #6366f1);
+          background: var(--bg-secondary, #1e293b);
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        &.disabled-input {
+          background: var(--bg-surface-hover, rgba(30, 41, 59, 0.4));
+          color: var(--text-muted, #64748b);
+        }
+      }
+    }
+  }
+
+  .edit-actions {
+    border-top-color: var(--border-color, rgba(255, 255, 255, 0.06));
+
+    .btn-cancel {
+      background: var(--bg-card, rgba(15, 23, 42, 0.7));
+      border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+      color: var(--text-secondary, #94a3b8);
+
+      &:hover:not(:disabled) {
+        background: var(--bg-surface-hover, rgba(30, 41, 59, 0.5));
+      }
+    }
+
+    .btn-save {
+      background: var(--accent-indigo, #6366f1);
+      color: #ffffff;
+
+      &:hover:not(:disabled) {
+        background: #4f46e5;
+      }
+    }
+  }
+
+  .documents-list {
+    .empty-message {
+      color: var(--text-muted, #64748b);
     }
   }
 }
