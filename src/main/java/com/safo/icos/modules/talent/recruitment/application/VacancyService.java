@@ -8,17 +8,21 @@ import com.safo.icos.modules.talent.recruitment.application.dto.VacancyDto;
 import com.safo.icos.modules.talent.recruitment.domain.model.Vacancy;
 import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
 import com.safo.icos.modules.talent.recruitment.domain.model.enums.PipelineStageType;
+import com.safo.icos.modules.talent.recruitment.domain.model.enums.VacancyStatus;
 import com.safo.icos.modules.talent.recruitment.domain.repository.VacancyRepository;
 import com.safo.icos.modules.talent.recruitment.infrastructure.mapper.RecruitmentMapper;
 import com.safo.icos.modules.talent.recruitment.infrastructure.repository.jpa.VacancyStageJpaRepository;
 import com.safo.icos.security.context.IcosUserPrincipal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -38,15 +42,23 @@ public class VacancyService {
   public VacancyDto createVacancy(CreateVacancyRequest request) {
     IcosUserPrincipal principal = getPrincipal();
 
-    Vacancy vacancy = Vacancy.create(
-            request.getCompanyId(),
-            request.getDepartmentId(),
-            request.getPositionId(),
-            request.getTitle(),
-            request.getDescription(),
-            request.getRequirements(),
-            principal.getUserId()
-    );
+    VacancyStatus status = request.getStatus() != null
+            ? request.getStatus()
+            : VacancyStatus.DRAFT;
+
+    Vacancy vacancy = Vacancy.builder()
+            .id(UUID.randomUUID())
+            .companyId(request.getCompanyId())
+            .departmentId(request.getDepartmentId())
+            .positionId(request.getPositionId())
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .requirements(request.getRequirements())
+            .status(status)
+            .createdBy(principal.getUserId())
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
 
     Vacancy savedVacancy = vacancyRepository.save(vacancy);
     createDefaultStages(savedVacancy.getId());
@@ -78,6 +90,26 @@ public class VacancyService {
             .map(mapper::toDto)
             .orElseThrow(() -> new BusinessException(
                     "Vacancy not found", RecruitmentErrorCode.VACANCY_NOT_FOUND));
+  }
+
+  /**
+   * Updates the status of an existing vacancy.
+   *
+   * @param vacancyId the vacancy UUID
+   * @param status the new status (DRAFT, OPEN, CLOSED, PAUSED)
+   * @return the updated vacancy DTO
+   * @throws BusinessException if vacancy not found
+   */
+  public VacancyDto updateVacancyStatus(UUID vacancyId, VacancyStatus status) {
+    Vacancy vacancy = vacancyRepository.findById(vacancyId)
+            .orElseThrow(() -> new BusinessException(
+                    "Vacancy not found", RecruitmentErrorCode.VACANCY_NOT_FOUND));
+
+    vacancy.setStatus(status);
+    Vacancy savedVacancy = vacancyRepository.save(vacancy);
+
+    log.info("Updated vacancy {} status to {}", vacancyId, status);
+    return mapper.toDto(savedVacancy);
   }
 
   private IcosUserPrincipal getPrincipal() {

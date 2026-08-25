@@ -16,8 +16,19 @@ class VacancyTest {
     UUID positionId = UUID.randomUUID();
     UUID createdBy = UUID.randomUUID();
 
-    Vacancy vacancy = Vacancy.create(companyId, departmentId, positionId,
-            "Java Developer", "Backend position", "Java, Spring", createdBy);
+    Vacancy vacancy = Vacancy.builder()
+            .id(UUID.randomUUID())
+            .companyId(companyId)
+            .departmentId(departmentId)
+            .positionId(positionId)
+            .title("Java Developer")
+            .description("Backend position")
+            .requirements("Java, Spring")
+            .status(VacancyStatus.DRAFT)
+            .createdBy(createdBy)
+            .createdAt(java.time.LocalDateTime.now())
+            .updatedAt(java.time.LocalDateTime.now())
+            .build();
 
     assertThat(vacancy.getId()).isNotNull();
     assertThat(vacancy.getCompanyId()).isEqualTo(companyId);

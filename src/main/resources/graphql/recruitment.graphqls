@@ -10,6 +10,7 @@ extend type Mutation {
     applyToVacancy(vacancyId: UUID!, candidate: CandidateInput!): Application!
     moveApplication(applicationId: UUID!, stageId: UUID!): Application!
     hireCandidate(applicationId: UUID!, userId: UUID!): Application!
+    updateVacancyStatus(vacancyId: UUID!, status: VacancyStatus!): Vacancy!
 }
 
 type Vacancy {
