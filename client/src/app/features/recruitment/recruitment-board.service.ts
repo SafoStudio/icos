@@ -57,6 +57,7 @@ export interface CreateVacancyInput {
   title: string;
   description?: string;
   requirements?: string;
+  status?: 'DRAFT' | 'OPEN' | 'CLOSED' | 'PAUSED';
 }
 
 export interface CandidateInput {
@@ -185,9 +186,22 @@ export class RecruitmentBoardService {
           title
           description
           status
+          createdAt
         }
       }
     `;
     return this.api.graphql<{ createVacancy: Vacancy }>(mutation, { input });
+  }
+
+  updateVacancyStatus(vacancyId: string, status: string): Observable<{ updateVacancyStatus: Vacancy }> {
+    const mutation = `
+      mutation UpdateVacancyStatus($vacancyId: UUID!, $status: VacancyStatus!) {
+        updateVacancyStatus(vacancyId: $vacancyId, status: $status) {
+          id
+          status
+        }
+      }
+    `;
+    return this.api.graphql<{ updateVacancyStatus: Vacancy }>(mutation, { vacancyId, status });
   }
 }

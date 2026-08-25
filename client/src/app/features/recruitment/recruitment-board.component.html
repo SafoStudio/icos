@@ -17,12 +17,22 @@
           [ngModel]="selectedVacancyId()"
           (ngModelChange)="onVacancyChange($event)"
         >
-          @for (vac of vacancies(); track vac.id) {
-          <option [value]="vac.id">{{ vac.title }} ({{ vac.status }})</option>
-          }
-          @if (vacancies().length === 0) {
-          <option value="">No active vacancies</option>
-          }
+          <optgroup label="Open Vacancies">
+            @for (vac of openVacancies(); track vac.id) {
+            <option [value]="vac.id">{{ vac.title }}</option>
+            }
+            @if (openVacancies().length === 0) {
+            <option value="" disabled>No open vacancies</option>
+            }
+          </optgroup>
+          <optgroup label="Draft Vacancies">
+            @for (vac of draftVacancies(); track vac.id) {
+            <option [value]="vac.id">{{ vac.title }} (Draft)</option>
+            }
+            @if (draftVacancies().length === 0) {
+            <option value="" disabled>No draft vacancies</option>
+            }
+          </optgroup>
         </select>
       </div>
 
@@ -31,7 +41,7 @@
         <span>New Vacancy</span>
       </button>
 
-      <button type="button" class="btn btn-primary" (click)="openApplySidebar()">
+      <button type="button" class="btn btn-primary" (click)="openApplySidebar()" [disabled]="!hasAnyVacancy()">
         <ng-icon name="tablerUserCheck" size="18" aria-hidden="true"></ng-icon>
         <span>Add Candidate</span>
       </button>
@@ -58,6 +68,38 @@
       <span class="status-badge" [class.open]="selectedVacancy()?.status === 'OPEN'">
           {{ selectedVacancy()?.status }}
         </span>
+      @if (selectedVacancy()?.status === 'DRAFT') {
+      <button type="button" class="btn-publish" (click)="publishVacancy(selectedVacancy()!.id)" [disabled]="isPublishing()">
+        <ng-icon name="tablerRocket" size="14" aria-hidden="true"></ng-icon>
+        {{ isPublishing() ? 'Publishing...' : 'Publish' }}
+      </button>
+      }
+      @if (selectedVacancy()?.status === 'OPEN') {
+      <button type="button" class="btn-pause" (click)="pauseVacancy(selectedVacancy()!.id)">
+        <ng-icon name="tablerPause" size="14" aria-hidden="true"></ng-icon>
+        Pause
+      </button>
+      <button type="button" class="btn-close" (click)="closeVacancy(selectedVacancy()!.id)">
+        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+        Close
+      </button>
+      }
+      @if (selectedVacancy()?.status === 'PAUSED') {
+      <button type="button" class="btn-reopen" (click)="reopenVacancy(selectedVacancy()!.id)">
+        <ng-icon name="tablerPlay" size="14" aria-hidden="true"></ng-icon>
+        Reopen
+      </button>
+      <button type="button" class="btn-close" (click)="closeVacancy(selectedVacancy()!.id)">
+        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+        Close
+      </button>
+      }
+      @if (selectedVacancy()?.status === 'CLOSED') {
+      <button type="button" class="btn-reopen" (click)="reopenVacancy(selectedVacancy()!.id)">
+        <ng-icon name="tablerRefresh" size="14" aria-hidden="true"></ng-icon>
+        Reopen
+      </button>
+      }
     </div>
     }
   </div>
@@ -162,7 +204,18 @@
   </div>
   }
 
-  <!-- Overlay -->
+  @if (!isLoading() && !board() && !selectedVacancy()) {
+  <div class="empty-state">
+    <ng-icon name="tablerUsers" size="48" aria-hidden="true"></ng-icon>
+    <h3>No vacancies yet</h3>
+    <p>Create your first vacancy to start recruiting.</p>
+    <button type="button" class="btn btn-primary" (click)="openVacancySidebar()">
+      <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+      Create Vacancy
+    </button>
+  </div>
+  }
+
   @if (showApplySidebar() || showVacancySidebar() || selectedApplication()) {
   <div
     class="sidebar-overlay"
@@ -171,7 +224,6 @@
   ></div>
   }
 
-  <!-- Add Candidate Sidebar -->
   <div class="sidebar" [class.open]="showApplySidebar()">
     <div class="sidebar-header">
       <h2>Add Candidate to {{ selectedVacancy()?.title || 'Pipeline' }}</h2>
@@ -226,7 +278,6 @@
     </div>
   </div>
 
-  <!-- Create Vacancy Sidebar -->
   <div class="sidebar" [class.open]="showVacancySidebar()">
     <div class="sidebar-header">
       <h2>Create New Vacancy</h2>
@@ -239,6 +290,14 @@
       <div class="form-group">
         <label for="vacancyTitleInput">Vacancy Title *</label>
         <input id="vacancyTitleInput" type="text" [(ngModel)]="vacancyForm.title" placeholder="e.g. Senior Frontend Developer" />
+      </div>
+
+      <div class="form-group">
+        <label for="vacancyStatusSelect">Status</label>
+        <select id="vacancyStatusSelect" [(ngModel)]="vacancyForm.status">
+          <option value="DRAFT">Draft</option>
+          <option value="OPEN">Open / Active</option>
+        </select>
       </div>
 
       <div class="form-group">
@@ -258,7 +317,6 @@
     </div>
   </div>
 
-  <!-- Candidate Detail Sidebar -->
   @if (selectedApplication()) {
   <div class="sidebar detail-sidebar" [class.open]="!!selectedApplication()">
     <div class="sidebar-header">

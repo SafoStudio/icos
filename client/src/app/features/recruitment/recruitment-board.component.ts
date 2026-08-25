@@ -31,6 +31,7 @@ export class RecruitmentBoardComponent implements OnInit {
   public board = signal<KanbanBoard | null>(null);
   public isLoading = signal<boolean>(false);
   public searchQuery = signal<string>('');
+  public isPublishing = signal<boolean>(false);
 
   public showApplySidebar = signal<boolean>(false);
   public showVacancySidebar = signal<boolean>(false);
@@ -45,10 +46,11 @@ export class RecruitmentBoardComponent implements OnInit {
     resumeUrl: ''
   };
 
-  public vacancyForm: Partial<CreateVacancyInput> = {
+  public vacancyForm: Partial<CreateVacancyInput> & { status?: string } = {
     title: '',
     description: '',
-    requirements: ''
+    requirements: '',
+    status: 'DRAFT'
   };
 
   public hasCompany = computed<boolean>(() => {
@@ -57,6 +59,18 @@ export class RecruitmentBoardComponent implements OnInit {
 
   public selectedVacancy = computed(() => {
     return this.vacancies().find(v => v.id === this.selectedVacancyId()) || null;
+  });
+
+  public openVacancies = computed(() => {
+    return this.vacancies().filter(v => v.status === 'OPEN');
+  });
+
+  public draftVacancies = computed(() => {
+    return this.vacancies().filter(v => v.status === 'DRAFT');
+  });
+
+  public hasAnyVacancy = computed(() => {
+    return this.vacancies().length > 0;
   });
 
   public filteredColumns = computed<KanbanColumn[]>(() => {
@@ -102,7 +116,12 @@ export class RecruitmentBoardComponent implements OnInit {
       next: (res) => {
         const list = res.vacancies || [];
         this.vacancies.set(list);
-        if (list.length > 0) {
+
+        const openList = list.filter(v => v.status === 'OPEN');
+        if (openList.length > 0) {
+          this.selectedVacancyId.set(openList[0].id);
+          this.loadKanbanBoard(openList[0].id);
+        } else if (list.length > 0) {
           this.selectedVacancyId.set(list[0].id);
           this.loadKanbanBoard(list[0].id);
         } else {
@@ -132,6 +151,66 @@ export class RecruitmentBoardComponent implements OnInit {
       error: (err) => {
         this.toast.error('Failed to load recruitment board: ' + (err.message || 'Error'));
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  public publishVacancy(vacancyId: string): void {
+    this.isPublishing.set(true);
+    this.recruitmentService.updateVacancyStatus(vacancyId, 'OPEN').subscribe({
+      next: () => {
+        this.toast.success('Vacancy published successfully!');
+        this.isPublishing.set(false);
+        this.loadVacancies();
+      },
+      error: (err) => {
+        this.toast.error('Failed to publish vacancy: ' + (err.message || 'Error'));
+        this.isPublishing.set(false);
+      }
+    });
+  }
+
+  public pauseVacancy(vacancyId: string): void {
+    this.isPublishing.set(true);
+    this.recruitmentService.updateVacancyStatus(vacancyId, 'PAUSED').subscribe({
+      next: () => {
+        this.toast.success('Vacancy paused successfully!');
+        this.isPublishing.set(false);
+        this.loadVacancies();
+      },
+      error: (err) => {
+        this.toast.error('Failed to pause vacancy: ' + (err.message || 'Error'));
+        this.isPublishing.set(false);
+      }
+    });
+  }
+
+  public closeVacancy(vacancyId: string): void {
+    this.isPublishing.set(true);
+    this.recruitmentService.updateVacancyStatus(vacancyId, 'CLOSED').subscribe({
+      next: () => {
+        this.toast.success('Vacancy closed successfully!');
+        this.isPublishing.set(false);
+        this.loadVacancies();
+      },
+      error: (err) => {
+        this.toast.error('Failed to close vacancy: ' + (err.message || 'Error'));
+        this.isPublishing.set(false);
+      }
+    });
+  }
+
+  public reopenVacancy(vacancyId: string): void {
+    this.isPublishing.set(true);
+    this.recruitmentService.updateVacancyStatus(vacancyId, 'OPEN').subscribe({
+      next: () => {
+        this.toast.success('Vacancy reopened successfully!');
+        this.isPublishing.set(false);
+        this.loadVacancies();
+      },
+      error: (err) => {
+        this.toast.error('Failed to reopen vacancy: ' + (err.message || 'Error'));
+        this.isPublishing.set(false);
       }
     });
   }
@@ -217,7 +296,8 @@ export class RecruitmentBoardComponent implements OnInit {
     this.vacancyForm = {
       title: '',
       description: '',
-      requirements: ''
+      requirements: '',
+      status: 'DRAFT'
     };
     this.showVacancySidebar.set(true);
   }
@@ -242,7 +322,8 @@ export class RecruitmentBoardComponent implements OnInit {
       companyId: companyId,
       title: this.vacancyForm.title,
       description: this.vacancyForm.description || '',
-      requirements: this.vacancyForm.requirements || ''
+      requirements: this.vacancyForm.requirements || '',
+      status: this.vacancyForm.status || 'DRAFT'
     };
 
     this.recruitmentService.createVacancy(payload).subscribe({
