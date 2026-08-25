@@ -255,7 +255,7 @@
       border-radius: 6px;
       font-size: 14px;
       color: #1e293b;
-      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      transition: border-color 0.2s, color 0.2s;
       background: #fafafa;
       box-sizing: border-box;
 
@@ -391,9 +391,7 @@
   }
 }
 
-// ============================================
 // DARK THEME
-// ============================================
 :host-context([data-theme="dark"]),
 :host-context(body:not(.light-theme)) {
   .profile-page {
