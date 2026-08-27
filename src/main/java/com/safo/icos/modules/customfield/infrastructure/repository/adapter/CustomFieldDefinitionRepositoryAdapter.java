@@ -26,12 +26,28 @@ public class CustomFieldDefinitionRepositoryAdapter implements CustomFieldDefini
     }
 
     @Override
+    public List<CustomFieldDefinition> findAll() {
+        return jpaRepository.findAll();
+    }
+
+    @Override
     public List<CustomFieldDefinition> findAllByEntityType(EntityType entityType) {
-        return jpaRepository.findAllByEntityType(entityType);
+        return jpaRepository.findAllByEntityTypeOrderByOrderIndexAscCreatedAtAsc(entityType);
     }
 
     @Override
     public Optional<CustomFieldDefinition> findByEntityTypeAndKey(EntityType entityType, String key) {
         return jpaRepository.findByEntityTypeAndKey(entityType, key);
     }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return jpaRepository.existsById(id);
+    }
 }
+

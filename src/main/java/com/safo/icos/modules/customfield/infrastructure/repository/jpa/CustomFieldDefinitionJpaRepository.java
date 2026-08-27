@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomFieldDefinitionJpaRepository extends JpaRepository<CustomFieldDefinition, UUID> {
-    List<CustomFieldDefinition> findAllByEntityType(EntityType entityType);
+    List<CustomFieldDefinition> findAllByEntityTypeOrderByOrderIndexAscCreatedAtAsc(EntityType entityType);
     Optional<CustomFieldDefinition> findByEntityTypeAndKey(EntityType entityType, String key);
 }
+
