@@ -6,6 +6,7 @@ import com.safo.icos.modules.customfield.domain.model.CustomFieldDefinition;
 import com.safo.icos.modules.customfield.domain.model.CustomFieldValue;
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
 import com.safo.icos.modules.customfield.domain.model.enums.FieldType;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -77,4 +79,79 @@ class CustomFieldServiceTest {
         CustomFieldValue value = customFieldService.setValue(valRequest);
         assertThat(value.getValueNumber()).isEqualByComparingTo("150.50");
     }
+
+    @Test
+    void shouldHandleCandidateCustomFieldWithRegexValidation() {
+        // 1. Create Candidate portfolio URL field with regex validation
+        CustomFieldDefinitionRequest defRequest = new CustomFieldDefinitionRequest();
+        defRequest.setEntityType(EntityType.CANDIDATE);
+        defRequest.setKey("portfolio_url");
+        defRequest.setLabel("Portfolio URL");
+        defRequest.setFieldType(FieldType.URL);
+        defRequest.setValidationRegex("^https?://.+");
+        defRequest.setValidationMessage("Must be a valid HTTP or HTTPS URL");
+
+        CustomFieldDefinition def = customFieldService.createDefinition(defRequest);
+        assertThat(def.getId()).isNotNull();
+
+        UUID candidateId = UUID.randomUUID();
+
+        // 2. Invalid URL should throw IllegalArgumentException
+        CustomFieldValueRequest invalidReq = new CustomFieldValueRequest();
+        invalidReq.setEntityType(EntityType.CANDIDATE);
+        invalidReq.setEntityId(candidateId);
+        invalidReq.setFieldKey("portfolio_url");
+        invalidReq.setValue("ftp://bad-link");
+
+        assertThrows(IllegalArgumentException.class, () -> customFieldService.setValue(invalidReq));
+
+        // 3. Valid URL should succeed
+        CustomFieldValueRequest validReq = new CustomFieldValueRequest();
+        validReq.setEntityType(EntityType.CANDIDATE);
+        validReq.setEntityId(candidateId);
+        validReq.setFieldKey("portfolio_url");
+        validReq.setValue("https://github.com/myprofile");
+
+        CustomFieldValue val = customFieldService.setValue(validReq);
+        assertThat(val.getValueText()).isEqualTo("https://github.com/myprofile");
+    }
+
+    @Test
+    void shouldHandleBatchSettingValues() {
+        // 1. Create 2 fields for Onboarding
+        CustomFieldDefinitionRequest def1 = new CustomFieldDefinitionRequest();
+        def1.setEntityType(EntityType.ONBOARDING);
+        def1.setKey("equipment_shipped");
+        def1.setLabel("Equipment Shipped");
+        def1.setFieldType(FieldType.BOOLEAN);
+        customFieldService.createDefinition(def1);
+
+        CustomFieldDefinitionRequest def2 = new CustomFieldDefinitionRequest();
+        def2.setEntityType(EntityType.ONBOARDING);
+        def2.setKey("mentor_notes");
+        def2.setLabel("Mentor Notes");
+        def2.setFieldType(FieldType.MULTILINE);
+        customFieldService.createDefinition(def2);
+
+        // 2. Batch set values
+        UUID processId = UUID.randomUUID();
+        CustomFieldValueRequest val1 = new CustomFieldValueRequest();
+        val1.setEntityType(EntityType.ONBOARDING);
+        val1.setEntityId(processId);
+        val1.setFieldKey("equipment_shipped");
+        val1.setValue(true);
+
+        CustomFieldValueRequest val2 = new CustomFieldValueRequest();
+        val2.setEntityType(EntityType.ONBOARDING);
+        val2.setEntityId(processId);
+        val2.setFieldKey("mentor_notes");
+        val2.setValue("Candidate assigned laptop and welcome kit.");
+
+        List<CustomFieldValue> saved = customFieldService.setValues(List.of(val1, val2));
+        assertThat(saved).hasSize(2);
+
+        List<CustomFieldValue> retrieved = customFieldService.getValues(EntityType.ONBOARDING, processId);
+        assertThat(retrieved).hasSize(2);
+    }
 }
+
