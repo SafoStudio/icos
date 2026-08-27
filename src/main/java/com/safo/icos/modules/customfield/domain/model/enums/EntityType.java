@@ -1,10 +1,14 @@
 package com.safo.icos.modules.customfield.domain.model.enums;
 
-/** Entity types that can have custom fields. */
+/**
+ * Entity types that can have custom fields dynamically attached to them.
+ */
 public enum EntityType {
   USER,
   COMPANY,
   DEPARTMENT,
   POSITION,
-  JOB
-}
+  JOB,
+  CANDIDATE,
+  ONBOARDING
+}
