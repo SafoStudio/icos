@@ -5,6 +5,17 @@ export { type User } from './user.model';
 export { type UserProfile } from './user-profile.model';
 export { type DepartmentMember } from './department-member.model';
 export {
+  type EntityType,
+  type FieldType,
+  type CustomFieldDefinition,
+  type CustomFieldValue,
+  type CustomFieldDefinitionInput,
+  type CustomFieldValueInput,
+  type FieldTypeMeta,
+  FIELD_TYPES_INFO,
+  ENTITY_TYPES_INFO
+} from './custom-field.model';
+export {
   type UserRole,
   ROLES,
   ROLE_LABELS,
@@ -19,3 +30,4 @@ export {
   getRoleCssClass,
   isRole
 } from './roles.model';
+
