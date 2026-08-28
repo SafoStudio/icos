@@ -7,13 +7,13 @@ import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.s
 import { AuthService, ToastService } from '@services';
 import { type User, type UserProfile, getRoleLabel, type UserRole } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
-import { TabsComponent, type TabItem } from '@components';
+import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 import { AvatarComponent } from './avatar/avatar.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, AvatarComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, AvatarComponent, CustomFieldsFormComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -31,9 +31,11 @@ export class ProfileComponent implements OnInit {
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal Information', icon: 'tablerUser' },
+    { id: 'custom-fields', label: 'Custom Attributes', icon: 'tablerForms' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
+
 
   readonly fullName = computed(() => {
     const user = this.user();

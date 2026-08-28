@@ -208,7 +208,28 @@
         </div>
         }
 
+        @if (activeTabId() === 'custom-fields') {
+
+        <div class="tab-content">
+          <div class="section-header">
+            <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0 0 0.5rem 0;">Custom Attributes & Info</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary, #6b7280); margin: 0 0 1rem 0;">
+              Additional employee data fields configured by system administrators.
+            </p>
+          </div>
+
+          <app-custom-fields-form
+            [entityType]="'USER'"
+            [entityId]="user()?.id"
+            [readonly]="false"
+            [showSaveButton]="true"
+            layout="grid"
+          ></app-custom-fields-form>
+        </div>
+        }
+
         @if (activeTabId() === 'compensation') {
+
         <div class="tab-content">
           <div class="section-header"></div>
           <div class="info-grid">

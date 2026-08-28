@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ToastService } from '@services';
+import { CustomFieldsFormComponent } from '@components';
 import {
   RecruitmentBoardService,
   Vacancy,
@@ -16,10 +17,11 @@ import {
 @Component({
   selector: 'app-recruitment-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, CustomFieldsFormComponent],
   templateUrl: './recruitment-board.component.html',
   styleUrls: ['./recruitment-board.component.scss']
 })
+
 export class RecruitmentBoardComponent implements OnInit {
   private readonly recruitmentService = inject(RecruitmentBoardService);
   private readonly toast = inject(ToastService);

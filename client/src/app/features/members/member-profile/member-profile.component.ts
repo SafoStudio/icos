@@ -8,12 +8,12 @@ import { DepartmentsService } from '../../org/departments/departments.service';
 import { AuthService, ToastService } from '@services';
 import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
-import { TabsComponent, type TabItem } from '@components';
+import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 
 @Component({
   selector: 'app-member-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, CustomFieldsFormComponent],
   templateUrl: './member-profile.component.html',
   styleUrls: ['./member-profile.component.scss']
 })
@@ -39,10 +39,12 @@ export class MemberProfileComponent implements OnInit {
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
+    { id: 'custom-fields', label: 'Custom Attributes', icon: 'tablerForms' },
     { id: 'hr_management', label: 'Actions & Roles', icon: 'tablerBuilding' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
+
 
   readonly backButtonText = computed(() => {
     const url = this.returnUrl();

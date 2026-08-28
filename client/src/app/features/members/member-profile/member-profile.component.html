@@ -218,8 +218,27 @@
           }
         </div>
         }
+        @if (activeTabId() === 'custom-fields') {
+        <div class="tab-content" style="padding: 1.25rem 0;">
+          <div class="section-header" style="margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0 0 0.375rem 0;">Custom Attributes & Info</h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary, #6b7280); margin: 0;">
+              Additional employee attributes configured by organization administrators.
+            </p>
+          </div>
+
+          <app-custom-fields-form
+            [entityType]="'USER'"
+            [entityId]="member()?.id"
+            [readonly]="!canManage()"
+            [showSaveButton]="canManage()"
+            layout="grid"
+          ></app-custom-fields-form>
+        </div>
+        }
 
         @if (activeTabId() === 'hr_management') {
+
         <div class="section-header">
           <p class="section-desc">Assign system roles or transfer member to a different department.</p>
         </div>

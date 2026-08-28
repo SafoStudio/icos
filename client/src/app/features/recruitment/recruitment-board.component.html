@@ -366,7 +366,19 @@
         </a>
       </div>
       }
+
+      <div class="detail-section">
+        <h4>Custom Candidate Attributes</h4>
+        <app-custom-fields-form
+          [entityType]="'CANDIDATE'"
+          [entityId]="selectedApplication()!.candidate.id"
+          [readonly]="false"
+          [showSaveButton]="true"
+          layout="vertical"
+        ></app-custom-fields-form>
+      </div>
     </div>
+
 
     <div class="sidebar-footer">
       @if (selectedApplication()!.status !== 'HIRED') {
