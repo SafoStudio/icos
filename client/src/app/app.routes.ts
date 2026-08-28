@@ -9,6 +9,7 @@ import { DepartmentsComponent } from './features/org/departments/departments.com
 import { DepartmentDetailComponent } from './features/org/departments/department-detail/department-detail.component';
 import { PositionsComponent } from './features/org/positions/positions.component';
 import { ProfileComponent } from './features/profile/profile.component';
+import { SettingsComponent } from './features/settings/settings.component';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
 
 import { RecruitmentBoardComponent } from './features/recruitment/recruitment-board.component';
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'calendar', component: CalendarComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
   { path: 'recruitment', component: RecruitmentBoardComponent, canActivate: [authGuard] },
@@ -41,3 +43,4 @@ export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
 ];
+

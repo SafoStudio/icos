@@ -55,7 +55,24 @@ import {
   tablerClock,
   tablerUserPlus,
   tablerUserX,
-  tablerCalendar
+  tablerCalendar,
+  tablerLink,
+  tablerForms,
+  tablerAdjustments,
+  tablerToggleLeft,
+  tablerToggleRight,
+  tablerAlignLeft,
+  tablerNumbers,
+  tablerListCheck,
+  tablerWorld,
+  tablerSparkles,
+  tablerCode,
+  tablerTypography,
+  tablerQuestionMark,
+  tablerDeviceFloppy,
+  tablerRefresh,
+  tablerCopy,
+  tablerExternalLink
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
@@ -114,5 +131,23 @@ export const APP_ICONS = provideIcons({
   tablerClock,
   tablerUserPlus,
   tablerUserX,
-  tablerCalendar
+  tablerCalendar,
+  tablerLink,
+  tablerForms,
+  tablerAdjustments,
+  tablerToggleLeft,
+  tablerToggleRight,
+  tablerAlignLeft,
+  tablerNumbers,
+  tablerListCheck,
+  tablerWorld,
+  tablerSparkles,
+  tablerCode,
+  tablerTypography,
+  tablerQuestionMark,
+  tablerDeviceFloppy,
+  tablerRefresh,
+  tablerCopy,
+  tablerExternalLink
 });
+

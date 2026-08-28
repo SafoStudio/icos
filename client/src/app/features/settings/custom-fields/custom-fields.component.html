@@ -1,0 +1,778 @@
+﻿<div class="custom-fields-settings-page">
+  <!-- PAGE HEADER -->
+  <header class="header-section">
+    <div class="header-text">
+      <div class="title-badge">
+        <ng-icon name="tablerForms" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
+        <h2 class="badge-text">Custom Fields & Dynamic Forms</h2>
+      </div>
+      <p class="subtitle">
+        Extend Candidate cards, Job vacancies, User profiles, and Onboarding workflows with custom data fields, validations, and conditional logic.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn btn-secondary btn-playground"
+        (click)="openPlayground()"
+        aria-label="Open dynamic form playground"
+      >
+        <ng-icon name="tablerSparkles" size="18" aria-hidden="true"></ng-icon>
+        <span>Test Form Playground</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-add-field"
+        (click)="openCreateModal()"
+        aria-label="Create new custom field definition"
+      >
+        <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+        <span>New Custom Field</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- STATS OVERVIEW -->
+  <section class="stats-row" aria-label="Custom fields statistics">
+    <div class="stat-card">
+      <div class="stat-icon-wrap primary" aria-hidden="true">
+        <ng-icon name="tablerForms" size="20"></ng-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ totalFieldsCount() }}</span>
+        <span class="stat-label">Total Custom Fields</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap green" aria-hidden="true">
+        <ng-icon name="tablerUserCheck" size="20"></ng-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ entityStats()['CANDIDATE'] || 0 }}</span>
+        <span class="stat-label">Candidate Fields</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap orange" aria-hidden="true">
+        <ng-icon name="tablerBriefcase" size="20"></ng-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ entityStats()['JOB'] || 0 }}</span>
+        <span class="stat-label">Job Vacancy Fields</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap purple" aria-hidden="true">
+        <ng-icon name="tablerClipboardList" size="20"></ng-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ entityStats()['ONBOARDING'] || 0 }}</span>
+        <span class="stat-label">Onboarding Fields</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon-wrap blue" aria-hidden="true">
+        <ng-icon name="tablerAdjustments" size="20"></ng-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ conditionalRulesCount() }}</span>
+        <span class="stat-label">Conditional Logic Rules</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTITY TABS -->
+  <nav class="entity-tabs-bar" aria-label="Entity type filter tabs">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedEntityType() === 'ALL'"
+      [attr.aria-selected]="selectedEntityType() === 'ALL'"
+      (click)="selectedEntityType.set('ALL')"
+    >
+      <ng-icon name="tablerLayoutGrid" size="16" aria-hidden="true"></ng-icon>
+      <span>All Entities</span>
+      <span class="tab-badge">{{ definitions().length }}</span>
+    </button>
+
+    @for (entity of entityTypesList; track entity) {
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="selectedEntityType() === entity"
+      [attr.aria-selected]="selectedEntityType() === entity"
+      (click)="selectedEntityType.set(entity)"
+    >
+      <ng-icon [name]="getEntityInfo(entity).icon" size="16" aria-hidden="true"></ng-icon>
+      <span>{{ getEntityInfo(entity).label }}</span>
+      @if (entityStats()[entity]) {
+      <span class="tab-badge">{{ entityStats()[entity] }}</span>
+      }
+    </button>
+    }
+  </nav>
+
+  <!-- SEARCH & FILTER TOOLBAR -->
+  <div class="toolbar-section">
+    <div class="search-box">
+      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
+      <label for="search-fields-input" class="sr-only">Filter custom fields</label>
+      <input
+        id="search-fields-input"
+        type="text"
+        placeholder="Filter by field label, key, or description..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+      @if (searchQuery()) {
+      <button class="clear-search-btn" (click)="searchQuery.set('')" aria-label="Clear search">
+        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+      </button>
+      }
+    </div>
+
+    <div class="filters-wrap">
+      <div class="filter-select-box">
+        <ng-icon name="tablerFilter" size="16" class="select-icon" aria-hidden="true"></ng-icon>
+        <label for="filter-type-select" class="sr-only">Filter by data type</label>
+        <select
+          id="filter-type-select"
+          [ngModel]="filterFieldType()"
+          (ngModelChange)="filterFieldType.set($event)"
+        >
+          <option value="ALL">All Field Types</option>
+          @for (ft of fieldTypesList; track ft) {
+          <option [value]="ft">{{ getFieldTypeInfo(ft).label }}</option>
+          }
+        </select>
+      </div>
+
+      @if (searchQuery() || filterFieldType() !== 'ALL') {
+      <button
+        type="button"
+        class="btn-reset"
+        (click)="searchQuery.set(''); filterFieldType.set('ALL')"
+        aria-label="Reset all filters"
+      >
+        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+        <span>Reset</span>
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT / FIELDS LIST -->
+  @if (loading()) {
+  <output class="loading-state" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Loading custom field definitions...</p>
+  </output>
+  } @else if (filteredDefinitions().length === 0) {
+  <output class="empty-state-card" aria-live="polite">
+    <div class="empty-icon-wrap" aria-hidden="true">
+      <ng-icon name="tablerForms" size="48"></ng-icon>
+    </div>
+    @if (definitions().length === 0) {
+    <h3>No custom fields configured yet</h3>
+    <p>Get started by creating dynamic custom fields for candidate intake forms, vacancy attributes, or employee records.</p>
+    <button type="button" class="btn btn-primary" (click)="openCreateModal()">
+      <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+      <span>Create Your First Custom Field</span>
+    </button>
+    } @else {
+    <h3>No matching custom fields</h3>
+    <p>Try adjusting your search keywords or filter criteria.</p>
+    <button type="button" class="btn btn-secondary" (click)="searchQuery.set(''); filterFieldType.set('ALL'); selectedEntityType.set('ALL')">
+      Clear Filters
+    </button>
+    }
+  </output>
+  } @else {
+  <div class="fields-table-wrapper">
+    <table class="fields-table" aria-label="Custom fields list">
+      <thead>
+        <tr>
+          <th scope="col" class="th-label">Field Label & Key</th>
+          <th scope="col" class="th-entity">Target Entity</th>
+          <th scope="col" class="th-type">Data Type</th>
+          <th scope="col" class="th-rules">Rules & Validation</th>
+          <th scope="col" class="th-options">Options / Choices</th>
+          <th scope="col" class="th-actions text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (def of filteredDefinitions(); track def.id) {
+        <tr class="field-row">
+          <!-- Field Label & Key -->
+          <td class="td-label">
+            <div class="label-group">
+              <span class="field-main-label">{{ def.label }}</span>
+              <span class="field-key-badge" [title]="'Key: ' + def.key">
+                <code>{{ def.key }}</code>
+              </span>
+            </div>
+            @if (def.description) {
+            <p class="field-sub-desc">{{ def.description }}</p>
+            }
+          </td>
+
+          <!-- Target Entity -->
+          <td class="td-entity">
+            <span class="entity-pill" [class]="'entity-' + def.entityType.toLowerCase()">
+              <ng-icon [name]="getEntityInfo(def.entityType).icon" size="14" aria-hidden="true"></ng-icon>
+              <span>{{ getEntityInfo(def.entityType).label }}</span>
+            </span>
+          </td>
+
+          <!-- Field Type -->
+          <td class="td-type">
+            <div class="type-badge-wrap">
+              <ng-icon [name]="getFieldTypeInfo(def.fieldType).icon" size="16" class="type-icon" aria-hidden="true"></ng-icon>
+              <span class="type-name">{{ getFieldTypeInfo(def.fieldType).label }}</span>
+            </div>
+          </td>
+
+          <!-- Rules & Validation -->
+          <td class="td-rules">
+            <div class="rules-badges-group">
+              @if (def.required) {
+              <span class="rule-badge rule-required" title="Mandatory field">Required</span>
+              } @else {
+              <span class="rule-badge rule-optional">Optional</span>
+              }
+
+              @if (def.filterable) {
+              <span class="rule-badge rule-filterable" title="Enabled for filters & search">Filterable</span>
+              }
+
+              @if (def.validationRegex) {
+              <span class="rule-badge rule-regex" [title]="'Regex: ' + def.validationRegex">
+                Regex Validated
+              </span>
+              }
+
+              @if (def.minValue !== null && def.minValue !== undefined || def.maxValue !== null && def.maxValue !== undefined) {
+              <span class="rule-badge rule-range">
+                Range: {{ def.minValue ?? '0' }} - {{ def.maxValue ?? '∞' }}
+              </span>
+              }
+
+              @if (def.conditionalFieldKey) {
+              <span
+                class="rule-badge rule-conditional"
+                [title]="'Only shown when ' + def.conditionalFieldKey + ' == ' + def.conditionalValue"
+              >
+                <ng-icon name="tablerAdjustments" size="12" aria-hidden="true"></ng-icon>
+                <span>If {{ def.conditionalFieldKey }} = {{ def.conditionalValue || 'true' }}</span>
+              </span>
+              }
+            </div>
+          </td>
+
+          <!-- Options -->
+          <td class="td-options">
+            @if (def.options && def.options.length > 0) {
+            <div class="options-preview-wrap">
+              @for (opt of def.options.slice(0, 3); track opt) {
+              <span class="opt-tag">{{ opt }}</span>
+              }
+              @if (def.options.length > 3) {
+              <span class="opt-tag more">+{{ def.options.length - 3 }}</span>
+              }
+            </div>
+            } @else {
+            <span class="no-options-text">—</span>
+            }
+          </td>
+
+          <!-- Actions -->
+          <td class="td-actions text-right">
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="btn-icon"
+                (click)="openEditModal(def)"
+                [attr.aria-label]="'Edit custom field ' + def.label"
+                title="Edit Field"
+              >
+                <ng-icon name="tablerEdit" size="16" aria-hidden="true"></ng-icon>
+              </button>
+
+              <button
+                type="button"
+                class="btn-icon btn-icon-danger"
+                (click)="confirmDelete(def)"
+                [attr.aria-label]="'Delete custom field ' + def.label"
+                title="Delete Field"
+              >
+                <ng-icon name="tablerTrash" size="16" aria-hidden="true"></ng-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+
+  <!-- ==================== CREATE / EDIT MODAL ==================== -->
+  @if (showEditModal()) {
+  <div class="modal-backdrop" (click)="closeEditModal()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card edit-field-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon [name]="editingFieldId() ? 'tablerEdit' : 'tablerPlus'" size="22" aria-hidden="true"></ng-icon>
+          <h3 id="modal-title">{{ editingFieldId() ? 'Edit Custom Field' : 'Create Custom Field' }}</h3>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeEditModal()" aria-label="Close modal">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body modal-grid-layout">
+        <!-- LEFT COLUMN: CONFIGURATION FORM -->
+        <div class="config-col">
+          <!-- Target Entity Selection -->
+          <div class="form-section">
+            <span class="section-title">1. Target Entity</span>
+            <div class="entity-cards-grid" role="radiogroup" aria-label="Select target entity">
+              @for (ent of entityTypesList; track ent) {
+              <button
+                type="button"
+                class="entity-select-btn"
+                [class.selected]="formEntityType === ent"
+                [disabled]="!!editingFieldId()"
+                [attr.aria-pressed]="formEntityType === ent"
+                (click)="formEntityType = ent"
+              >
+                <ng-icon [name]="getEntityInfo(ent).icon" size="18" aria-hidden="true"></ng-icon>
+                <span>{{ getEntityInfo(ent).label }}</span>
+              </button>
+              }
+            </div>
+          </div>
+
+          <!-- Basic Attributes -->
+          <div class="form-section">
+            <span class="section-title">2. Field Details</span>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="formLabelInput">Field Label *</label>
+                <input
+                  id="formLabelInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Visa Sponsorship Needed"
+                  [(ngModel)]="formLabel"
+                  (input)="onLabelInput()"
+                />
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="formKeyInput">Key Identifier *</label>
+                <input
+                  id="formKeyInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. visa_sponsorship_needed"
+                  [(ngModel)]="formKey"
+                  [disabled]="!!editingFieldId()"
+                />
+                <span class="input-hint">Unique snake_case identifier</span>
+              </div>
+            </div>
+
+            <!-- Field Type Picker -->
+            <div class="form-group">
+              <label>Data Type *</label>
+              <div class="field-types-grid" role="radiogroup" aria-label="Select data type">
+                @for (ft of fieldTypesList; track ft) {
+                <button
+                  type="button"
+                  class="type-select-card"
+                  [class.selected]="formFieldType === ft"
+                  [attr.aria-pressed]="formFieldType === ft"
+                  (click)="formFieldType = ft"
+                >
+                  <ng-icon [name]="getFieldTypeInfo(ft).icon" size="18" class="type-icon" aria-hidden="true"></ng-icon>
+                  <div class="type-info">
+                    <span class="type-title">{{ getFieldTypeInfo(ft).label }}</span>
+                  </div>
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Options Manager (For Enum / Multi Select) -->
+            @if (formFieldType === 'ENUM' || formFieldType === 'MULTI_SELECT') {
+            <div class="form-group options-manager-box">
+              <label for="new-option-input">Predefined Options *</label>
+              <div class="options-add-row">
+                <input
+                  id="new-option-input"
+                  type="text"
+                  class="form-control"
+                  placeholder="Add an option (e.g. LinkedIn, Referral)"
+                  [(ngModel)]="newOptionInput"
+                  (keydown.enter)="$event.preventDefault(); addOption()"
+                />
+                <button type="button" class="btn btn-secondary" (click)="addOption()">
+                  <ng-icon name="tablerPlus" size="16" aria-hidden="true"></ng-icon>
+                  <span>Add</span>
+                </button>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="quick-presets-row">
+                <span class="preset-label">Quick Presets:</span>
+                <button
+                  type="button"
+                  class="btn-preset-chip"
+                  (click)="applyOptionPreset(['LinkedIn', 'Indeed', 'Referral', 'Career Page', 'Agency'])"
+                >
+                  + Source Presets
+                </button>
+                <button
+                  type="button"
+                  class="btn-preset-chip"
+                  (click)="applyOptionPreset(['Citizen / Permanent', 'Work Permit', 'Sponsorship Required'])"
+                >
+                  + Visa Presets
+                </button>
+                <button
+                  type="button"
+                  class="btn-preset-chip"
+                  (click)="applyOptionPreset(['Junior', 'Middle', 'Senior', 'Lead', 'Executive'])"
+                >
+                  + Seniority
+                </button>
+              </div>
+
+              <!-- Tag List -->
+              <div class="tags-list">
+                @for (opt of formOptions; track opt) {
+                <span class="tag-chip">
+                  <span>{{ opt }}</span>
+                  <button type="button" class="tag-remove-btn" (click)="removeOption(opt)" [attr.aria-label]="'Remove option ' + opt">
+                    <ng-icon name="tablerX" size="12" aria-hidden="true"></ng-icon>
+                  </button>
+                </span>
+                }
+                @if (formOptions.length === 0) {
+                <span class="empty-tags-hint">No options added yet. Type above and click Add.</span>
+                }
+              </div>
+            </div>
+            }
+
+            <!-- Min/Max for Numeric -->
+            @if (formFieldType === 'NUMBER') {
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="minValueInput">Minimum Value</label>
+                <input
+                  id="minValueInput"
+                  type="number"
+                  class="form-control"
+                  placeholder="e.g. 0"
+                  [(ngModel)]="formMinValue"
+                />
+              </div>
+              <div class="form-group flex-1">
+                <label for="maxValueInput">Maximum Value</label>
+                <input
+                  id="maxValueInput"
+                  type="number"
+                  class="form-control"
+                  placeholder="e.g. 500000"
+                  [(ngModel)]="formMaxValue"
+                />
+              </div>
+            </div>
+            }
+
+            <!-- Helper Text & Placeholder -->
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="formPlaceholderInput">Placeholder Text</label>
+                <input
+                  id="formPlaceholderInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Enter full city name"
+                  [(ngModel)]="formPlaceholder"
+                />
+              </div>
+              <div class="form-group flex-1">
+                <label for="formDescInput">Description / Tooltip</label>
+                <input
+                  id="formDescInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Current city of residence"
+                  [(ngModel)]="formDescription"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="formDefaultInput">Default Value</label>
+              <input
+                id="formDefaultInput"
+                type="text"
+                class="form-control"
+                placeholder="Optional initial value"
+                [(ngModel)]="formDefaultValue"
+              />
+            </div>
+          </div>
+
+          <!-- Section 3: Validation Rules -->
+          <div class="form-section">
+            <span class="section-title">3. Validation & Constraints</span>
+            <div class="toggles-row">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="formRequired" />
+                <span><strong>Required Field</strong> (Must be completed in forms)</span>
+              </label>
+
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="formFilterable" />
+                <span><strong>Filterable</strong> (Show in search & filter bars)</span>
+              </label>
+            </div>
+
+            <!-- Validation Presets -->
+            <div class="form-group mt-3">
+              <label for="validation-preset-select">Format Validation Rule</label>
+              <select
+                id="validation-preset-select"
+                class="form-control"
+                [(ngModel)]="selectedValidationPreset"
+                (ngModelChange)="onValidationPresetChange()"
+              >
+                @for (p of validationPresets; track p.id) {
+                <option [value]="p.id">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+
+            @if (selectedValidationPreset !== 'none') {
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="regexInput">Regex Pattern</label>
+                <input
+                  id="regexInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="^pattern$"
+                  [(ngModel)]="formValidationRegex"
+                />
+              </div>
+              <div class="form-group flex-1">
+                <label for="validationMsgInput">Custom Error Message</label>
+                <input
+                  id="validationMsgInput"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Invalid format entered"
+                  [(ngModel)]="formValidationMessage"
+                />
+              </div>
+            </div>
+            }
+          </div>
+
+          <!-- Section 4: Conditional Logic -->
+          <div class="form-section">
+            <span class="section-title">4. Conditional Display Logic</span>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="enableConditional" />
+              <span><strong>Enable Conditional Display</strong> (Show field only when criteria met)</span>
+            </label>
+
+            @if (enableConditional) {
+            <div class="conditional-builder-box">
+              <p class="builder-hint">
+                Show this field only when parent field on <strong>{{ getEntityInfo(formEntityType).label }}</strong> matches:
+              </p>
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="parent-field-select">Parent Field</label>
+                  <select id="parent-field-select" class="form-control" [(ngModel)]="formConditionalFieldKey">
+                    <option value="">-- Select Parent Field --</option>
+                    @for (pDef of potentialParentFields(); track pDef.id) {
+                    <option [value]="pDef.key">{{ pDef.label }} ({{ pDef.key }})</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="conditional-val-input">Expected Trigger Value</label>
+                  <input
+                    id="conditional-val-input"
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. true, YES, Sponsorship Required"
+                    [(ngModel)]="formConditionalValue"
+                  />
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: LIVE INTERACTIVE PREVIEW -->
+        <div class="preview-col">
+          <div class="preview-sticky-card">
+            <div class="preview-header">
+              <ng-icon name="tablerEye" size="18" aria-hidden="true"></ng-icon>
+              <h4>Live Field Preview</h4>
+            </div>
+            <p class="preview-desc">
+              Here is how this field will render in the dynamic form:
+            </p>
+
+            <div class="preview-render-box">
+              <app-custom-fields-form
+                [entityType]="formEntityType"
+                [customDefinitions]="[livePreviewDefinition()]"
+                layout="vertical"
+              ></app-custom-fields-form>
+            </div>
+
+            <div class="preview-meta-summary">
+              <div class="meta-line">
+                <span class="lbl">Key:</span>
+                <code>{{ formKey || 'not_set' }}</code>
+              </div>
+              <div class="meta-line">
+                <span class="lbl">Type:</span>
+                <span>{{ getFieldTypeInfo(formFieldType).label }}</span>
+              </div>
+              <div class="meta-line">
+                <span class="lbl">Required:</span>
+                <span>{{ formRequired ? 'Yes' : 'No' }}</span>
+              </div>
+              @if (enableConditional && formConditionalFieldKey) {
+              <div class="meta-line">
+                <span class="lbl">Conditional:</span>
+                <span>{{ formConditionalFieldKey }} == '{{ formConditionalValue }}'</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEditModal()" [disabled]="saving()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary btn-save" (click)="saveDefinition()" [disabled]="saving()">
+          <ng-icon name="tablerDeviceFloppy" size="18" aria-hidden="true"></ng-icon>
+          <span>{{ saving() ? 'Saving...' : (editingFieldId() ? 'Save Changes' : 'Create Custom Field') }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==================== DELETE CONFIRMATION MODAL ==================== -->
+  @if (showDeleteModal() && fieldToDelete()) {
+  <div class="modal-backdrop" (click)="showDeleteModal.set(false)" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+    <div class="modal-card delete-modal" (click)="$event.stopPropagation()">
+      <div class="delete-icon-wrap" aria-hidden="true">
+        <ng-icon name="tablerTrash" size="32"></ng-icon>
+      </div>
+      <h3 id="delete-dialog-title">Delete Custom Field</h3>
+      <p>
+        Are you sure you want to delete <strong>{{ fieldToDelete()?.label }}</strong> (<code>{{ fieldToDelete()?.key }}</code>)?
+        All existing data stored in this field across existing entity records will also be permanently deleted.
+      </p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="showDeleteModal.set(false)" [disabled]="saving()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteDefinition()" [disabled]="saving()">
+          {{ saving() ? 'Deleting...' : 'Yes, Delete Field' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==================== PLAYGROUND / TEST MODAL ==================== -->
+  @if (showPlaygroundModal()) {
+  <div class="modal-backdrop" (click)="closePlayground()" role="dialog" aria-modal="true" aria-labelledby="playground-dialog-title">
+    <div class="modal-card playground-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon name="tablerSparkles" size="22" aria-hidden="true"></ng-icon>
+          <h3 id="playground-dialog-title">Dynamic Form Playground</h3>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closePlayground()" aria-label="Close playground">
+          <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="playground-intro">
+          Test interactive custom field behavior, conditional visibility rules, and validations for any entity type in real time before using them in live processes.
+        </p>
+
+        <!-- Entity Switcher -->
+        <div class="playground-entity-bar">
+          <label>Select Target Entity Form:</label>
+          <div class="entity-pills-row" role="radiogroup" aria-label="Select entity for testing">
+            @for (ent of entityTypesList; track ent) {
+            <button
+              type="button"
+              class="pill-entity-btn"
+              [class.active]="playgroundEntityType === ent"
+              [attr.aria-pressed]="playgroundEntityType === ent"
+              (click)="playgroundEntityType = ent; playgroundValues = {}"
+            >
+              <ng-icon [name]="getEntityInfo(ent).icon" size="16" aria-hidden="true"></ng-icon>
+              <span>{{ getEntityInfo(ent).label }}</span>
+            </button>
+            }
+          </div>
+        </div>
+
+        <!-- Rendered Form -->
+        <div class="playground-form-container">
+          <app-custom-fields-form
+            [entityType]="playgroundEntityType"
+            [(values)]="playgroundValues"
+            layout="grid"
+          ></app-custom-fields-form>
+        </div>
+
+        <!-- Values Inspector -->
+        <div class="playground-state-inspector">
+          <div class="inspector-header">
+            <ng-icon name="tablerCode" size="16" aria-hidden="true"></ng-icon>
+            <span>Live Form JSON Output:</span>
+          </div>
+          <pre class="json-output">{{ playgroundValues | json }}</pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="closePlayground()">
+          Close Playground
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

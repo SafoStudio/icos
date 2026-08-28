@@ -1,0 +1,79 @@
+﻿<div class="settings-layout-page">
+  <header class="settings-header">
+    <div class="settings-header-inner">
+      <div class="header-icon-badge" aria-hidden="true">
+        <ng-icon name="tablerSettings" size="24"></ng-icon>
+      </div>
+      <div>
+        <h2>System Settings</h2>
+        <p class="settings-subtitle">Manage company configurations, dynamic form schema builder, and workspace preferences.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="settings-content-wrapper">
+    <app-tabs
+      [tabs]="tabs"
+      [activeTabId]="activeTabId()"
+      (tabChange)="activeTabId.set($event)"
+    >
+      <!-- TAB 1: CUSTOM FIELDS -->
+      @if (activeTabId() === 'custom-fields') {
+      <div class="tab-pane" role="tabpanel" aria-label="Custom fields settings">
+        <app-custom-fields-settings></app-custom-fields-settings>
+      </div>
+      }
+
+      <!-- TAB 2: GENERAL ORGANIZATION -->
+      @if (activeTabId() === 'general') {
+      <div class="tab-pane general-settings-pane" role="tabpanel" aria-label="General workspace settings">
+        <div class="card-section">
+          <h3>Workspace Information</h3>
+          <p class="section-desc">Details of your active organization and corporate account.</p>
+
+          <div class="info-table">
+            <div class="info-row">
+              <span class="info-key">User Email:</span>
+              <span class="info-val">{{ currentUser()?.email || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">Role:</span>
+              <span class="info-val badge-role">{{ currentUser()?.role || 'SPECIALIST' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-key">Company ID:</span>
+              <span class="info-val code-val">{{ currentUser()?.companyId || 'Global' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- TAB 3: PREFERENCES -->
+      @if (activeTabId() === 'preferences') {
+      <div class="tab-pane preferences-pane" role="tabpanel" aria-label="Appearance and theme preferences">
+        <div class="card-section">
+          <h3>Theme & Display Preferences</h3>
+          <p class="section-desc">Customize your workspace appearance.</p>
+
+          <div class="pref-item">
+            <div>
+              <strong>Dark Mode</strong>
+              <p class="text-muted">Toggle between dark and light color palettes.</p>
+            </div>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="toggleTheme()"
+              [attr.aria-label]="isDark() ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
+            >
+              <ng-icon [name]="isDark() ? 'tablerSun' : 'tablerMoon'" size="18" aria-hidden="true"></ng-icon>
+              <span>{{ isDark() ? 'Switch to Light' : 'Switch to Dark' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </app-tabs>
+  </main>
+</div>
