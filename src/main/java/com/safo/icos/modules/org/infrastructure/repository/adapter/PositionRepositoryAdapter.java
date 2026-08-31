@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class PositionRepositoryImpl implements PositionRepository {
+public class PositionRepositoryAdapter implements PositionRepository {
   private final PositionJpaRepository jpaRepository;
   private final OrgMapper mapper;
 

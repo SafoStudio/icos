@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class CompanyRepositoryImpl implements CompanyRepository {
+public class CompanyRepositoryAdapter implements CompanyRepository {
   private final CompanyJpaRepository jpaRepository;
   private final OrgMapper mapper;
 

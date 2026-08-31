@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class DepartmentRepositoryImpl implements DepartmentRepository {
+public class DepartmentRepositoryAdapter implements DepartmentRepository {
   private final DepartmentJpaRepository jpaRepository;
   private final OrgMapper mapper;
 

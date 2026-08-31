@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @RequiredArgsConstructor
-public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
+public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
 
   private final RefreshTokenJpaRepository jpaRepository;
   private final RefreshTokenMapper refreshTokenMapper;

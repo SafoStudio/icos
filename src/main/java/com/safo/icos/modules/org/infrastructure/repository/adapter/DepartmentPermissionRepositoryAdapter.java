@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class DepartmentPermissionRepositoryImpl implements DepartmentPermissionRepository {
+public class DepartmentPermissionRepositoryAdapter implements DepartmentPermissionRepository {
 
   private final DepartmentPermissionJpaRepository jpaRepository;
   private final OrgMapper mapper;

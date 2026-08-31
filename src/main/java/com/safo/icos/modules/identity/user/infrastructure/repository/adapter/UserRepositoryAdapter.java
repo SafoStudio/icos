@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryAdapter implements UserRepository {
 
   private final UserJpaRepository jpaRepository;
   private final MembershipRepository membershipRepository;

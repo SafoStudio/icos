@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class UserProviderImpl implements UserProvider {
+public class UserProviderAdapter implements UserProvider {
   private final UserService userService;
   private final MembershipJpaRepository membershipJpaRepository;
   private final PermissionJpaRepository permissionJpaRepository;
