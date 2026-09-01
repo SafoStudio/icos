@@ -12,17 +12,19 @@ import lombok.Getter;
 public class OffboardingProcess {
   private final UUID id;
   private final UUID membershipId;
+  private final UUID companyId;
   private final UUID templateId;
   private final OffboardingProcessStatus status;
   private final LocalDate startDate;
   private final LocalDate lastWorkingDay;
   private final String reason;
-  private final String initiatedBy;   // MEMBER, HEAD, HR
+  private final String initiatedBy;
   private final LocalDateTime createdAt;
   private final LocalDateTime updatedAt;
 
   public static OffboardingProcess create(
           UUID membershipId,
+          UUID companyId,
           UUID templateId,
           LocalDate lastWorkingDay,
           String reason,
@@ -31,6 +33,7 @@ public class OffboardingProcess {
     return OffboardingProcess.builder()
             .id(UUID.randomUUID())
             .membershipId(membershipId)
+            .companyId(companyId)
             .templateId(templateId)
             .status(OffboardingProcessStatus.PENDING_APPROVAL)
             .startDate(LocalDate.now())

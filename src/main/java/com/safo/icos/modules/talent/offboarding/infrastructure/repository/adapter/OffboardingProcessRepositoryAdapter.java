@@ -4,6 +4,7 @@ import com.safo.icos.modules.talent.offboarding.domain.model.OffboardingProcess;
 import com.safo.icos.modules.talent.offboarding.domain.repository.OffboardingProcessRepository;
 import com.safo.icos.modules.talent.offboarding.infrastructure.mapper.OffboardingMapper;
 import com.safo.icos.modules.talent.offboarding.infrastructure.repository.jpa.OffboardingProcessJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,12 @@ public class OffboardingProcessRepositoryAdapter implements OffboardingProcessRe
   @Override
   public Optional<OffboardingProcess> findByMembershipId(UUID membershipId) {
     return jpaRepository.findByMembershipId(membershipId).map(mapper::toDomain);
+  }
+
+  @Override
+  public List<OffboardingProcess> findByCompanyId(UUID companyId) {
+    return jpaRepository.findByCompanyId(companyId).stream()
+            .map(mapper::toDomain)
+            .toList();
   }
 }

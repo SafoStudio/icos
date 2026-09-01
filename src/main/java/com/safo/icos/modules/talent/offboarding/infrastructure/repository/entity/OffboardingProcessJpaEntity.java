@@ -25,6 +25,9 @@ public class OffboardingProcessJpaEntity {
   @Column(name = "membership_id", nullable = false)
   private UUID membershipId;
 
+  @Column(name = "company_id", nullable = false)
+  private UUID companyId;
+
   @Column(name = "template_id")
   private UUID templateId;
 
