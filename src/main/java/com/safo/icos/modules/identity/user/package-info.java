@@ -15,7 +15,7 @@
  * </ul>
  *
  * @see com.safo.icos.modules.identity.user.api.UserProvider
- * @see com.safo.icos.modules.identity.user.application.service.UserService
+ * @see com.safo.icos.modules.identity.user.application.UserService
  * @see com.safo.icos.modules.identity.user.domain.model.User
  */
 package com.safo.icos.modules.identity.user;

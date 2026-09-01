@@ -1,0 +1,108 @@
+extend type Query {
+    offboardingProcess(id: UUID!): OffboardingProcess
+    offboardingProcessByMembership(membershipId: UUID!): OffboardingProcess
+    offboardingProcessesByCompany(companyId: UUID!): [OffboardingProcess!]!
+    myOffboardingTasks: [OffboardingTask!]!
+    offboardingTemplates(companyId: UUID!): [OffboardingTemplate!]!
+    offboardingTask(taskId: UUID!): OffboardingTask
+}
+
+extend type Mutation {
+    createOffboardingTemplate(input: CreateOffboardingTemplateInput!): OffboardingTemplate!
+    addTaskToOffboardingTemplate(input: AddOffboardingTaskTemplateInput!): OffboardingTaskTemplate!
+    startOffboarding(input: StartOffboardingInput!): OffboardingProcess!
+    approveOffboardingProcess(processId: UUID!): OffboardingProcess!
+    transitionOffboardingProcess(input: TransitionOffboardingProcessInput!): OffboardingProcess!
+    signOffOffboardingProcess(processId: UUID!): OffboardingProcess!
+    cancelOffboardingProcess(processId: UUID!): Boolean!
+    startOffboardingTask(taskId: UUID!): OffboardingTask!
+    completeOffboardingTask(taskId: UUID!): OffboardingTask!
+    skipOffboardingTask(taskId: UUID!): OffboardingTask!
+    blockOffboardingTask(taskId: UUID!): OffboardingTask!
+    unblockOffboardingTask(taskId: UUID!): OffboardingTask!
+}
+
+type OffboardingProcess {
+    id: UUID!
+    membershipId: UUID!
+    templateId: UUID
+    status: OffboardingProcessStatus!
+    startDate: String!
+    lastWorkingDay: String!
+    reason: String
+    initiatedBy: String
+    tasks: [OffboardingTask!]!
+}
+
+type OffboardingTask {
+    id: UUID!
+    processId: UUID!
+    title: String!
+    description: String
+    assigneeId: UUID!
+    status: OffboardingTaskStatus!
+    dueDate: String
+    completedAt: DateTime
+}
+
+type OffboardingTemplate {
+    id: UUID!
+    companyId: UUID!
+    name: String!
+    description: String
+}
+
+type OffboardingTaskTemplate {
+    id: UUID!
+    templateId: UUID!
+    title: String!
+    description: String
+    daysFromStart: Int!
+    assigneeRole: String!
+}
+
+input CreateOffboardingTemplateInput {
+    companyId: UUID!
+    name: String!
+    description: String
+}
+
+input AddOffboardingTaskTemplateInput {
+    templateId: UUID!
+    title: String!
+    description: String
+    daysFromStart: Int!
+    assigneeRole: String!
+}
+
+input StartOffboardingInput {
+    membershipId: UUID!
+    templateId: UUID!
+    lastWorkingDay: String!
+    reason: String!
+    initiatedBy: String!
+}
+
+input TransitionOffboardingProcessInput {
+    processId: UUID!
+    status: OffboardingProcessStatus!
+}
+
+enum OffboardingProcessStatus {
+    PENDING_APPROVAL
+    HR_INTERVIEW
+    KNOWLEDGE_TRANSFER
+    IT_REVOKE
+    FINANCIAL_SETTLEMENT
+    READY_FOR_SIGN_OFF
+    COMPLETED
+    CANCELLED
+}
+
+enum OffboardingTaskStatus {
+    PENDING
+    IN_PROGRESS
+    DONE
+    SKIPPED
+    BLOCKED
+}

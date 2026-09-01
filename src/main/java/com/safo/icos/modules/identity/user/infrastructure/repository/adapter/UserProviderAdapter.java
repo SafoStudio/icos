@@ -7,7 +7,7 @@ import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
 import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
-import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.MembershipJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;

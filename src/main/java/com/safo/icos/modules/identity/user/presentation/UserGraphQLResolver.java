@@ -1,6 +1,6 @@
 package com.safo.icos.modules.identity.user.presentation;
 
-import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.modules.identity.user.application.dto.ProfileResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.ProfileUpdateDto;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;

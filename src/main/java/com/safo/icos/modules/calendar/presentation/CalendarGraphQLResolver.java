@@ -6,7 +6,7 @@ import com.safo.icos.modules.calendar.application.CalendarService;
 import com.safo.icos.modules.calendar.domain.model.enums.ParticipantStatus;
 import com.safo.icos.modules.calendar.infrastructure.mapper.EventMapper;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
-import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.security.context.IcosUserPrincipal;
 import java.time.OffsetDateTime;
 import java.util.List;

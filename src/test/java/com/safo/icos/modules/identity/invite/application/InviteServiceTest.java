@@ -8,7 +8,7 @@ import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.modules.identity.invite.infrastructure.email.EmailService;
-import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.DepartmentService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;

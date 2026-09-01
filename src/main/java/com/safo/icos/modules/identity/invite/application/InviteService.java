@@ -15,7 +15,7 @@ import com.safo.icos.modules.org.application.DepartmentService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
 import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
-import com.safo.icos.modules.identity.user.application.service.UserService;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.security.context.IcosUserPrincipal;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;

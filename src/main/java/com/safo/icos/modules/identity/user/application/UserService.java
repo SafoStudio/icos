@@ -1,4 +1,4 @@
-package com.safo.icos.modules.identity.user.application.service;
+package com.safo.icos.modules.identity.user.application;
 
 import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
