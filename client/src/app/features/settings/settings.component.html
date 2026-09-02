@@ -1,20 +1,18 @@
 ﻿<div class="settings-layout-page">
-  <header class="settings-header">
-    <div class="settings-header-inner">
-      <div class="header-icon-badge" aria-hidden="true">
-        <ng-icon name="tablerSettings" size="24"></ng-icon>
-      </div>
-      <div>
-        <h2>System Settings</h2>
-        <p class="settings-subtitle">Manage company configurations, dynamic form schema builder, and workspace preferences.</p>
-      </div>
+  <div class="page-header">
+    <div class="title-badge">
+      <ng-icon name="tablerSettings" size="20" class="badge-icon" aria-hidden="true"></ng-icon>
+      <span class="badge-text">System Settings</span>
     </div>
-  </header>
+    <p class="subtitle">Manage company configurations, dynamic form schema builder, and workspace preferences.</p>
+  </div>
 
   <main class="settings-content-wrapper">
     <app-tabs
       [tabs]="tabs"
       [activeTabId]="activeTabId()"
+      [contentMaxHeight]="activeTabId() === 'custom-fields' ? 'calc(100vh - 180px)' : 'calc(100vh - 300px)'"
+      [contentMinHeight]="activeTabId() === 'custom-fields' ? '500px' : 'auto'"
       (tabChange)="activeTabId.set($event)"
     >
       <!-- TAB 1: CUSTOM FIELDS -->

@@ -3,6 +3,7 @@
   border: 1px solid var(--border-color, #e2e8f0);
   overflow: hidden;
   box-shadow: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.05));
+  border-radius: 12px;
 }
 
 .tabs-header {
@@ -13,6 +14,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   flex-shrink: 0;
+  padding: 0 16px;
 
   &::-webkit-scrollbar {
     height: 3px;
@@ -57,6 +59,17 @@
   &.active {
     color: var(--accent-indigo, #667eea);
     font-weight: 600;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent-indigo, #667eea);
+      border-radius: 2px;
+    }
   }
 
   &.disabled {
@@ -87,11 +100,10 @@
 }
 
 .tabs-content {
-  min-height: auto;
   overflow-y: auto;
-  max-height: calc(100vh - 300px);
   background: var(--bg-surface, #ffffff);
   color: var(--text-primary, #0f172a);
+  padding: 24px;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -153,8 +165,6 @@
 
   .tabs-content {
     padding: 16px;
-    min-height: 300px;
-    max-height: calc(100vh - 250px);
   }
 }
 
@@ -169,7 +179,6 @@
 
   .tabs-content {
     padding: 20px;
-    max-height: calc(100vh - 280px);
   }
 }
 

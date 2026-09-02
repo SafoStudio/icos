@@ -2,53 +2,49 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: var(--bg-app, #f8fafc);
+  background: var(--bg-primary, #f8fafc);
+  padding: 24px 32px;
 }
 
-.settings-header {
-  background: var(--bg-surface, #ffffff);
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
-  padding: 1.5rem 2rem;
+.page-header {
+  margin-bottom: 24px;
 
-  .settings-header-inner {
-    display: flex;
+  .title-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--accent-indigo, #6366f1);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    letter-spacing: 0.3px;
 
-    .header-icon-badge {
+    .badge-icon {
       display: flex;
       align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary, #4f46e5);
     }
 
-    h2 {
-      font-size: 1.375rem;
-      font-weight: 700;
-      color: var(--text-primary, #111827);
-      margin: 0;
+    .badge-text {
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
     }
+  }
 
-    .settings-subtitle {
-      font-size: 0.875rem;
-      color: var(--text-secondary, #6b7280);
-      margin-top: 0.25rem;
-      margin-bottom: 0;
-    }
+  .subtitle {
+    margin: 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: 16px;
+    font-weight: 400;
   }
 }
 
 .settings-content-wrapper {
-  max-width: 1400px;
   width: 100%;
-  margin: 0 auto;
-  padding: 1rem 0;
 }
 
 .tab-pane {
@@ -60,7 +56,7 @@
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 12px;
   padding: 1.75rem;
-  margin: 1.5rem 2rem;
+  margin-top: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 
   h3 {
@@ -166,5 +162,128 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// Dark theme support
+:root[data-theme="dark"],
+body.dark-theme {
+  .settings-layout-page {
+    background: var(--bg-primary, #0f172a);
+  }
+
+  .page-header {
+    .title-badge {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #818cf8;
+
+      .badge-text {
+        color: #818cf8;
+      }
+    }
+
+    .subtitle {
+      color: var(--text-secondary, #94a3b8);
+    }
+  }
+
+  .card-section {
+    background: var(--bg-surface, rgba(30, 41, 59, 0.6));
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+
+    h3 {
+      color: var(--text-primary, #f8fafc);
+    }
+
+    .section-desc {
+      color: var(--text-secondary, #94a3b8);
+    }
+  }
+
+  .info-table {
+    .info-row {
+      border-bottom-color: var(--border-color, rgba(255, 255, 255, 0.06));
+
+      .info-key {
+        color: var(--text-secondary, #94a3b8);
+      }
+
+      .info-val {
+        color: var(--text-primary, #f8fafc);
+
+        &.badge-role {
+          background: rgba(99, 102, 241, 0.2);
+          color: #818cf8;
+        }
+
+        &.code-val {
+          background: var(--bg-surface-secondary, rgba(51, 65, 85, 0.5));
+          color: var(--text-secondary, #94a3b8);
+        }
+      }
+    }
+  }
+
+  .pref-item {
+    .text-muted {
+      color: var(--text-secondary, #94a3b8);
+    }
+
+    .btn {
+      border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+      background: var(--bg-surface, rgba(30, 41, 59, 0.6));
+      color: var(--text-primary, #f8fafc);
+
+      &:hover {
+        background: var(--bg-hover, rgba(51, 65, 85, 0.7));
+        border-color: var(--primary, #6366f1);
+        color: var(--primary, #818cf8);
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .settings-layout-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    .subtitle {
+      font-size: 14px;
+    }
+  }
+
+  .card-section {
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .info-table .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+
+    .info-key {
+      width: 100%;
+    }
+  }
+
+  .pref-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .settings-layout-page {
+    padding: 20px;
+  }
+
+  .card-section {
+    padding: 1.25rem;
   }
 }

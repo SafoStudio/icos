@@ -21,6 +21,9 @@ export class TabsComponent {
   @Input() set activeTabId(value: string) {
     this._activeTabId.set(value);
   }
+  @Input() contentMaxHeight: string = 'calc(100vh - 300px)';
+  @Input() contentMinHeight: string = 'auto';
+
   @Output() tabChange = new EventEmitter<string>();
 
   private readonly _activeTabId: WritableSignal<string> = signal('');

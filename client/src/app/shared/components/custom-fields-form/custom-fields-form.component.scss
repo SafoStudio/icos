@@ -307,7 +307,6 @@
     color: #ffffff;
     border: none;
     cursor: pointer;
-    transition: background 0.15s;
 
     &:hover:not(:disabled) {
       background: var(--primary-hover, #4338ca);

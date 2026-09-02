@@ -171,9 +171,9 @@ export const ENTITY_TYPES_INFO: Record<EntityType, { label: string; icon: string
     description: 'Vacancies, department codes, budget allocations, hiring priority'
   },
   USER: {
-    label: 'User / Employee',
+    label: 'User / Member',
     icon: 'tablerUser',
-    description: 'Employee profiles, shirt sizes, equipment IDs, languages'
+    description: 'Member profiles, shirt sizes, equipment IDs, languages'
   },
   ONBOARDING: {
     label: 'Onboarding',

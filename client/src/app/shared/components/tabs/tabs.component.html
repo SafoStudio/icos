@@ -21,7 +21,11 @@
     }
   </div>
 
-  <div class="tabs-content">
+  <div
+    class="tabs-content"
+    [style.max-height]="contentMaxHeight"
+    [style.min-height]="contentMinHeight"
+  >
     <ng-content></ng-content>
   </div>
 </div>

@@ -121,32 +121,34 @@
   <!-- SEARCH & FILTER TOOLBAR -->
   <div class="toolbar-section">
     <div class="search-box">
-      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
-      <label for="search-fields-input" class="sr-only">Filter custom fields</label>
-      <input
-        id="search-fields-input"
-        type="text"
-        placeholder="Filter by field label, key, or description..."
-        [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
-      />
-      @if (searchQuery()) {
-      <button class="clear-search-btn" (click)="searchQuery.set('')" aria-label="Clear search">
-        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
-      </button>
-      }
+      <div class="search-input-wrap">
+        <ng-icon name="tablerSearch" size="16" class="search-icon" aria-hidden="true"></ng-icon>
+        <label for="search-fields-input" class="visually-hidden">Filter custom fields</label>
+        <input
+          id="search-fields-input"
+          type="text"
+          placeholder="Filter by label, key, or description"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+        @if (searchQuery()) {
+        <button class="clear-search-btn" (click)="searchQuery.set('')" aria-label="Clear search">
+          <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+        </button>
+        }
+      </div>
     </div>
 
     <div class="filters-wrap">
       <div class="filter-select-box">
         <ng-icon name="tablerFilter" size="16" class="select-icon" aria-hidden="true"></ng-icon>
-        <label for="filter-type-select" class="sr-only">Filter by data type</label>
+        <label for="filter-type-select" class="visually-hidden">Filter by data type</label>
         <select
           id="filter-type-select"
           [ngModel]="filterFieldType()"
           (ngModelChange)="filterFieldType.set($event)"
         >
-          <option value="ALL">All Field Types</option>
+          <option value="ALL">All Types</option>
           @for (ft of fieldTypesList; track ft) {
           <option [value]="ft">{{ getFieldTypeInfo(ft).label }}</option>
           }

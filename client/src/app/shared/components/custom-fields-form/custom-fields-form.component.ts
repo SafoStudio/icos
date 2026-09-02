@@ -18,8 +18,7 @@ import {
   CustomFieldDefinition,
   CustomFieldValue,
   CustomFieldValueInput,
-  EntityType,
-  FieldType
+  EntityType
 } from '@models';
 
 @Component({
