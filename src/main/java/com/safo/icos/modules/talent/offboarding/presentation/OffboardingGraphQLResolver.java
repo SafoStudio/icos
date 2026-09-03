@@ -88,14 +88,14 @@ public class OffboardingGraphQLResolver {
   @MutationMapping
   @RequirePermission("offboarding:manage")
   public OffboardingTaskTemplateDto addTaskToOffboardingTemplate(@Argument AddOffboardingTaskTemplateInput input) {
-    offboardingService.addTaskToTemplate(
+    var taskTemplate = offboardingService.addTaskToTemplate(
             input.templateId(),
             input.title(),
             input.description(),
             input.daysFromStart(),
             input.assigneeRole()
     );
-    return null;
+    return mapper.toDto(taskTemplate);
   }
 
   @MutationMapping

@@ -44,22 +44,51 @@ public class OffboardingService {
   private final UserService userService;
   private final ApplicationEventPublisher eventPublisher;
 
+  /**
+   * Creates a new offboarding template for a company.
+   *
+   * @param companyId   the company identifier
+   * @param name        the template name
+   * @param description template description
+   * @return the saved offboarding template
+   */
   public OffboardingTemplate createTemplate(UUID companyId, String name, String description) {
     OffboardingTemplate template = OffboardingTemplate.create(companyId, name, description);
     return templateRepository.save(template);
   }
 
-  public void addTaskToTemplate(UUID templateId, String title, String description,
-                                Integer daysFromStart, String assigneeRole) {
+  /**
+   * Adds a task template definition to an existing offboarding template.
+   *
+   * @param templateId   the offboarding template ID
+   * @param title        the task title
+   * @param description  the task description
+   * @param daysFromStart the offset in days from the offboarding start date
+   * @param assigneeRole the role responsible for this task (e.g. HR, IT, EMPLOYEE, HEAD)
+   * @return the saved task template
+   */
+  public OffboardingTaskTemplate addTaskToTemplate(UUID templateId, String title, String description,
+                                                   Integer daysFromStart, String assigneeRole) {
     templateRepository.findById(templateId)
             .orElseThrow(() -> new BusinessException(
                     "Template not found", OffboardingErrorCode.RESOURCE_NOT_FOUND));
 
     OffboardingTaskTemplate taskTemplate = OffboardingTaskTemplate.create(
             templateId, title, description, daysFromStart, assigneeRole);
-    taskTemplateRepository.save(taskTemplate);
+    return taskTemplateRepository.save(taskTemplate);
   }
 
+  /**
+   * Initiates an offboarding process for an employee membership based on an offboarding template.
+   * Creates corresponding tasks and assigns them according to template roles.
+   *
+   * @param membershipId   the employee membership ID (or user ID)
+   * @param templateId     the template to instantiate tasks from
+   * @param lastWorkingDay the employee's last working day
+   * @param reason         the offboarding reason
+   * @param initiatedBy    identifier or name of the user initiating the offboarding
+   * @return the created offboarding process in PENDING_APPROVAL status
+   */
   public OffboardingProcess startOffboarding(
           UUID membershipId,
           UUID templateId,
@@ -69,7 +98,16 @@ public class OffboardingService {
   ) {
     log.info("Starting offboarding for membership: {}, lastWorkingDay: {}", membershipId, lastWorkingDay);
 
-    Optional<OffboardingProcess> existingProcess = processRepository.findByMembershipId(membershipId);
+    MembershipDto membership = userService.findMembershipById(membershipId)
+            .or(() -> userService.findFirstActiveMembershipByUserId(membershipId))
+            .orElseThrow(() -> new BusinessException(
+                    MEMBERSHIP_NOT_FOUND + ": " + membershipId,
+                    OffboardingErrorCode.RESOURCE_NOT_FOUND));
+
+    UUID resolvedMembershipId = membership.getId();
+    UUID companyId = membership.getCompanyId();
+
+    Optional<OffboardingProcess> existingProcess = processRepository.findByMembershipId(resolvedMembershipId);
     if (existingProcess.isPresent()) {
       OffboardingProcessStatus status = existingProcess.get().getStatus();
       if (status != OffboardingProcessStatus.COMPLETED && status != OffboardingProcessStatus.CANCELLED) {
@@ -80,15 +118,8 @@ public class OffboardingService {
       }
     }
 
-    MembershipDto membership = userService.findMembershipById(membershipId)
-            .orElseThrow(() -> new BusinessException(
-                    MEMBERSHIP_NOT_FOUND + ": " + membershipId,
-                    OffboardingErrorCode.RESOURCE_NOT_FOUND));
-
-    UUID companyId = membership.getCompanyId();
-
     OffboardingProcess process = OffboardingProcess.create(
-            membershipId, companyId, templateId, lastWorkingDay, reason, initiatedBy);
+            resolvedMembershipId, companyId, templateId, lastWorkingDay, reason, initiatedBy);
     OffboardingProcess savedProcess = processRepository.save(process);
 
     List<OffboardingTaskTemplate> taskTemplates = taskTemplateRepository.findByTemplateId(templateId);
@@ -97,7 +128,7 @@ public class OffboardingService {
     }
 
     for (OffboardingTaskTemplate tt : taskTemplates) {
-      UUID assigneeId = resolveAssigneeByRole(companyId, membershipId, tt.getAssigneeRole());
+      UUID assigneeId = resolveAssigneeByRole(companyId, resolvedMembershipId, tt.getAssigneeRole());
 
       OffboardingTask task = OffboardingTask.create(
               savedProcess.getId(),
@@ -506,27 +537,37 @@ public class OffboardingService {
     return switch (role.toUpperCase()) {
       case "EMPLOYEE" -> {
         MembershipDto membership = userService.findMembershipById(membershipId)
+                .or(() -> userService.findFirstActiveMembershipByUserId(membershipId))
                 .orElseThrow(() -> new BusinessException(
                         MEMBERSHIP_NOT_FOUND, OffboardingErrorCode.RESOURCE_NOT_FOUND));
         yield membership.getUserId();
       }
-      case "MANAGER" -> findUserByRoleOrThrow(companyId, "MANAGER", "manager");
-      case "HR" -> findUserByRoleOrThrow(companyId, "HR", "HR");
-      case "IT_ADMIN", "IT" -> findUserByRoleOrThrow(companyId, "IT_ADMIN", "IT Admin");
-      case "ACCOUNTING", "FINANCE" -> findUserByRoleOrThrow(companyId, "ACCOUNTING", "Accounting");
-      default -> throw new BusinessException(
-              "Unknown role: " + role,
-              OffboardingErrorCode.UNKNOWN_ROLE);
+      case "MANAGER", "HEAD" -> findUserByRolesWithFallback(companyId, List.of("HEAD", "MANAGER", "ADMIN", "OWNER"), "Manager/Head");
+      case "HR" -> findUserByRolesWithFallback(companyId, List.of("HR", "ADMIN", "OWNER"), "HR");
+      case "IT_ADMIN", "IT" -> findUserByRolesWithFallback(companyId, List.of("IT_ADMIN", "IT", "ADMIN", "OWNER"), "IT Admin");
+      case "ACCOUNTING", "FINANCE" -> findUserByRolesWithFallback(companyId, List.of("ACCOUNTING", "FINANCE", "ADMIN", "OWNER"), "Accounting");
+      case "ADMIN" -> findUserByRolesWithFallback(companyId, List.of("ADMIN", "OWNER"), "Admin");
+      case "OWNER" -> findUserByRolesWithFallback(companyId, List.of("OWNER", "ADMIN"), "Owner");
+      default -> findUserByRolesWithFallback(companyId, List.of(role.toUpperCase(), "ADMIN", "OWNER"), role);
     };
   }
 
-  private UUID findUserByRoleOrThrow(UUID companyId, String roleName, String roleDisplayName) {
-    return getAllMembershipsByCompany(companyId).stream()
-            .filter(m -> roleName.equals(m.getRole()))
-            .findFirst()
+  private UUID findUserByRolesWithFallback(UUID companyId, List<String> preferredRoles, String roleDisplayName) {
+    List<MembershipDto> memberships = getAllMembershipsByCompany(companyId);
+    for (String roleName : preferredRoles) {
+      Optional<UUID> userId = memberships.stream()
+              .filter(m -> roleName.equalsIgnoreCase(m.getRole()))
+              .map(MembershipDto::getUserId)
+              .findFirst();
+      if (userId.isPresent()) {
+        return userId.get();
+      }
+    }
+    return memberships.stream()
             .map(MembershipDto::getUserId)
+            .findFirst()
             .orElseThrow(() -> new BusinessException(
-                    "No " + roleDisplayName + " found for company: " + companyId,
+                    "No employee found for company: " + companyId + " for role " + roleDisplayName,
                     OffboardingErrorCode.NO_EMPLOYEE_FOR_ROLE));
   }
 
