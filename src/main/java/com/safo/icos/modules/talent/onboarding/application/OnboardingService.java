@@ -59,20 +59,23 @@ public class OnboardingService {
    * Starts an onboarding process for a new member using the given template.
    * Instantiates all template tasks and publishes assignment events.
    *
-   * @param membershipId the new member's membership ID
+   * @param membershipId the new member's membership ID (or user ID)
    * @param templateId   the template to use
    * @param startDate    the first day of onboarding
    * @return the created onboarding process
    * @throws BusinessException if the membership is not found
    */
   public OnboardingProcess startOnboarding(UUID membershipId, UUID templateId, LocalDate startDate) {
-    OnboardingProcess process = OnboardingProcess.create(membershipId, templateId, startDate);
-    OnboardingProcess savedProcess = processRepository.save(process);
-
-    UUID userId = userProvider.findMembershipById(membershipId)
-            .map(MembershipDto::getUserId)
+    MembershipDto membership = userProvider.findMembershipById(membershipId)
+            .or(() -> userProvider.findFirstActiveMembershipByUserId(membershipId))
             .orElseThrow(() -> new BusinessException(
-                    "Membership not found", OnboardingErrorCode.RESOURCE_NOT_FOUND));
+                    "Membership not found: " + membershipId, OnboardingErrorCode.RESOURCE_NOT_FOUND));
+
+    UUID resolvedMembershipId = membership.getId();
+    UUID userId = membership.getUserId();
+
+    OnboardingProcess process = OnboardingProcess.create(resolvedMembershipId, templateId, startDate);
+    OnboardingProcess savedProcess = processRepository.save(process);
 
     List<OnboardingTaskTemplate> taskTemplates =
             taskTemplateRepository.findByTemplateId(templateId);
@@ -91,6 +94,16 @@ public class OnboardingService {
     }
 
     return savedProcess;
+  }
+
+  /**
+   * Returns all onboarding processes for the given company.
+   *
+   * @param companyId the company UUID
+   * @return list of onboarding processes
+   */
+  public List<OnboardingProcess> getProcessesByCompany(UUID companyId) {
+    return processRepository.findByCompanyId(companyId);
   }
 
   /**

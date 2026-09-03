@@ -1,5 +1,6 @@
 extend type Query {
     onboardingProcess(id: UUID!): OnboardingProcess
+    onboardingProcessesByCompany(companyId: UUID!): [OnboardingProcess!]!
     myOnboardingTasks: [OnboardingTask!]!
     onboardingTemplates(companyId: UUID!): [OnboardingTemplate!]!
 }

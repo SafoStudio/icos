@@ -39,6 +39,12 @@ public class OnboardingGraphQLResolver {
     }
 
     @QueryMapping
+    @RequirePermission("onboarding:read")
+    public List<OnboardingProcessDto> onboardingProcessesByCompany(@Argument UUID companyId) {
+        return onboardingService.getProcessesByCompany(companyId).stream().map(mapper::toDto).toList();
+    }
+
+    @QueryMapping
     @RequirePermission("onboarding:task.complete")
     public List<OnboardingTaskDto> myOnboardingTasks() {
         IcosUserPrincipal principal = getPrincipal();

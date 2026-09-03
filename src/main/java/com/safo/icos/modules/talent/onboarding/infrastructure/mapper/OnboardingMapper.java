@@ -131,8 +131,10 @@ public class OnboardingMapper {
         return OnboardingProcessDto.builder()
                 .id(domain.getId())
                 .membershipId(domain.getMembershipId())
+                .templateId(domain.getTemplateId())
                 .status(domain.getStatus().name())
                 .startDate(domain.getStartDate())
+                .targetCompletionDate(domain.getTargetCompletionDate())
                 .build();
     }
 
@@ -140,10 +142,13 @@ public class OnboardingMapper {
         if (domain == null) return null;
         return OnboardingTaskDto.builder()
                 .id(domain.getId())
+                .processId(domain.getProcessId())
                 .title(domain.getTitle())
                 .description(domain.getDescription())
+                .assigneeId(domain.getAssigneeId())
                 .status(domain.getStatus().name())
                 .dueDate(domain.getDueDate())
+                .completedAt(domain.getCompletedAt())
                 .build();
     }
 

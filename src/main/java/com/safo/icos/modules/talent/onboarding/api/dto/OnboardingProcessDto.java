@@ -13,6 +13,8 @@ import lombok.Getter;
 public class OnboardingProcessDto {
   private final UUID id;
   private final UUID membershipId;
+  private final UUID templateId;
   private final String status;
   private final LocalDate startDate;
+  private final LocalDate targetCompletionDate;
 }
