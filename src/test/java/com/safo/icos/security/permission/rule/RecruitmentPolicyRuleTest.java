@@ -18,6 +18,10 @@ class RecruitmentPolicyRuleTest {
     assertThat(rule.supports("recruitment:create")).isTrue();
     assertThat(rule.supports("application:review")).isTrue();
     assertThat(rule.supports("interview:schedule")).isTrue();
+    assertThat(rule.supports("vacancy:read")).isTrue();
+    assertThat(rule.supports("candidate:manage")).isTrue();
+    assertThat(rule.supports("pipeline:read")).isTrue();
+    assertThat(rule.supports("pipeline:manage")).isTrue();
   }
 
   @Test
@@ -51,6 +55,24 @@ class RecruitmentPolicyRuleTest {
     PolicyResult result = rule.check(hrMember, "application:review", null);
 
     assertThat(result.effect()).isEqualTo(PolicyResult.Effect.ALLOW);
+  }
+
+  @Test
+  void shouldAllowHrRole() {
+    IcosUserPrincipal hrRole = principalWithRoleAndDept("HR", null);
+
+    PolicyResult result = rule.check(hrRole, "pipeline:manage", null);
+
+    assertThat(result.effect()).isEqualTo(PolicyResult.Effect.ALLOW);
+  }
+
+  @Test
+  void shouldAllowPipelineActionForOwnerAndAdmin() {
+    IcosUserPrincipal admin = principalWithRoleAndDept("ADMIN", null);
+    IcosUserPrincipal owner = principalWithRoleAndDept("OWNER", null);
+
+    assertThat(rule.check(admin, "pipeline:read", null).effect()).isEqualTo(PolicyResult.Effect.ALLOW);
+    assertThat(rule.check(owner, "pipeline:manage", null).effect()).isEqualTo(PolicyResult.Effect.ALLOW);
   }
 
   @Test
