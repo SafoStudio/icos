@@ -1,0 +1,198 @@
+<div class="pipeline-container">
+  <header class="pipeline-header">
+    <div class="header-left">
+      <div class="title-badge">
+        <ng-icon name="tablerUserPlus" size="20" class="badge-icon" aria-hidden="true"></ng-icon>
+        <span class="badge-text">Onboarding Pipeline</span>
+      </div>
+      <p class="header-subtitle">Track new hire integration, task completions, and onboarding milestones.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="openStartModal()">
+        <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+        <span>Start Onboarding</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
+      <input
+        type="text"
+        placeholder="Filter by employee name, email or status..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </div>
+
+    <div class="stats-pills">
+      <span class="stat-pill">Total Active: {{ processes().length }}</span>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading onboarding pipeline...</span>
+  </div>
+  }
+
+  @if (!isLoading()) {
+  <div class="pipeline-board">
+    @for (col of columns(); track col.status) {
+    <div class="pipeline-column">
+      <div class="column-header">
+        <div class="status-wrap">
+          <span class="status-dot" [class]="col.badgeClass" aria-hidden="true"></span>
+          <h3 class="column-title">{{ col.label }}</h3>
+        </div>
+        <span class="count-badge">{{ col.processes.length }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (proc of col.processes; track proc.id) {
+        <div class="process-card">
+          <div class="card-main">
+            <div class="card-user">
+              <div class="avatar-gradient" aria-hidden="true">
+                {{ getInitials(proc.membershipId) }}
+              </div>
+              <div class="user-details">
+                <h4 class="user-name">{{ getMemberName(proc.membershipId) }}</h4>
+                <span class="user-email">{{ getMemberEmail(proc.membershipId) }}</span>
+              </div>
+            </div>
+
+            <div class="date-row">
+              <div class="date-item">
+                <span class="date-label">Start Date:</span>
+                <span class="date-value">{{ proc.startDate }}</span>
+              </div>
+              @if (proc.targetCompletionDate) {
+              <div class="date-item">
+                <span class="date-label">Target:</span>
+                <span class="date-value">{{ proc.targetCompletionDate }}</span>
+              </div>
+              }
+            </div>
+
+            <div class="progress-section">
+              <div class="progress-header">
+                <span class="progress-label">Checklist Tasks</span>
+                <span class="progress-ratio">{{ getCompletedTasksCount(proc.tasks) }}/{{ proc.tasks.length || 0 }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" [style.width.%]="getProgressPercentage(proc.tasks)"></div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button
+                type="button"
+                class="btn-tasks-toggle"
+                (click)="toggleProcessTasks(proc.id)"
+              >
+                <ng-icon [name]="expandedProcessId() === proc.id ? 'tablerChevronDown' : 'tablerChevronRight'" size="16"></ng-icon>
+                <span>{{ expandedProcessId() === proc.id ? 'Hide Tasks' : 'View Tasks' }} ({{ proc.tasks.length || 0 }})</span>
+              </button>
+            </div>
+
+            @if (expandedProcessId() === proc.id) {
+            <div class="tasks-checklist">
+              @for (task of proc.tasks; track task.id) {
+              <div class="task-item" [class.done]="task.status === 'DONE'">
+                <button
+                  type="button"
+                  class="task-check-btn"
+                  [disabled]="task.status === 'DONE'"
+                  (click)="completeTask(task, $event)"
+                  [title]="task.status === 'DONE' ? 'Task completed' : 'Mark task complete'"
+                >
+                  <ng-icon [name]="task.status === 'DONE' ? 'tablerCheck' : 'tablerCheckbox'" size="16"></ng-icon>
+                </button>
+                <div class="task-info">
+                  <span class="task-title" [class.line-through]="task.status === 'DONE'">{{ task.title }}</span>
+                  @if (task.dueDate) {
+                  <span class="task-due">Due: {{ task.dueDate }}</span>
+                  }
+                </div>
+              </div>
+              }
+              @if (!proc.tasks || proc.tasks.length === 0) {
+              <div class="no-tasks">No tasks assigned for this process.</div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if (col.processes.length === 0) {
+        <div class="empty-column-placeholder">
+          <span>No employees in {{ col.label }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Start Onboarding Modal / Drawer -->
+  @if (showStartModal()) {
+  <div class="modal-backdrop" (click)="closeStartModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Start Employee Onboarding</h3>
+        <button type="button" class="btn-close" (click)="closeStartModal()">
+          <ng-icon name="tablerX" size="20"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="memberSelect">Select Employee</label>
+          <select id="memberSelect" [(ngModel)]="startForm.membershipId">
+            <option value="" disabled>Choose an employee...</option>
+            @for (mem of members(); track mem.id) {
+            <option [value]="mem.id">{{ mem.firstName }} {{ mem.lastName }} ({{ mem.email }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="templateSelect">Onboarding Template</label>
+          <select id="templateSelect" [(ngModel)]="startForm.templateId">
+            <option value="" disabled>Choose a template...</option>
+            @for (tpl of templates(); track tpl.id) {
+            <option [value]="tpl.id">{{ tpl.name }}</option>
+            }
+          </select>
+          @if (templates().length === 0) {
+          <span class="form-hint">No templates available. Default template will be created.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input id="startDate" type="date" [(ngModel)]="startForm.startDate" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeStartModal()">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submitStartOnboarding()"
+          [disabled]="isSubmitting() || !startForm.membershipId || !startForm.templateId"
+        >
+          {{ isSubmitting() ? 'Starting...' : 'Launch Onboarding' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

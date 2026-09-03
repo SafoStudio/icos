@@ -1,0 +1,17 @@
+<div class="talent-page">
+  <div class="page-header">
+    <div class="title-badge">
+      <ng-icon name="tablerBriefcase" size="20" class="badge-icon" aria-hidden="true"></ng-icon>
+      <span class="badge-text">Talent Management</span>
+    </div>
+    <p class="subtitle">Streamline hiring pipeline, onboarding workflows, and departure procedures</p>
+  </div>
+
+  <app-tabs
+    [tabs]="tabs"
+    [activeTabId]="activeTabId()"
+    (tabChange)="onTabChange($event)"
+  >
+    <router-outlet></router-outlet>
+  </app-tabs>
+</div>

@@ -70,7 +70,7 @@ export class SidebarComponent {
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
     { label: 'Calendar', icon: 'tablerCalendarClock', route: '/calendar' },
-    { label: 'Recruitment', icon: 'tablerBriefcase', route: '/recruitment' },
+    { label: 'Talent', icon: 'tablerBriefcase', route: '/talent' },
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },

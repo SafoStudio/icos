@@ -1,0 +1,252 @@
+<div class="pipeline-container">
+  <header class="pipeline-header">
+    <div class="header-left">
+      <div class="title-badge">
+        <ng-icon name="tablerUserX" size="20" class="badge-icon" aria-hidden="true"></ng-icon>
+        <span class="badge-text">Offboarding Pipeline</span>
+      </div>
+      <p class="header-subtitle">Manage departure clearance, asset revocation, handovers, and exit protocols.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="btn btn-primary" (click)="openStartModal()">
+        <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+        <span>Initiate Offboarding</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <ng-icon name="tablerSearch" size="18" class="search-icon" aria-hidden="true"></ng-icon>
+      <input
+        type="text"
+        placeholder="Filter by employee, reason or stage..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+    </div>
+
+    <div class="stats-pills">
+      <span class="stat-pill">Total Active: {{ processes().length }}</span>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading offboarding pipeline...</span>
+  </div>
+  }
+
+  @if (!isLoading()) {
+  <div class="pipeline-board">
+    @for (col of columns(); track col.status) {
+    <div class="pipeline-column">
+      <div class="column-header">
+        <div class="status-wrap">
+          <span class="status-dot" [class]="col.badgeClass" aria-hidden="true"></span>
+          <h3 class="column-title">{{ col.label }}</h3>
+        </div>
+        <span class="count-badge">{{ col.processes.length }}</span>
+      </div>
+
+      <div class="cards-list">
+        @for (proc of col.processes; track proc.id) {
+        <div class="process-card">
+          <div class="card-main">
+            <div class="card-user">
+              <div class="avatar-gradient" aria-hidden="true">
+                {{ getInitials(proc.membershipId) }}
+              </div>
+              <div class="user-details">
+                <h4 class="user-name">{{ getMemberName(proc.membershipId) }}</h4>
+                <span class="user-email">{{ getMemberEmail(proc.membershipId) }}</span>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-item">
+                <span class="info-label">Last Day:</span>
+                <span class="info-value highlight">{{ proc.lastWorkingDay }}</span>
+              </div>
+              @if (proc.reason) {
+              <div class="info-item">
+                <span class="reason-pill">{{ proc.reason }}</span>
+              </div>
+              }
+            </div>
+
+            <div class="progress-section">
+              <div class="progress-header">
+                <span class="progress-label">Departure Checklist</span>
+                <span class="progress-ratio">{{ getCompletedTasksCount(proc.tasks) }}/{{ proc.tasks.length || 0 }}</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-bar" [style.width.%]="getProgressPercentage(proc.tasks)"></div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              @if (proc.status === 'PENDING_APPROVAL') {
+              <button type="button" class="btn-action btn-approve" (click)="approveProcess(proc.id)">
+                <ng-icon name="tablerCheck" size="14"></ng-icon>
+                <span>Approve</span>
+              </button>
+              }
+
+              @if (proc.status === 'READY_FOR_SIGN_OFF') {
+              <button type="button" class="btn-action btn-signoff" (click)="signOffProcess(proc.id)">
+                <ng-icon name="tablerCheck" size="14"></ng-icon>
+                <span>Sign Off</span>
+              </button>
+              }
+
+              @if (proc.status !== 'PENDING_APPROVAL' && proc.status !== 'READY_FOR_SIGN_OFF' && proc.status !== 'COMPLETED') {
+              <button type="button" class="btn-action btn-advance" (click)="advanceStage(proc)">
+                <span>Advance Stage →</span>
+              </button>
+              }
+
+              <button
+                type="button"
+                class="btn-tasks-toggle"
+                (click)="toggleProcessTasks(proc.id)"
+              >
+                <ng-icon [name]="expandedProcessId() === proc.id ? 'tablerChevronDown' : 'tablerChevronRight'" size="16"></ng-icon>
+                <span>Tasks ({{ proc.tasks.length || 0 }})</span>
+              </button>
+            </div>
+
+            @if (expandedProcessId() === proc.id) {
+            <div class="tasks-checklist">
+              @for (task of proc.tasks; track task.id) {
+              <div class="task-item" [class.done]="task.status === 'DONE' || task.status === 'SKIPPED'">
+                <button
+                  type="button"
+                  class="task-check-btn"
+                  [disabled]="task.status === 'DONE' || task.status === 'SKIPPED'"
+                  (click)="completeTask(task, $event)"
+                  [title]="task.status === 'DONE' ? 'Done' : 'Mark task complete'"
+                >
+                  <ng-icon [name]="task.status === 'DONE' ? 'tablerCheck' : 'tablerCheckbox'" size="16"></ng-icon>
+                </button>
+
+                <div class="task-info">
+                  <span class="task-title" [class.line-through]="task.status === 'DONE' || task.status === 'SKIPPED'">
+                    {{ task.title }}
+                  </span>
+                  <div class="task-meta">
+                    <span class="task-status-tag" [class]="'tag-' + task.status.toLowerCase()">{{ task.status }}</span>
+                    @if (task.dueDate) {
+                    <span class="task-due">Due: {{ task.dueDate }}</span>
+                    }
+                  </div>
+                </div>
+
+                @if (task.status === 'PENDING' || task.status === 'IN_PROGRESS') {
+                <button
+                  type="button"
+                  class="task-skip-btn"
+                  (click)="skipTask(task, $event)"
+                  title="Skip task"
+                >
+                  Skip
+                </button>
+                }
+              </div>
+              }
+              @if (!proc.tasks || proc.tasks.length === 0) {
+              <div class="no-tasks">No tasks defined.</div>
+              }
+
+              @if (proc.status !== 'COMPLETED') {
+              <div class="cancel-row">
+                <button type="button" class="btn-cancel-proc" (click)="cancelProcess(proc.id)">Cancel Process</button>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if (col.processes.length === 0) {
+        <div class="empty-column-placeholder">
+          <span>No employees in {{ col.label }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Initiate Offboarding Modal -->
+  @if (showStartModal()) {
+  <div class="modal-backdrop" (click)="closeStartModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Initiate Employee Offboarding</h3>
+        <button type="button" class="btn-close" (click)="closeStartModal()">
+          <ng-icon name="tablerX" size="20"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="offboardMemberSelect">Select Employee</label>
+          <select id="offboardMemberSelect" [(ngModel)]="startForm.membershipId">
+            <option value="" disabled>Choose an employee...</option>
+            @for (mem of members(); track mem.id) {
+            <option [value]="mem.id">{{ mem.firstName }} {{ mem.lastName }} ({{ mem.email }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="offboardTemplateSelect">Offboarding Template</label>
+          <select id="offboardTemplateSelect" [(ngModel)]="startForm.templateId">
+            <option value="" disabled>Choose a template...</option>
+            @for (tpl of templates(); track tpl.id) {
+            <option [value]="tpl.id">{{ tpl.name }}</option>
+            }
+          </select>
+          @if (templates().length === 0) {
+          <span class="form-hint">No templates available. A template will be created if needed.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="lastWorkingDay">Last Working Day</label>
+          <input id="lastWorkingDay" type="date" [(ngModel)]="startForm.lastWorkingDay" />
+        </div>
+
+        <div class="form-group">
+          <label for="offboardReason">Reason for Departure</label>
+          <select id="offboardReason" [(ngModel)]="startForm.reason">
+            <option value="Resignation">Voluntary Resignation</option>
+            <option value="Contract Expiration">Contract Expiration</option>
+            <option value="Mutual Agreement">Mutual Agreement</option>
+            <option value="Retirement">Retirement</option>
+            <option value="Relocation">Relocation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeStartModal()">Cancel</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submitStartOffboarding()"
+          [disabled]="isSubmitting() || !startForm.membershipId || !startForm.templateId"
+        >
+          {{ isSubmitting() ? 'Initiating...' : 'Start Offboarding' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

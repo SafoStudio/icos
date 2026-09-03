@@ -15,6 +15,9 @@ import { authGuard, publicGuard } from './core/guards/auth.guard';
 import { RecruitmentBoardComponent } from './features/recruitment/recruitment-board.component';
 import { TaskBoardComponent } from './features/tasks/task-board.component';
 import { CalendarComponent } from './features/calendar/calendar.component';
+import { TalentComponent } from './features/talent/talent.component';
+import { OnboardingPipelineComponent } from './features/talent/onboarding/onboarding-pipeline.component';
+import { OffboardingPipelineComponent } from './features/talent/offboarding/offboarding-pipeline.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
@@ -25,9 +28,22 @@ export const routes: Routes = [
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
-  { path: 'recruitment', component: RecruitmentBoardComponent, canActivate: [authGuard] },
-  { path: 'vacancies', redirectTo: 'recruitment', pathMatch: 'full' },
-  { path: 'candidates', redirectTo: 'recruitment', pathMatch: 'full' },
+  {
+    path: 'talent',
+    component: TalentComponent,
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'recruitment', pathMatch: 'full' },
+      { path: 'recruitment', component: RecruitmentBoardComponent },
+      { path: 'onboarding', component: OnboardingPipelineComponent },
+      { path: 'offboarding', component: OffboardingPipelineComponent },
+    ]
+  },
+  { path: 'recruitment', redirectTo: 'talent/recruitment', pathMatch: 'full' },
+  { path: 'onboarding', redirectTo: 'talent/onboarding', pathMatch: 'full' },
+  { path: 'offboarding', redirectTo: 'talent/offboarding', pathMatch: 'full' },
+  { path: 'vacancies', redirectTo: 'talent/recruitment', pathMatch: 'full' },
+  { path: 'candidates', redirectTo: 'talent/recruitment', pathMatch: 'full' },
   { path: 'tasks', component: TaskBoardComponent, canActivate: [authGuard] },
   {
     path: 'organization',
