@@ -2,6 +2,7 @@ package com.safo.icos.modules.talent.offboarding.infrastructure.mapper;
 
 import com.safo.icos.modules.talent.offboarding.api.dto.OffboardingProcessDto;
 import com.safo.icos.modules.talent.offboarding.api.dto.OffboardingTaskDto;
+import com.safo.icos.modules.talent.offboarding.api.dto.OffboardingTaskTemplateDto;
 import com.safo.icos.modules.talent.offboarding.api.dto.OffboardingTemplateDto;
 import com.safo.icos.modules.talent.offboarding.domain.model.OffboardingProcess;
 import com.safo.icos.modules.talent.offboarding.domain.model.OffboardingTask;
@@ -149,10 +150,12 @@ public class OffboardingMapper {
     return OffboardingProcessDto.builder()
             .id(domain.getId())
             .membershipId(domain.getMembershipId())
+            .templateId(domain.getTemplateId())
             .status(domain.getStatus().name())
             .startDate(domain.getStartDate())
             .lastWorkingDay(domain.getLastWorkingDay())
             .reason(domain.getReason())
+            .initiatedBy(domain.getInitiatedBy())
             .build();
   }
 
@@ -160,10 +163,12 @@ public class OffboardingMapper {
     if (domain == null) return null;
     return OffboardingTaskDto.builder()
             .id(domain.getId())
+            .processId(domain.getProcessId())
             .title(domain.getTitle())
             .description(domain.getDescription())
             .status(domain.getStatus().name())
             .dueDate(domain.getDueDate())
+            .completedAt(domain.getCompletedAt())
             .assigneeId(domain.getAssigneeId())
             .build();
   }
@@ -175,6 +180,18 @@ public class OffboardingMapper {
             .companyId(domain.getCompanyId())
             .name(domain.getName())
             .description(domain.getDescription())
+            .build();
+  }
+
+  public OffboardingTaskTemplateDto toDto(OffboardingTaskTemplate domain) {
+    if (domain == null) return null;
+    return OffboardingTaskTemplateDto.builder()
+            .id(domain.getId())
+            .templateId(domain.getTemplateId())
+            .title(domain.getTitle())
+            .description(domain.getDescription())
+            .daysFromStart(domain.getDaysFromStart())
+            .assigneeRole(domain.getAssigneeRole())
             .build();
   }
 }
