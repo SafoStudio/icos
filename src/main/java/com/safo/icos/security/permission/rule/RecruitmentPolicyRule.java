@@ -20,7 +20,10 @@ public class RecruitmentPolicyRule implements PolicyRule {
   public boolean supports(String action) {
     return action.startsWith("recruitment:")
             || action.startsWith("application:")
-            || action.startsWith("interview:");
+            || action.startsWith("interview:")
+            || action.startsWith("vacancy:")
+            || action.startsWith("candidate:")
+            || action.startsWith("pipeline:");
   }
 
   @Override
@@ -29,8 +32,7 @@ public class RecruitmentPolicyRule implements PolicyRule {
       return PolicyResult.allow("Admin/Owner has full access to recruitment");
     }
 
-    if (user.getDepartmentName() != null
-            && user.getDepartmentName().equalsIgnoreCase("HR")) {
+    if (isHr(user)) {
       return PolicyResult.allow("HR department members can manage recruitment");
     }
 
@@ -38,6 +40,14 @@ public class RecruitmentPolicyRule implements PolicyRule {
 
     return PolicyResult.deny(
             "Only ADMIN, OWNER or HR department members can manage recruitment");
+  }
+
+  private boolean isHr(IcosUserPrincipal user) {
+    if ("HR".equalsIgnoreCase(user.getRoleName())) {
+      return true;
+    }
+    return user.getDepartmentName() != null
+            && user.getDepartmentName().toUpperCase().contains("HR");
   }
 
   @Override
