@@ -39,12 +39,10 @@ export class MemberProfileComponent implements OnInit {
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
-    { id: 'custom-fields', label: 'Custom Attributes', icon: 'tablerForms' },
     { id: 'hr_management', label: 'Actions & Roles', icon: 'tablerBuilding' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
-
 
   readonly backButtonText = computed(() => {
     const url = this.returnUrl();
@@ -101,6 +99,8 @@ export class MemberProfileComponent implements OnInit {
 
   selectedRole: string = '';
   selectedDepartmentId: string = '';
+
+  getRoleLabel = getRoleLabel;
 
   ngOnInit(): void {
     const returnUrl = this.route.snapshot.queryParams['returnUrl'];

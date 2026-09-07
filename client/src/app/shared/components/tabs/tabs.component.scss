@@ -103,7 +103,6 @@
   overflow-y: auto;
   background: var(--bg-surface, #ffffff);
   color: var(--text-primary, #0f172a);
-  padding: 24px;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -162,10 +161,6 @@
       font-size: 16px;
     }
   }
-
-  .tabs-content {
-    padding: 16px;
-  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -175,10 +170,6 @@
 
   .tab-btn {
     padding: 12px 20px;
-  }
-
-  .tabs-content {
-    padding: 20px;
   }
 }
 

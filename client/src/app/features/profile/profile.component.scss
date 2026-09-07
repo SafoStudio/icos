@@ -35,7 +35,6 @@
   width: 100%;
 }
 
-
 .profile-sidebar {
   flex: 0 0 340px;
   min-width: 340px;
@@ -224,6 +223,10 @@
       transition: color 0.3s ease;
     }
   }
+
+  app-custom-fields-form {
+    grid-column: 1 / -1;
+  }
 }
 
 .edit-form {
@@ -248,7 +251,8 @@
       transition: color 0.3s ease;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 8px 12px;
       border: 1px solid #cbd5e1;
@@ -271,7 +275,26 @@
         color: #94a3b8;
         cursor: not-allowed;
       }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
     }
+
+    select {
+      appearance: auto;
+      cursor: pointer;
+
+      &:disabled {
+        background: #f1f3f5;
+        color: #94a3b8;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  app-custom-fields-form {
+    grid-column: 1 / -1;
   }
 }
 
@@ -391,7 +414,6 @@
   }
 }
 
-// DARK THEME
 :host-context([data-theme="dark"]),
 :host-context(body:not(.light-theme)) {
   .profile-page {
@@ -518,7 +540,8 @@
         color: var(--text-secondary, #94a3b8);
       }
 
-      input {
+      input,
+      select {
         background: var(--input-bg, rgba(15, 23, 42, 0.6));
         border-color: var(--border-color, rgba(255, 255, 255, 0.08));
         color: var(--text-primary, #f8fafc);
@@ -532,6 +555,23 @@
         &.disabled-input {
           background: var(--bg-surface-hover, rgba(30, 41, 59, 0.4));
           color: var(--text-muted, #64748b);
+        }
+
+        &::placeholder {
+          color: var(--text-muted, #64748b);
+        }
+      }
+
+      select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 14px;
+        padding-right: 36px;
+
+        option {
+          background: var(--bg-secondary, #1e293b);
+          color: var(--text-primary, #f8fafc);
         }
       }
     }

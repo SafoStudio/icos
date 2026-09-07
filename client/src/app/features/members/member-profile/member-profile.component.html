@@ -21,13 +21,13 @@
         </div>
         <h2 class="photo-name">{{ fullName() }}</h2>
         <div class="badges-row">
-            <span class="badge badge-role" [class]="'role-' + member()?.role?.toLowerCase()">
-              {{ roleLabel() }}
-            </span>
+          <span class="badge badge-role" [class]="'role-' + member()?.role?.toLowerCase()">
+            {{ roleLabel() }}
+          </span>
           <span class="badge badge-dept">
-              <ng-icon name="tablerBuilding" size="14"></ng-icon>
-              {{ departmentName() }}
-            </span>
+            <ng-icon name="tablerBuilding" size="14"></ng-icon>
+            {{ departmentName() }}
+          </span>
         </div>
 
         <div class="sidebar-contact-info">
@@ -62,11 +62,12 @@
     </div>
 
     <app-tabs
-        [tabs]="tabs"
-        [activeTabId]="activeTabId()"
-        (tabChange)="activeTabId.set($event)"
-      >
-        @if (activeTabId() === 'personal') {
+      [tabs]="tabs"
+      [activeTabId]="activeTabId()"
+      (tabChange)="activeTabId.set($event)"
+    >
+      @if (activeTabId() === 'personal') {
+      <div>
         <div class="section-header">
           @if (canManage()) {
           @if (!isEditing()) {
@@ -84,89 +85,136 @@
         <div class="profile-fields">
           @if (isEditing()) {
           <div class="edit-form">
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="firstName-input">First Name</label>
-                <input
-                  id="firstName-input"
-                  type="text"
-                  [(ngModel)]="editUser.firstName"
-                  placeholder="First Name"
-                />
-              </div>
+            <form (ngSubmit)="saveProfile()">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="firstName-input">First Name</label>
+                  <input
+                    id="firstName-input"
+                    type="text"
+                    [(ngModel)]="editUser.firstName"
+                    name="firstName"
+                    placeholder="First Name"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="lastName-input">Last Name</label>
-                <input
-                  id="lastName-input"
-                  type="text"
-                  [(ngModel)]="editUser.lastName"
-                  placeholder="Last Name"
-                />
-              </div>
+                <div class="form-group">
+                  <label for="lastName-input">Last Name</label>
+                  <input
+                    id="lastName-input"
+                    type="text"
+                    [(ngModel)]="editUser.lastName"
+                    name="lastName"
+                    placeholder="Last Name"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="email-input">Email Address</label>
-                <input
-                  id="email-input"
-                  type="email"
-                  [value]="member()?.email"
-                  disabled
-                  class="disabled-input"
-                />
-              </div>
+                <div class="form-group">
+                  <label for="email-input">Email Address</label>
+                  <input
+                    id="email-input"
+                    type="email"
+                    [value]="member()?.email"
+                    disabled
+                    class="disabled-input"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="phone-input">Phone Number</label>
-                <input
-                  id="phone-input"
-                  type="text"
-                  [(ngModel)]="editProfile.phoneNumber"
-                  placeholder="+1 (555) 000-0000"
-                />
-              </div>
+                <div class="form-group">
+                  <label for="phone-input">Phone Number</label>
+                  <input
+                    id="phone-input"
+                    type="text"
+                    [(ngModel)]="editProfile.phoneNumber"
+                    name="phoneNumber"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="address-input">Address</label>
-                <input
-                  id="address-input"
-                  type="text"
-                  [(ngModel)]="editProfile.address"
-                  placeholder="Full residential address"
-                />
-              </div>
+                <div class="form-group">
+                  <label for="address-input">Address</label>
+                  <input
+                    id="address-input"
+                    type="text"
+                    [(ngModel)]="editProfile.address"
+                    name="address"
+                    placeholder="Full residential address"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="hire-date-input">Hire Date</label>
-                <input
-                  id="hire-date-input"
-                  type="date"
-                  [(ngModel)]="editProfile.hireDate"
-                />
-              </div>
+                <div class="form-group">
+                  <label for="hire-date-input">Hire Date</label>
+                  <input
+                    id="hire-date-input"
+                    type="date"
+                    [(ngModel)]="editProfile.hireDate"
+                    name="hireDate"
+                  />
+                </div>
 
-              <div class="form-group">
-                <label for="birth-date-input">Birth Date</label>
-                <input
-                  id="birth-date-input"
-                  type="date"
-                  [(ngModel)]="editProfile.birthDate"
-                />
-              </div>
-            </div>
+                <div class="form-group">
+                  <label for="birth-date-input">Birth Date</label>
+                  <input
+                    id="birth-date-input"
+                    type="date"
+                    [(ngModel)]="editProfile.birthDate"
+                    name="birthDate"
+                  />
+                </div>
 
-            <div class="edit-actions">
-              <button class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
-                Cancel
-              </button>
-              <button class="btn-save" (click)="saveProfile()" [disabled]="saving()">
-                @if (saving()) {
-                Saving...
-                } @else {
-                Save Changes
+                @if (canManage()) {
+                <div class="form-group">
+                  <label for="role-input">Role</label>
+                  <select
+                    id="role-input"
+                    [(ngModel)]="editUser.role"
+                    name="role"
+                    class="form-control"
+                  >
+                    @for (role of rolesList; track role) {
+                    <option [value]="role">{{ getRoleLabel(role) }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="department-input">Department</label>
+                  <select
+                    id="department-input"
+                    [(ngModel)]="editUser.departmentId"
+                    name="departmentId"
+                    class="form-control"
+                  >
+                    <option value="">-- Unassigned / General --</option>
+                    @for (dept of departments(); track dept.id) {
+                    <option [value]="dept.id">{{ dept.name }}</option>
+                    }
+                  </select>
+                </div>
                 }
-              </button>
-            </div>
+
+                <app-custom-fields-form
+                  [entityType]="'USER'"
+                  [entityId]="member()?.id"
+                  [readonly]="false"
+                  [showSaveButton]="false"
+                  layout="grid"
+                ></app-custom-fields-form>
+              </div>
+
+              <div class="edit-actions">
+                <button type="button" class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
+                  Cancel
+                </button>
+                <button type="submit" class="btn-save" [disabled]="saving()">
+                  @if (saving()) {
+                  Saving...
+                  } @else {
+                  Save Changes
+                  }
+                </button>
+              </div>
+            </form>
           </div>
           } @else {
           <div class="info-grid">
@@ -214,31 +262,22 @@
               <span class="label">Birth Date</span>
               <span class="value">{{ formatDate(member()?.profile?.birthDate) }}</span>
             </div>
+
+            <app-custom-fields-form
+              [entityType]="'USER'"
+              [entityId]="member()?.id"
+              [readonly]="true"
+              [showSaveButton]="false"
+              layout="grid"
+            ></app-custom-fields-form>
           </div>
           }
         </div>
-        }
-        @if (activeTabId() === 'custom-fields') {
-        <div class="tab-content" style="padding: 1.25rem 0;">
-          <div class="section-header" style="margin-bottom: 1.25rem;">
-            <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0 0 0.375rem 0;">Custom Attributes & Info</h3>
-            <p style="font-size: 0.875rem; color: var(--text-secondary, #6b7280); margin: 0;">
-              Additional employee attributes configured by organization administrators.
-            </p>
-          </div>
+      </div>
+      }
 
-          <app-custom-fields-form
-            [entityType]="'USER'"
-            [entityId]="member()?.id"
-            [readonly]="!canManage()"
-            [showSaveButton]="canManage()"
-            layout="grid"
-          ></app-custom-fields-form>
-        </div>
-        }
-
-        @if (activeTabId() === 'hr_management') {
-
+      @if (activeTabId() === 'hr_management') {
+      <div>
         <div class="section-header">
           <p class="section-desc">Assign system roles or transfer member to a different department.</p>
         </div>
@@ -257,7 +296,7 @@
               <label for="role-select">Select New Role</label>
               <select id="role-select" [(ngModel)]="selectedRole" class="form-control">
                 @for (role of rolesList; track role) {
-                <option [value]="role">{{ role }}</option>
+                <option [value]="role">{{ getRoleLabel(role) }}</option>
                 }
               </select>
             </div>
@@ -310,9 +349,11 @@
           <p>You do not have HR/Admin permissions to modify employee roles or departments.</p>
         </div>
         }
-        }
+      </div>
+      }
 
-        @if (activeTabId() === 'compensation') {
+      @if (activeTabId() === 'compensation') {
+      <div>
         <div class="section-header"></div>
         <div class="info-grid">
           <div class="info-item">
@@ -332,15 +373,18 @@
             <span class="value">Semi-Monthly</span>
           </div>
         </div>
-        }
+      </div>
+      }
 
-        @if (activeTabId() === 'documents') {
+      @if (activeTabId() === 'documents') {
+      <div>
         <div class="section-header"></div>
         <div class="documents-list">
           <p class="empty-message">No uploaded documents available for this employee.</p>
         </div>
-        }
-      </app-tabs>
+      </div>
+      }
+    </app-tabs>
   </div>
   }
 </div>

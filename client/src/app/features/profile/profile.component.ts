@@ -31,7 +31,6 @@ export class ProfileComponent implements OnInit {
 
   readonly tabs: TabItem[] = [
     { id: 'personal', label: 'Personal Information', icon: 'tablerUser' },
-    { id: 'custom-fields', label: 'Custom Attributes', icon: 'tablerForms' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];

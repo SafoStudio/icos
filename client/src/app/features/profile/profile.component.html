@@ -18,13 +18,13 @@
         }
         <h2 class="photo-name">{{ fullName() }}</h2>
         <div class="badges-row">
-            <span class="badge badge-role" [class]="'role-' + user()?.role?.toLowerCase()">
-              {{ roleLabel() }}
-            </span>
+          <span class="badge badge-role" [class]="'role-' + user()?.role?.toLowerCase()">
+            {{ roleLabel() }}
+          </span>
           <span class="badge badge-dept">
-              <ng-icon name="tablerBuilding" size="14"></ng-icon>
-              {{ departmentName() }}
-            </span>
+            <ng-icon name="tablerBuilding" size="14"></ng-icon>
+            {{ departmentName() }}
+          </span>
         </div>
 
         <div class="sidebar-contact-info">
@@ -42,28 +42,29 @@
       </div>
     </div>
 
-      <app-tabs
-        [tabs]="tabs"
-        [activeTabId]="activeTabId()"
-        (tabChange)="activeTabId.set($event)"
-      >
-        @if (activeTabId() === 'personal') {
-        <div class="tab-content">
-          <div class="section-header">
-            @if (!isEditing()) {
-            <button class="btn-edit" (click)="startEdit()">
-              <ng-icon name="tablerEdit" size="18"></ng-icon>
-            </button>
-            } @else {
-            <button class="btn-close-edit" (click)="cancelEdit()">
-              <ng-icon name="tablerX" size="18"></ng-icon>
-            </button>
-            }
-          </div>
+    <app-tabs
+      [tabs]="tabs"
+      [activeTabId]="activeTabId()"
+      (tabChange)="activeTabId.set($event)"
+    >
+      @if (activeTabId() === 'personal') {
+      <div class="tab-content">
+        <div class="section-header">
+          @if (!isEditing()) {
+          <button class="btn-edit" (click)="startEdit()">
+            <ng-icon name="tablerEdit" size="18"></ng-icon>
+          </button>
+          } @else {
+          <button class="btn-close-edit" (click)="cancelEdit()">
+            <ng-icon name="tablerX" size="18"></ng-icon>
+          </button>
+          }
+        </div>
 
-          <div class="profile-fields">
-            @if (isEditing()) {
-            <div class="edit-form">
+        <div class="profile-fields">
+          @if (isEditing()) {
+          <div class="edit-form">
+            <form (ngSubmit)="saveProfile()">
               <div class="form-grid">
                 <div class="form-group">
                   <label for="firstName-input">First Name</label>
@@ -71,6 +72,7 @@
                     id="firstName-input"
                     type="text"
                     [(ngModel)]="editUser.firstName"
+                    name="firstName"
                     placeholder="First Name"
                   />
                 </div>
@@ -81,6 +83,7 @@
                     id="lastName-input"
                     type="text"
                     [(ngModel)]="editUser.lastName"
+                    name="lastName"
                     placeholder="Last Name"
                   />
                 </div>
@@ -113,6 +116,7 @@
                     id="phone-input"
                     type="text"
                     [(ngModel)]="editProfile.phoneNumber"
+                    name="phoneNumber"
                     placeholder="Phone Number"
                   />
                 </div>
@@ -123,6 +127,7 @@
                     id="address-input"
                     type="text"
                     [(ngModel)]="editProfile.address"
+                    name="address"
                     placeholder="Address"
                   />
                 </div>
@@ -144,15 +149,24 @@
                     id="birth-date-input"
                     type="date"
                     [(ngModel)]="editProfile.birthDate"
+                    name="birthDate"
                   />
                 </div>
+
+                <app-custom-fields-form
+                  [entityType]="'USER'"
+                  [entityId]="user()?.id"
+                  [readonly]="false"
+                  [showSaveButton]="false"
+                  layout="grid"
+                ></app-custom-fields-form>
               </div>
 
               <div class="edit-actions">
-                <button class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
+                <button type="button" class="btn-cancel" (click)="cancelEdit()" [disabled]="saving()">
                   Cancel
                 </button>
-                <button class="btn-save" (click)="saveProfile()" [disabled]="saving()">
+                <button type="submit" class="btn-save" [disabled]="saving()">
                   @if (saving()) {
                   Saving...
                   } @else {
@@ -160,108 +174,96 @@
                   }
                 </button>
               </div>
-            </div>
-            } @else {
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">First Name</span>
-                <span class="value">{{ user()?.firstName }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Last Name</span>
-                <span class="value">{{ user()?.lastName }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Email</span>
-                <span class="value">{{ user()?.email }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Role</span>
-                <span class="value">{{ roleLabel() }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Phone Number</span>
-                <span class="value">{{ user()?.profile?.phoneNumber || '-' }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Address</span>
-                <span class="value">{{ user()?.profile?.address || '-' }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Hire Date</span>
-                <span class="value">{{ formatDate(user()?.profile?.hireDate) }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="label">Birth Date</span>
-                <span class="value">{{ formatDate(user()?.profile?.birthDate) }}</span>
-              </div>
-            </div>
-            }
+            </form>
           </div>
-        </div>
-        }
-
-        @if (activeTabId() === 'custom-fields') {
-
-        <div class="tab-content">
-          <div class="section-header">
-            <h3 style="font-size: 1.125rem; font-weight: 600; margin: 0 0 0.5rem 0;">Custom Attributes & Info</h3>
-            <p style="font-size: 0.875rem; color: var(--text-secondary, #6b7280); margin: 0 0 1rem 0;">
-              Additional employee data fields configured by system administrators.
-            </p>
-          </div>
-
-          <app-custom-fields-form
-            [entityType]="'USER'"
-            [entityId]="user()?.id"
-            [readonly]="false"
-            [showSaveButton]="true"
-            layout="grid"
-          ></app-custom-fields-form>
-        </div>
-        }
-
-        @if (activeTabId() === 'compensation') {
-
-        <div class="tab-content">
-          <div class="section-header"></div>
+          } @else {
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Salary</span>
-              <span class="value">$120,000</span>
+              <span class="label">First Name</span>
+              <span class="value">{{ user()?.firstName }}</span>
             </div>
-            <div class="info-item">
-              <span class="label">Bonus</span>
-              <span class="value">$10,000</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Currency</span>
-              <span class="value">USD</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Pay Period</span>
-              <span class="value">Monthly</span>
-            </div>
-          </div>
-        </div>
-        }
 
-        @if (activeTabId() === 'documents') {
-        <div class="tab-content">
-          <div class="section-header"></div>
-          <div class="documents-list">
-            <p class="empty-message">No documents uploaded yet.</p>
+            <div class="info-item">
+              <span class="label">Last Name</span>
+              <span class="value">{{ user()?.lastName }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Email</span>
+              <span class="value">{{ user()?.email }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Role</span>
+              <span class="value">{{ roleLabel() }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Phone Number</span>
+              <span class="value">{{ user()?.profile?.phoneNumber || '-' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Address</span>
+              <span class="value">{{ user()?.profile?.address || '-' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Hire Date</span>
+              <span class="value">{{ formatDate(user()?.profile?.hireDate) }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="label">Birth Date</span>
+              <span class="value">{{ formatDate(user()?.profile?.birthDate) }}</span>
+            </div>
+
+            <app-custom-fields-form
+              [entityType]="'USER'"
+              [entityId]="user()?.id"
+              [readonly]="true"
+              [showSaveButton]="false"
+              layout="grid"
+            ></app-custom-fields-form>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @if (activeTabId() === 'compensation') {
+      <div class="tab-content">
+        <div class="section-header"></div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Salary</span>
+            <span class="value">$120,000</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Bonus</span>
+            <span class="value">$10,000</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Currency</span>
+            <span class="value">USD</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Pay Period</span>
+            <span class="value">Monthly</span>
           </div>
         </div>
-        }
-      </app-tabs>
+      </div>
+      }
+
+      @if (activeTabId() === 'documents') {
+      <div class="tab-content">
+        <div class="section-header"></div>
+        <div class="documents-list">
+          <p class="empty-message">No documents uploaded yet.</p>
+        </div>
+      </div>
+      }
+    </app-tabs>
   </div>
   }
 </div>
