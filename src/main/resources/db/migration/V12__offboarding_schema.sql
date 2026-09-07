@@ -1,6 +1,4 @@
--- ==========================================================
--- V12: OFFBOARDING MODULE SCHEMA & PERMISSIONS
--- ==========================================================
+-- Offboarding Module Schema
 
 -- 1. Offboarding Templates
 CREATE TABLE IF NOT EXISTS offboarding_templates (
@@ -53,33 +51,3 @@ CREATE TABLE IF NOT EXISTS offboarding_tasks (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Seed Permissions for Offboarding
-INSERT INTO permissions (id, name, description, version, created_at, updated_at)
-VALUES
-    (gen_random_uuid(), 'offboarding:read', 'View offboarding processes, tasks, and templates', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'offboarding:manage', 'Initiate, approve, transition, and manage offboarding processes', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'offboarding:task.read', 'View assigned offboarding tasks', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'offboarding:task.complete', 'Update, complete, or skip offboarding tasks', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (name) DO NOTHING;
-
--- 6. Assign Offboarding Permissions to ADMIN and OWNER Roles
-DO $\$
-DECLARE
-    admin_id UUID;
-    owner_id UUID;
-BEGIN
-    SELECT id INTO admin_id FROM roles WHERE name = 'ADMIN';
-    SELECT id INTO owner_id FROM roles WHERE name = 'OWNER';
-
-    IF admin_id IS NOT NULL THEN
-        INSERT INTO roles_permissions (role_id, permission_id)
-        SELECT admin_id, id FROM permissions WHERE name LIKE 'offboarding:%'
-        ON CONFLICT DO NOTHING;
-    END IF;
-
-    IF owner_id IS NOT NULL THEN
-        INSERT INTO roles_permissions (role_id, permission_id)
-        SELECT owner_id, id FROM permissions WHERE name LIKE 'offboarding:%'
-        ON CONFLICT DO NOTHING;
-    END IF;
-END $\$;

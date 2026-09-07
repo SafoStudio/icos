@@ -98,7 +98,12 @@ VALUES
     -- 16. APPROVAL MODULE
     (gen_random_uuid(), 'approval:read', 'View approval requests', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     (gen_random_uuid(), 'approval:manage', 'Manage approval workflows', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    (gen_random_uuid(), 'approval:approve', 'Approve or reject requests', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    (gen_random_uuid(), 'approval:approve', 'Approve or reject requests', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+    (gen_random_uuid(), 'offboarding:read', 'View offboarding processes, tasks, and templates', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'offboarding:manage', 'Initiate, approve, transition, and manage offboarding processes', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'offboarding:task.read', 'View assigned offboarding tasks', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (gen_random_uuid(), 'offboarding:task.complete', 'Update, complete, or skip offboarding tasks', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ASSIGN ALL PERMISSIONS TO ADMIN & OWNER
 DO $$
