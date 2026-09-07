@@ -1,262 +1,280 @@
-﻿<div class="custom-fields-form-container" [class]="'layout-' + layout" role="region" [attr.aria-label]="'Custom fields for ' + entityType">
-  @if (loading()) {
-  <output class="loading-inline" aria-live="polite">
-    <div class="spinner-sm" aria-hidden="true"></div>
-    <span>Loading fields...</span>
-  </output>
-  } @else if (visibleDefinitions().length === 0) {
-  <output class="no-fields-state" aria-live="polite">
-    <ng-icon name="tablerForms" size="20" class="icon-muted" aria-hidden="true"></ng-icon>
-    <span>No custom fields configured for this section</span>
-  </output>
-  } @else {
-  <div class="fields-grid" [class.readonly-mode]="readonly">
-    @for (def of visibleDefinitions(); track def.id || def.key) {
-    <div
-      class="field-item"
-      [class.has-error]="getFieldError(def.key)"
-      [class.full-width]="def.fieldType === 'MULTILINE' || def.fieldType === 'MULTI_SELECT'"
-    >
-      <div class="field-header">
-        <label [for]="'cf-' + def.key" class="field-label">
-          {{ def.label }}
-          @if (def.required) {
-          <span class="required-star" aria-hidden="true">*</span>
-          <span class="visually-hidden">(required)</span>
-          }
-        </label>
-        @if (def.description) {
-        <span class="field-desc" [title]="def.description" [attr.aria-label]="def.description">
-          <ng-icon name="tablerInfoCircle" size="14" aria-hidden="true"></ng-icon>
-          <span class="desc-text">{{ def.description }}</span>
-        </span>
-        }
-      </div>
-
-      <!-- FIELD TYPE: STRING / SHORT TEXT -->
-      @if (def.fieldType === 'STRING') {
-      <div class="input-wrapper">
-        <input
-          [id]="'cf-' + def.key"
-          type="text"
-          class="form-control"
-          [disabled]="readonly"
-          [attr.aria-required]="def.required"
-          [attr.aria-invalid]="!!getFieldError(def.key)"
-          [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-          [placeholder]="def.placeholder || 'Enter ' + def.label"
-          [ngModel]="formValues()[def.key]"
-          (ngModelChange)="onValueChange(def.key, $event)"
-        />
-      </div>
-      }
-
-      <!-- FIELD TYPE: MULTILINE TEXT -->
-      @if (def.fieldType === 'MULTILINE') {
-      <div class="input-wrapper">
-        <label>
-<textarea
-  [id]="'cf-' + def.key"
-  rows="3"
-  class="form-control textarea-control"
-  [disabled]="readonly"
-  [attr.aria-required]="def.required"
-  [attr.aria-invalid]="!!getFieldError(def.key)"
-  [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-  [placeholder]="def.placeholder || 'Enter ' + def.label + '...'"
-  [ngModel]="formValues()[def.key]"
-  (ngModelChange)="onValueChange(def.key, $event)"
-></textarea>
-        </label>
-      </div>
-      }
-
-      <!-- FIELD TYPE: NUMBER -->
-      @if (def.fieldType === 'NUMBER') {
-      <div class="input-wrapper">
-        <input
-          [id]="'cf-' + def.key"
-          type="number"
-          class="form-control"
-          [disabled]="readonly"
-          [attr.aria-required]="def.required"
-          [attr.aria-invalid]="!!getFieldError(def.key)"
-          [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-          [min]="def.minValue !== null && def.minValue !== undefined ? def.minValue : null"
-          [max]="def.maxValue !== null && def.maxValue !== undefined ? def.maxValue : null"
-          [placeholder]="def.placeholder || (def.minValue ? 'Min: ' + def.minValue : '0')"
-          [ngModel]="formValues()[def.key]"
-          (ngModelChange)="onValueChange(def.key, $event)"
-        />
-      </div>
-      }
-
-      <!-- FIELD TYPE: DATE -->
-      @if (def.fieldType === 'DATE') {
-      <div class="input-wrapper date-wrapper">
-        <label>
-          <input
-            [id]="'cf-' + def.key"
-            type="date"
-            class="form-control"
-            [disabled]="readonly"
-            [attr.aria-required]="def.required"
-            [attr.aria-invalid]="!!getFieldError(def.key)"
-            [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-            [ngModel]="formValues()[def.key]"
-            (ngModelChange)="onValueChange(def.key, $event)"
-          />
-        </label>
-      </div>
-      }
-
-      <!-- FIELD TYPE: BOOLEAN / TOGGLE -->
-      @if (def.fieldType === 'BOOLEAN') {
-      <div class="toggle-control-wrapper">
-        <label class="switch" [attr.aria-label]="def.label">
-          <input
-            [id]="'cf-' + def.key"
-            type="checkbox"
-            [disabled]="readonly"
-            [attr.aria-required]="def.required"
-            [ngModel]="formValues()[def.key]"
-            (ngModelChange)="onValueChange(def.key, $event)"
-          />
-          <span class="slider round" aria-hidden="true"></span>
-        </label>
-        <span class="toggle-label-text">
-          {{ formValues()[def.key] ? 'Yes / Enabled' : 'No / Disabled' }}
-        </span>
-      </div>
-      }
-
-      <!-- FIELD TYPE: ENUM / SINGLE SELECT -->
-      @if (def.fieldType === 'ENUM') {
-      <div class="select-wrapper">
-        <label>
-          <select
-            [id]="'cf-' + def.key"
-            class="form-control"
-            [disabled]="readonly"
-            [attr.aria-required]="def.required"
-            [attr.aria-invalid]="!!getFieldError(def.key)"
-            [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-            [ngModel]="formValues()[def.key]"
-            (ngModelChange)="onValueChange(def.key, $event)"
-          >
-            <option value="">-- Select an option --</option>
-            @for (opt of def.options || []; track opt) {
-            <option [value]="opt">{{ opt }}</option>
+﻿<div class="custom-fields-form-container" [class]="'layout-' + layout">
+  <section [attr.aria-label]="'Custom fields for ' + entityType">
+    @if (loading()) {
+    <output class="loading-inline" aria-live="polite">
+      <div class="spinner-sm" aria-hidden="true"></div>
+      <span>Loading fields...</span>
+    </output>
+    } @else if (visibleDefinitions().length === 0) {
+    <output class="no-fields-state" aria-live="polite">
+      <ng-icon name="tablerForms" size="20" class="icon-muted" aria-hidden="true"></ng-icon>
+      <span>No custom fields configured for this section</span>
+    </output>
+    } @else {
+    <div class="fields-grid" [class.readonly-mode]="readonly">
+      @for (def of visibleDefinitions(); track def.id || def.key) {
+      <div
+        class="field-item"
+        [class.has-error]="getFieldError(def.key)"
+        [class.full-width]="def.fieldType === 'MULTILINE' || def.fieldType === 'MULTI_SELECT'"
+      >
+        <div class="field-header">
+          <!-- Видимий лейбл -->
+          <span class="field-label" [id]="'label-' + def.key">
+            {{ def.label }}
+            @if (def.required) {
+            <span class="required-star" aria-hidden="true">*</span>
+            <span class="visually-hidden">(required)</span>
             }
-          </select>
-        </label>
-      </div>
-      }
+          </span>
+          @if (def.description) {
+          <span class="field-desc" [title]="def.description" [attr.aria-label]="def.description">
+            <ng-icon name="tablerInfoCircle" size="14" aria-hidden="true"></ng-icon>
+            <span class="desc-text">{{ def.description }}</span>
+          </span>
+          }
+        </div>
 
-      <!-- FIELD TYPE: MULTI_SELECT -->
-      @if (def.fieldType === 'MULTI_SELECT') {
-      <div class="multi-select-container" role="group" [attr.aria-label]="def.label">
-        @if ((def.options || []).length === 0) {
-        <span class="empty-options">No options configured</span>
-        } @else {
-        <div class="options-pills-grid">
-          @for (opt of def.options || []; track opt) {
-          <button
-            type="button"
-            class="pill-option-btn"
-            [class.selected]="isOptionSelected(def.key, opt)"
-            [disabled]="readonly"
-            [attr.aria-pressed]="isOptionSelected(def.key, opt)"
-            (click)="toggleMultiSelectOption(def.key, opt)"
+        <!-- FIELD TYPE: STRING / SHORT TEXT -->
+        @if (def.fieldType === 'STRING') {
+        <div class="input-wrapper">
+          <label>
+            <input
+              [id]="'cf-' + def.key"
+              type="text"
+              class="form-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [placeholder]="def.placeholder || 'Enter ' + def.label"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+          </label>
+        </div>
+        }
+
+        <!-- FIELD TYPE: MULTILINE TEXT -->
+        @if (def.fieldType === 'MULTILINE') {
+        <div class="input-wrapper">
+          <label>
+            <textarea
+              [id]="'cf-' + def.key"
+              rows="3"
+              class="form-control textarea-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [placeholder]="def.placeholder || 'Enter ' + def.label + '...'"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            ></textarea>
+          </label>
+        </div>
+        }
+
+        <!-- FIELD TYPE: NUMBER -->
+        @if (def.fieldType === 'NUMBER') {
+        <div class="input-wrapper">
+          <label>
+            <input
+              [id]="'cf-' + def.key"
+              type="number"
+              class="form-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [min]="def.minValue !== null && def.minValue !== undefined ? def.minValue : null"
+              [max]="def.maxValue !== null && def.maxValue !== undefined ? def.maxValue : null"
+              [placeholder]="def.placeholder || (def.minValue ? 'Min: ' + def.minValue : '0')"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+          </label>
+        </div>
+        }
+
+        <!-- FIELD TYPE: DATE -->
+        @if (def.fieldType === 'DATE') {
+        <div class="input-wrapper date-wrapper">
+          <label>
+            <input
+              [id]="'cf-' + def.key"
+              type="date"
+              class="form-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+          </label>
+        </div>
+        }
+
+        <!-- FIELD TYPE: BOOLEAN / TOGGLE -->
+        @if (def.fieldType === 'BOOLEAN') {
+        <div class="toggle-control-wrapper">
+          <span class="visually-hidden" [id]="'label-' + def.key">{{ def.label }}</span>
+          <label class="switch" [attr.aria-label]="def.label">
+            <input
+              [id]="'cf-' + def.key"
+              type="checkbox"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+            <span class="slider round" aria-hidden="true"></span>
+          </label>
+          <span class="toggle-label-text" aria-hidden="true">
+            {{ formValues()[def.key] ? 'Yes / Enabled' : 'No / Disabled' }}
+          </span>
+        </div>
+        }
+
+        <!-- FIELD TYPE: ENUM / SINGLE SELECT -->
+        @if (def.fieldType === 'ENUM') {
+        <div class="select-wrapper">
+          <label>
+            <select
+              [id]="'cf-' + def.key"
+              class="form-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            >
+              <option value="">-- Select an option --</option>
+              @for (opt of def.options || []; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        }
+
+        <!-- FIELD TYPE: MULTI_SELECT -->
+        @if (def.fieldType === 'MULTI_SELECT') {
+        <fieldset class="multi-select-container" [attr.aria-labelledby]="'label-' + def.key">
+          <legend class="field-label visually-hidden" [id]="'label-' + def.key">{{ def.label }}</legend>
+          @if ((def.options || []).length === 0) {
+          <span class="empty-options">No options configured</span>
+          } @else {
+          <div class="options-pills-grid">
+            @for (opt of def.options || []; track opt) {
+            <button
+              type="button"
+              class="pill-option-btn"
+              [class.selected]="isOptionSelected(def.key, opt)"
+              [disabled]="readonly"
+              [attr.aria-pressed]="isOptionSelected(def.key, opt)"
+              [attr.aria-label]="'Toggle ' + opt"
+              (click)="toggleMultiSelectOption(def.key, opt)"
+            >
+              <ng-icon
+                [name]="isOptionSelected(def.key, opt) ? 'tablerCheck' : 'tablerPlus'"
+                size="14"
+                aria-hidden="true"
+              ></ng-icon>
+              <span>{{ opt }}</span>
+            </button>
+            }
+          </div>
+          }
+        </fieldset>
+        }
+
+        <!-- FIELD TYPE: URL -->
+        @if (def.fieldType === 'URL') {
+        <div class="url-input-wrapper">
+          <label>
+            <input
+              [id]="'cf-' + def.key"
+              type="url"
+              class="form-control url-input"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [placeholder]="def.placeholder || 'https://...'"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+          </label>
+          @if (formValues()[def.key] && !getFieldError(def.key)) {
+          <a
+            [href]="formValues()[def.key]"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-open-url"
+            title="Open link in new tab"
+            aria-label="Open link in new tab"
           >
-            <ng-icon
-              [name]="isOptionSelected(def.key, opt) ? 'tablerCheck' : 'tablerPlus'"
-              size="14"
-              aria-hidden="true"
-            ></ng-icon>
-            <span>{{ opt }}</span>
-          </button>
+            <ng-icon name="tablerExternalLink" size="16" aria-hidden="true"></ng-icon>
+          </a>
           }
         </div>
         }
-      </div>
-      }
 
-      <!-- FIELD TYPE: URL -->
-      @if (def.fieldType === 'URL') {
-      <div class="url-input-wrapper">
-        <label>
-          <input
-            [id]="'cf-' + def.key"
-            type="url"
-            class="form-control url-input"
-            [disabled]="readonly"
-            [attr.aria-required]="def.required"
-            [attr.aria-invalid]="!!getFieldError(def.key)"
-            [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-            [placeholder]="def.placeholder || 'https://...'"
-            [ngModel]="formValues()[def.key]"
-            (ngModelChange)="onValueChange(def.key, $event)"
-          />
-        </label>
-        @if (formValues()[def.key] && !getFieldError(def.key)) {
-        <a
-          [href]="formValues()[def.key]"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-open-url"
-          title="Open link in new tab"
-          aria-label="Open link in new tab"
-        >
-          <ng-icon name="tablerExternalLink" size="16" aria-hidden="true"></ng-icon>
-        </a>
+        <!-- FIELD TYPE: ENTITY_REF -->
+        @if (def.fieldType === 'ENTITY_REF') {
+        <div class="input-wrapper">
+          <label>
+            <input
+              [id]="'cf-' + def.key"
+              type="text"
+              class="form-control"
+              [disabled]="readonly"
+              [attr.aria-labelledby]="'label-' + def.key"
+              [attr.aria-required]="def.required"
+              [attr.aria-invalid]="!!getFieldError(def.key)"
+              [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
+              [placeholder]="def.placeholder || 'Entity ID (UUID)'"
+              [ngModel]="formValues()[def.key]"
+              (ngModelChange)="onValueChange(def.key, $event)"
+            />
+          </label>
+        </div>
+        }
+
+        @if (getFieldError(def.key)) {
+        <output class="field-error-message" [id]="'err-' + def.key" aria-live="assertive">
+          <ng-icon name="tablerAlertCircle" size="14" aria-hidden="true"></ng-icon>
+          <span>{{ getFieldError(def.key) }}</span>
+        </output>
         }
       </div>
       }
+    </div>
 
-      <!-- FIELD TYPE: ENTITY_REF -->
-      @if (def.fieldType === 'ENTITY_REF') {
-      <div class="input-wrapper">
-        <label>
-          <input
-            [id]="'cf-' + def.key"
-            type="text"
-            class="form-control"
-            [disabled]="readonly"
-            [attr.aria-required]="def.required"
-            [attr.aria-invalid]="!!getFieldError(def.key)"
-            [attr.aria-describedby]="getFieldError(def.key) ? 'err-' + def.key : null"
-            [placeholder]="def.placeholder || 'Entity ID (UUID)'"
-            [ngModel]="formValues()[def.key]"
-            (ngModelChange)="onValueChange(def.key, $event)"
-          />
-        </label>
-      </div>
-      }
-
-      @if (getFieldError(def.key)) {
-      <output class="field-error-message" [id]="'err-' + def.key" aria-live="assertive">
-        <ng-icon name="tablerAlertCircle" size="14" aria-hidden="true"></ng-icon>
-        <span>{{ getFieldError(def.key) }}</span>
-      </output>
-      }
+    @if (showSaveButton && !readonly) {
+    <div class="form-actions-footer">
+      <button
+        type="button"
+        class="btn btn-primary btn-save-cf"
+        (click)="save()"
+        [disabled]="saving() || !isFormValid()"
+        aria-label="Save custom fields"
+      >
+        <ng-icon name="tablerDeviceFloppy" size="18" aria-hidden="true"></ng-icon>
+        <span>{{ saving() ? 'Saving Fields...' : 'Save Custom Fields' }}</span>
+      </button>
     </div>
     }
-  </div>
-
-  @if (showSaveButton && !readonly) {
-  <div class="form-actions-footer">
-    <button
-      type="button"
-      class="btn btn-primary btn-save-cf"
-      (click)="save()"
-      [disabled]="saving() || !isFormValid()"
-      aria-label="Save custom fields"
-    >
-      <ng-icon name="tablerDeviceFloppy" size="18" aria-hidden="true"></ng-icon>
-      <span>{{ saving() ? 'Saving Fields...' : 'Save Custom Fields' }}</span>
-    </button>
-  </div>
-  }
-  }
+    }
+  </section>
 </div>
