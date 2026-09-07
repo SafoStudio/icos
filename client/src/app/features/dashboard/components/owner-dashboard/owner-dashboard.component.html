@@ -1,5 +1,4 @@
 <div class="dashboard-content">
-  <!-- Метрики -->
   <div class="metrics-grid">
     @for (metric of metrics; track metric.label) {
     <div class="metric-card">
@@ -12,7 +11,6 @@
     }
   </div>
 
-  <!-- Heads of departments -->
   <div class="table-section">
     <div class="section-header">
       <h3>Heads of departments</h3>
@@ -30,17 +28,17 @@
         </tr>
         </thead>
         <tbody>
-        @for (employee of employees; track employee.email) {
+        @for (member of members; track member.email) {
         <tr>
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.position }}</td>
-          <td>{{ employee.department }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.position }}</td>
+          <td>{{ member.department }}</td>
           <td>
-                <span class="status-badge" [class]="employee.status.toLowerCase().replace(' ', '-')">
-                  {{ employee.status }}
+                <span class="status-badge" [class]="member.status.toLowerCase().replace(' ', '-')">
+                  {{ member.status }}
                 </span>
           </td>
-          <td>{{ employee.email }}</td>
+          <td>{{ member.email }}</td>
         </tr>
         }
         </tbody>
@@ -48,7 +46,6 @@
     </div>
   </div>
 
-  <!-- Active Projects -->
   <div class="table-section">
     <div class="section-header">
       <h3>Active Projects</h3>

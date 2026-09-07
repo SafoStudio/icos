@@ -16,7 +16,7 @@ export class OwnerDashboardComponent {
     { label: 'Revenue This Month', value: '$284,500', change: '+8.3%', changeType: 'positive' }
   ];
 
-  employees = [
+  members = [
     { name: 'John Doe', position: 'CEO', department: 'Executive', status: 'Active', email: 'john.doe@acme.com' },
     { name: 'Jane Smith', position: 'HR Director', department: 'Human Resources', status: 'Active', email: 'jane.smith@acme.com' },
     { name: 'Mike Johnson', position: 'Lead Developer', department: 'Engineering', status: 'Active', email: 'mike.johnson@acme.com' },

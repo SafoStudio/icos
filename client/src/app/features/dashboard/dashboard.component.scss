@@ -2,4 +2,11 @@
   padding: 24px 32px;
   background: #f8f9fc;
   min-height: 100vh;
+  transition: background-color 0.3s ease;
+
+  // Dark theme
+  :host-context([data-theme="dark"]),
+  :host-context(body:not(.light-theme)) & {
+    background: var(--bg-primary, #0f172a);
+  }
 }
