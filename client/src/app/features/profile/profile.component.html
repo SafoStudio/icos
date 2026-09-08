@@ -159,6 +159,7 @@
                   [readonly]="false"
                   [showSaveButton]="false"
                   layout="grid"
+                  (valuesChange)="onCustomFieldsChange($event)"
                 ></app-custom-fields-form>
               </div>
 
@@ -224,6 +225,7 @@
               [readonly]="true"
               [showSaveButton]="false"
               layout="grid"
+              (valuesChange)="onCustomFieldsChange($event)"
             ></app-custom-fields-form>
           </div>
           }

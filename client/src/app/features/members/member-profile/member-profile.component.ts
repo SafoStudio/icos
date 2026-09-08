@@ -1,12 +1,12 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from '../../profile/profile.service';
 import { DepartmentsService } from '../../org/departments/departments.service';
-import { AuthService, ToastService } from '@services';
-import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole } from '@models';
+import { AuthService, ToastService, CustomFieldsService } from '@services';
+import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole, CustomFieldValueInput, CustomFieldValue } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 
@@ -25,6 +25,9 @@ export class MemberProfileComponent implements OnInit {
   private readonly departmentsService = inject(DepartmentsService);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
+  private readonly customFieldsService = inject(CustomFieldsService);
+
+  @ViewChild(CustomFieldsFormComponent) customFieldsForm!: CustomFieldsFormComponent;
 
   readonly memberId = signal<string | null>(null);
   readonly loading = signal<boolean>(true);
@@ -96,6 +99,7 @@ export class MemberProfileComponent implements OnInit {
 
   editUser: Partial<User> & { role?: string; departmentId?: string } = {};
   editProfile: Partial<UserProfile> = {};
+  customFieldValues: Record<string, any> = {};
 
   selectedRole: string = '';
   selectedDepartmentId: string = '';
@@ -117,6 +121,10 @@ export class MemberProfileComponent implements OnInit {
         this.router.navigate(['/members']);
       }
     });
+  }
+
+  onCustomFieldsChange(values: Record<string, any>) {
+    this.customFieldValues = values;
   }
 
   goBack(): void {
@@ -184,12 +192,14 @@ export class MemberProfileComponent implements OnInit {
     };
 
     this.isEditing.set(true);
+    this.customFieldValues = {};
   }
 
   cancelEdit(): void {
     this.isEditing.set(false);
     this.editUser = {};
     this.editProfile = {};
+    this.customFieldValues = {};
   }
 
   saveProfile(): void {
@@ -237,6 +247,24 @@ export class MemberProfileComponent implements OnInit {
 
     if (Object.keys(profileUpdate).length > 1) {
       updates.push(firstValueFrom(this.profileService.updateProfile(profileUpdate)));
+    }
+
+    if (Object.keys(this.customFieldValues).length > 0) {
+      const customFieldInputs: CustomFieldValueInput[] = Object.entries(this.customFieldValues).map(([key, value]) => ({
+        entityType: 'USER' as any,
+        entityId: m.id,
+        fieldKey: key,
+        value: value
+      }));
+
+      updates.push(
+        new Promise<CustomFieldValue[]>((resolve, reject) => {
+          this.customFieldsService.setFieldValues(customFieldInputs).subscribe({
+            next: (result: CustomFieldValue[]) => resolve(result),
+            error: (error: any) => reject(error)
+          });
+        })
+      );
     }
 
     Promise.all(updates)

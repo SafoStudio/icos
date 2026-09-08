@@ -1,11 +1,11 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from './profile.service';
-import { AuthService, ToastService } from '@services';
-import { type User, type UserProfile, getRoleLabel, type UserRole } from '@models';
+import { AuthService, ToastService, CustomFieldsService } from '@services';
+import { type User, type UserProfile, getRoleLabel, type UserRole, CustomFieldValueInput, CustomFieldValue } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 import { AvatarComponent } from './avatar/avatar.component';
@@ -19,9 +19,12 @@ import { AvatarComponent } from './avatar/avatar.component';
 })
 export class ProfileComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
+  private readonly customFieldsService = inject(CustomFieldsService);
   private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
+
+  @ViewChild(CustomFieldsFormComponent) customFieldsForm!: CustomFieldsFormComponent;
 
   readonly loading = signal<boolean>(false);
   readonly saving = signal<boolean>(false);
@@ -34,7 +37,6 @@ export class ProfileComponent implements OnInit {
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
-
 
   readonly fullName = computed(() => {
     const user = this.user();
@@ -54,9 +56,14 @@ export class ProfileComponent implements OnInit {
 
   editUser: Partial<User> = {};
   editProfile: Partial<UserProfile> = {};
+  customFieldValues: Record<string, any> = {};
 
   ngOnInit() {
     this.loadProfile();
+  }
+
+  onCustomFieldsChange(values: Record<string, any>) {
+    this.customFieldValues = values;
   }
 
   loadProfile() {
@@ -75,7 +82,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-
   startEdit() {
     const user = this.user();
     if (!user) return;
@@ -92,12 +98,14 @@ export class ProfileComponent implements OnInit {
     };
 
     this.isEditing.set(true);
+    this.customFieldValues = {};
   }
 
   cancelEdit() {
     this.isEditing.set(false);
     this.editUser = {};
     this.editProfile = {};
+    this.customFieldValues = {};
   }
 
   saveProfile() {
@@ -138,6 +146,24 @@ export class ProfileComponent implements OnInit {
       updates.push(firstValueFrom(this.profileService.updateProfile(profileUpdate)));
     }
 
+    if (Object.keys(this.customFieldValues).length > 0) {
+      const customFieldInputs: CustomFieldValueInput[] = Object.entries(this.customFieldValues).map(([key, value]) => ({
+        entityType: 'USER' as any,
+        entityId: user.id,
+        fieldKey: key,
+        value: value
+      }));
+
+      updates.push(
+        new Promise<CustomFieldValue[]>((resolve, reject) => {
+          this.customFieldsService.setFieldValues(customFieldInputs).subscribe({
+            next: (result: CustomFieldValue[]) => resolve(result),
+            error: (error: any) => reject(error)
+          });
+        })
+      );
+    }
+
     Promise.all(updates)
       .then(() => {
         this.toastService.success('Profile updated successfully');
@@ -147,7 +173,7 @@ export class ProfileComponent implements OnInit {
       })
       .catch((error) => {
         console.error('Error updating profile:', error);
-        this.toastService.error('Failed to update profile');
+        this.toastService.error(error.message || 'Failed to update profile');
         this.saving.set(false);
       });
   }
