@@ -12,10 +12,11 @@ import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
 
-import { RecruitmentBoardComponent } from './features/recruitment/recruitment-board.component';
 import { TaskBoardComponent } from './features/tasks/task-board.component';
 import { CalendarComponent } from './features/calendar/calendar.component';
+
 import { TalentComponent } from './features/talent/talent.component';
+import { RecruitmentBoardComponent } from './features/talent/recruitment/recruitment-board.component';
 import { OnboardingPipelineComponent } from './features/talent/onboarding/onboarding-pipeline.component';
 import { OffboardingPipelineComponent } from './features/talent/offboarding/offboarding-pipeline.component';
 
