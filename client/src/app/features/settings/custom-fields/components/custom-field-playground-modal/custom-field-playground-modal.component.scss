@@ -1,0 +1,253 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.modal-card {
+  background: var(--bg-surface, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &.playground-modal {
+    max-width: 900px;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+
+  .modal-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--text-primary, #111827);
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary, #9ca3af);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+
+    &:hover {
+      color: var(--text-primary, #111827);
+    }
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  background: var(--bg-surface-secondary, #fafafa);
+}
+
+.playground-intro {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  margin-bottom: 1.25rem;
+}
+
+.playground-entity-bar {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .entity-pills-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pill-entity-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: var(--bg-surface, #ffffff);
+    color: var(--text-secondary, #4b5563);
+    font-size: 0.8125rem;
+    cursor: pointer;
+
+    &.active {
+      background: var(--primary, #4f46e5);
+      border-color: var(--primary, #4f46e5);
+      color: #ffffff;
+    }
+  }
+}
+
+.playground-form-container {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.playground-state-inspector {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #f8fafc;
+
+  .inspector-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+  }
+
+  .json-output {
+    margin: 0;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #38bdf8;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+
+  &.btn-primary {
+    background: var(--primary, #4f46e5);
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: var(--primary-hover, #4338ca);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Dark theme
+:host-context([data-theme="dark"]),
+:host-context(body:not(.light-theme)) {
+  .modal-backdrop {
+    background: rgba(0, 0, 0, 0.85);
+  }
+
+  .modal-card {
+    background: #1e293b;
+
+    .modal-header {
+      border-bottom-color: rgba(255, 255, 255, 0.06);
+
+      .modal-header-title {
+        color: #f8fafc;
+
+        h3 {
+          color: #f8fafc;
+        }
+      }
+
+      .btn-close-modal {
+        color: #64748b;
+
+        &:hover {
+          color: #f8fafc;
+        }
+      }
+    }
+
+    .modal-footer {
+      border-top-color: rgba(255, 255, 255, 0.06);
+      background: rgba(15, 23, 42, 0.4);
+    }
+  }
+
+  .playground-intro {
+    color: #94a3b8;
+  }
+
+  .playground-entity-bar {
+    label {
+      color: #94a3b8;
+    }
+
+    .pill-entity-btn {
+      background: #1e293b;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+
+      &.active {
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .playground-form-container {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .playground-state-inspector {
+    background: #0f172a;
+
+    .inspector-header {
+      color: #94a3b8;
+    }
+
+    .json-output {
+      color: #38bdf8;
+    }
+  }
+}

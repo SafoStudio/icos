@@ -1,0 +1,33 @@
+<header class="header-section">
+  <div class="header-text">
+    <div class="title-badge">
+      <ng-icon name="tablerForms" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
+      <h2 class="badge-text">Custom Fields & Dynamic Forms</h2>
+    </div>
+    <p class="subtitle">
+      Extend Candidate cards, Job vacancies, User profiles, and Onboarding workflows with custom data fields, validations, and conditional logic.
+    </p>
+  </div>
+
+  <div class="header-actions">
+    <button
+      type="button"
+      class="btn btn-secondary btn-playground"
+      (click)="openPlayground.emit()"
+      aria-label="Open dynamic form playground"
+    >
+      <ng-icon name="tablerSparkles" size="18" aria-hidden="true"></ng-icon>
+      <span>Test Form Playground</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-primary btn-add-field"
+      (click)="openCreate.emit()"
+      aria-label="Create new custom field definition"
+    >
+      <ng-icon name="tablerPlus" size="18" aria-hidden="true"></ng-icon>
+      <span>New Custom Field</span>
+    </button>
+  </div>
+</header>

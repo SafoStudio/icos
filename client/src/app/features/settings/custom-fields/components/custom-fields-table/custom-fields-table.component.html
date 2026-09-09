@@ -1,0 +1,126 @@
+<div class="fields-table-wrapper">
+  <table class="fields-table" aria-label="Custom fields list">
+    <thead>
+    <tr>
+      <th scope="col" class="th-label">Field Label & Key</th>
+      <th scope="col" class="th-entity">Target Entity</th>
+      <th scope="col" class="th-type">Data Type</th>
+      <th scope="col" class="th-rules">Rules & Validation</th>
+      <th scope="col" class="th-options">Options / Choices</th>
+      <th scope="col" class="th-actions text-right">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @for (def of definitions; track def.id) {
+    <tr class="field-row">
+      <!-- Field Label & Key -->
+      <td class="td-label">
+        <div class="label-group">
+          <span class="field-main-label">{{ def.label }}</span>
+          <span class="field-key-badge" [title]="'Key: ' + def.key">
+                <code>{{ def.key }}</code>
+              </span>
+        </div>
+        @if (def.description) {
+        <p class="field-sub-desc">{{ def.description }}</p>
+        }
+      </td>
+
+      <!-- Target Entity -->
+      <td class="td-entity">
+            <span class="entity-pill" [class]="'entity-' + def.entityType.toLowerCase()">
+              <ng-icon [name]="getEntityIcon(def.entityType)" size="14" aria-hidden="true"></ng-icon>
+              <span>{{ getEntityLabel(def.entityType) }}</span>
+            </span>
+      </td>
+
+      <!-- Field Type -->
+      <td class="td-type">
+        <div class="type-badge-wrap">
+          <ng-icon [name]="getFieldTypeIcon(def.fieldType)" size="16" class="type-icon" aria-hidden="true"></ng-icon>
+          <span class="type-name">{{ getFieldTypeLabel(def.fieldType) }}</span>
+        </div>
+      </td>
+
+      <!-- Rules & Validation -->
+      <td class="td-rules">
+        <div class="rules-badges-group">
+          @if (def.required) {
+          <span class="rule-badge rule-required" title="Mandatory field">Required</span>
+          } @else {
+          <span class="rule-badge rule-optional">Optional</span>
+          }
+
+          @if (def.filterable) {
+          <span class="rule-badge rule-filterable" title="Enabled for filters & search">Filterable</span>
+          }
+
+          @if (def.validationRegex) {
+          <span class="rule-badge rule-regex" [title]="'Regex: ' + def.validationRegex">
+                  Regex Validated
+                </span>
+          }
+
+          @if (def.minValue !== null && def.minValue !== undefined || def.maxValue !== null && def.maxValue !== undefined) {
+          <span class="rule-badge rule-range">
+                  Range: {{ def.minValue ?? '0' }} - {{ def.maxValue ?? '∞' }}
+                </span>
+          }
+
+          @if (def.conditionalFieldKey) {
+          <span
+            class="rule-badge rule-conditional"
+            [title]="'Only shown when ' + def.conditionalFieldKey + ' == ' + def.conditionalValue"
+          >
+                  <ng-icon name="tablerAdjustments" size="12" aria-hidden="true"></ng-icon>
+                  <span>If {{ def.conditionalFieldKey }} = {{ def.conditionalValue || 'true' }}</span>
+                </span>
+          }
+        </div>
+      </td>
+
+      <!-- Options -->
+      <td class="td-options">
+        @if (def.options && def.options.length > 0) {
+        <div class="options-preview-wrap">
+          @for (opt of def.options.slice(0, 3); track opt) {
+          <span class="opt-tag">{{ opt }}</span>
+          }
+          @if (def.options.length > 3) {
+          <span class="opt-tag more">+{{ def.options.length - 3 }}</span>
+          }
+        </div>
+        } @else {
+        <span class="no-options-text">—</span>
+        }
+      </td>
+
+      <!-- Actions -->
+      <td class="td-actions text-right">
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="btn-icon"
+            (click)="edit.emit(def)"
+            [attr.aria-label]="'Edit custom field ' + def.label"
+            title="Edit Field"
+          >
+            <ng-icon name="tablerEdit" size="16" aria-hidden="true"></ng-icon>
+          </button>
+
+          <button
+            type="button"
+            class="btn-icon btn-icon-danger"
+            (click)="delete.emit(def)"
+            [attr.aria-label]="'Delete custom field ' + def.label"
+            title="Delete Field"
+          >
+            <ng-icon name="tablerTrash" size="16" aria-hidden="true"></ng-icon>
+          </button>
+        </div>
+      </td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,62 @@
+<div class="modal-backdrop" (click)="close.emit()" role="dialog" aria-modal="true" aria-labelledby="playground-dialog-title">
+  <div class="modal-card playground-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-title">
+        <ng-icon name="tablerSparkles" size="22" aria-hidden="true"></ng-icon>
+        <h3 id="playground-dialog-title">Dynamic Form Playground</h3>
+      </div>
+      <button type="button" class="btn-close-modal" (click)="close.emit()" aria-label="Close playground">
+        <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="playground-intro">
+        Test interactive custom field behavior, conditional visibility rules, and validations for any entity type in real time before using them in live processes.
+      </p>
+
+      <!-- Entity Switcher -->
+      <div class="playground-entity-bar">
+        <label>Select Target Entity Form:</label>
+        <div class="entity-pills-row" role="radiogroup" aria-label="Select entity for testing">
+          @for (ent of entityTypes; track ent) {
+          <button
+            type="button"
+            class="pill-entity-btn"
+            [class.active]="playgroundEntityType === ent"
+            [attr.aria-pressed]="playgroundEntityType === ent"
+            (click)="playgroundEntityType = ent; playgroundValues = {}"
+          >
+            <ng-icon [name]="getEntityIcon(ent)" size="16" aria-hidden="true"></ng-icon>
+            <span>{{ getEntityLabel(ent) }}</span>
+          </button>
+          }
+        </div>
+      </div>
+
+      <!-- Rendered Form -->
+      <div class="playground-form-container">
+        <app-custom-fields-form
+          [entityType]="playgroundEntityType"
+          [(values)]="playgroundValues"
+          layout="grid"
+        ></app-custom-fields-form>
+      </div>
+
+      <!-- Values Inspector -->
+      <div class="playground-state-inspector">
+        <div class="inspector-header">
+          <ng-icon name="tablerCode" size="16" aria-hidden="true"></ng-icon>
+          <span>Live Form JSON Output:</span>
+        </div>
+        <pre class="json-output">{{ playgroundValues | json }}</pre>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="close.emit()">
+        Close Playground
+      </button>
+    </div>
+  </div>
+</div>

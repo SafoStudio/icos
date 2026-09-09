@@ -1,0 +1,79 @@
+<nav class="entity-tabs-bar" aria-label="Entity type filter tabs">
+  <button
+    type="button"
+    class="tab-btn"
+    [class.active]="selectedEntity === 'ALL'"
+    [attr.aria-selected]="selectedEntity === 'ALL'"
+    (click)="entityChange.emit('ALL')"
+  >
+    <ng-icon name="tablerLayoutGrid" size="16" aria-hidden="true"></ng-icon>
+    <span>All Entities</span>
+    <span class="tab-badge">{{ totalDefinitions }}</span>
+  </button>
+
+  @for (entity of entityTypes; track entity) {
+  <button
+    type="button"
+    class="tab-btn"
+    [class.active]="selectedEntity === entity"
+    [attr.aria-selected]="selectedEntity === entity"
+    (click)="entityChange.emit(entity)"
+  >
+    <ng-icon [name]="getEntityIcon(entity)" size="16" aria-hidden="true"></ng-icon>
+    <span>{{ getEntityLabel(entity) }}</span>
+    @if (entityStats[entity]) {
+    <span class="tab-badge">{{ entityStats[entity] }}</span>
+    }
+  </button>
+  }
+</nav>
+
+<div class="toolbar-section">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <ng-icon name="tablerSearch" size="16" class="search-icon" aria-hidden="true"></ng-icon>
+      <label for="search-fields-input" class="visually-hidden">Filter custom fields</label>
+      <input
+        id="search-fields-input"
+        type="text"
+        placeholder="Filter by label, key, or description"
+        [ngModel]="searchQuery"
+        (ngModelChange)="searchChange.emit($event)"
+      />
+      @if (searchQuery) {
+      <button class="clear-search-btn" (click)="searchChange.emit('')" aria-label="Clear search">
+        <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+      </button>
+      }
+    </div>
+  </div>
+
+  <div class="filters-wrap">
+    <div class="filter-select-box">
+      <ng-icon name="tablerFilter" size="16" class="select-icon" aria-hidden="true"></ng-icon>
+      <label for="filter-type-select" class="visually-hidden">Filter by data type</label>
+      <select
+        id="filter-type-select"
+        [ngModel]="filterFieldType"
+        (ngModelChange)="filterTypeChange.emit($event)"
+      >
+        <option value="ALL">All Types</option>
+        @for (ft of fieldTypes; track ft) {
+        <option [value]="ft">{{ getFieldTypeLabel(ft) }}</option>
+        }
+      </select>
+    </div>
+
+    @if (searchQuery || filterFieldType !== 'ALL') {
+    <button
+      type="button"
+      class="btn-reset"
+      (click)="resetFilters.emit()"
+      aria-label="Reset all filters"
+    >
+      <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
+      <span>Reset</span>
+    </button>
+    }
+  </div>
+</div>

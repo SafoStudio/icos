@@ -1,0 +1,214 @@
+.fields-table-wrapper {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.fields-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+
+  th {
+    padding: 0.875rem 1rem;
+    background: var(--bg-table-header, #f9fafb);
+    color: var(--text-secondary, #4b5563);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: var(--bg-hover, rgba(0, 0, 0, 0.015));
+  }
+}
+
+.label-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  .field-main-label {
+    font-weight: 600;
+    color: var(--text-primary, #111827);
+  }
+
+  .field-key-badge code {
+    font-family: monospace;
+    font-size: 0.75rem;
+    background: var(--bg-surface-secondary, #f3f4f6);
+    color: var(--text-secondary, #4b5563);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+}
+
+.field-sub-desc {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #6b7280);
+  margin-top: 0.25rem;
+}
+
+.entity-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-surface-secondary, #f3f4f6);
+  color: var(--text-primary, #374151);
+
+  &.entity-candidate {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+  }
+  &.entity-job {
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+  }
+  &.entity-user {
+    background: rgba(79, 70, 229, 0.1);
+    color: #3730a3;
+  }
+  &.entity-onboarding {
+    background: rgba(139, 92, 246, 0.1);
+    color: #5b21b6;
+  }
+  &.entity-department {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+  }
+}
+
+.type-badge-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+
+  .type-icon {
+    color: var(--primary, #4f46e5);
+  }
+
+  .type-name {
+    font-weight: 500;
+    color: var(--text-primary, #1f2937);
+  }
+}
+
+.rules-badges-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.rule-badge {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.rule-required {
+    background: rgba(239, 68, 68, 0.1);
+    color: #b91c1c;
+  }
+
+  &.rule-optional {
+    background: rgba(156, 163, 175, 0.15);
+    color: #4b5563;
+  }
+
+  &.rule-filterable {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+  }
+
+  &.rule-regex {
+    background: rgba(139, 92, 246, 0.1);
+    color: #6d28d9;
+  }
+
+  &.rule-range {
+    background: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+  }
+
+  &.rule-conditional {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(16, 185, 129, 0.1);
+    color: #047857;
+    text-transform: none;
+  }
+}
+
+.options-preview-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+
+  .opt-tag {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    background: var(--bg-surface-secondary, #f3f4f6);
+    border-radius: 4px;
+    color: var(--text-primary, #374151);
+
+    &.more {
+      background: var(--border-color, #e5e7eb);
+      color: var(--text-secondary, #6b7280);
+      font-weight: 600;
+    }
+  }
+}
+
+.no-options-text {
+  color: var(--text-tertiary, #9ca3af);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.375rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-secondary, #4b5563);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: var(--primary, #4f46e5);
+    border-color: var(--primary, #4f46e5);
+  }
+
+  &.btn-icon-danger:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+  }
+}

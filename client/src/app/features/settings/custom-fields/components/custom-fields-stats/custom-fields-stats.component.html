@@ -1,0 +1,51 @@
+<section class="stats-row" aria-label="Custom fields statistics">
+  <div class="stat-card">
+    <div class="stat-icon-wrap primary" aria-hidden="true">
+      <ng-icon name="tablerForms" size="20"></ng-icon>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ total }}</span>
+      <span class="stat-label">Total Custom Fields</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon-wrap green" aria-hidden="true">
+      <ng-icon name="tablerUserCheck" size="20"></ng-icon>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ entityStats['CANDIDATE'] || 0 }}</span>
+      <span class="stat-label">Candidate Fields</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon-wrap orange" aria-hidden="true">
+      <ng-icon name="tablerBriefcase" size="20"></ng-icon>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ entityStats['JOB'] || 0 }}</span>
+      <span class="stat-label">Job Vacancy Fields</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon-wrap purple" aria-hidden="true">
+      <ng-icon name="tablerClipboardList" size="20"></ng-icon>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ entityStats['ONBOARDING'] || 0 }}</span>
+      <span class="stat-label">Onboarding Fields</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon-wrap blue" aria-hidden="true">
+      <ng-icon name="tablerAdjustments" size="20"></ng-icon>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ conditionalRules }}</span>
+      <span class="stat-label">Conditional Logic Rules</span>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,370 @@
+<div class="modal-backdrop" (click)="close.emit()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-card edit-field-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-title">
+        <ng-icon [name]="formService.editingId() ? 'tablerEdit' : 'tablerPlus'" size="22" aria-hidden="true"></ng-icon>
+        <h3 id="modal-title">{{ formService.editingId() ? 'Edit Custom Field' : 'Create Custom Field' }}</h3>
+      </div>
+      <button type="button" class="btn-close-modal" (click)="close.emit()" aria-label="Close modal">
+        <ng-icon name="tablerX" size="20" aria-hidden="true"></ng-icon>
+      </button>
+    </div>
+
+    <div class="modal-body modal-grid-layout">
+      <!-- LEFT COLUMN: CONFIGURATION FORM -->
+      <div class="config-col">
+        <!-- Target Entity Selection -->
+        <div class="form-section">
+          <span class="section-title">1. Target Entity</span>
+          <div class="entity-cards-grid" role="radiogroup" aria-label="Select target entity">
+            @for (ent of getEntityTypes(); track ent) {
+            <button
+              type="button"
+              class="entity-select-btn"
+              [class.selected]="formService.entityType() === ent"
+              [disabled]="!!formService.editingId()"
+              [attr.aria-pressed]="formService.entityType() === ent"
+              (click)="formService.entityType.set(ent)"
+            >
+              <ng-icon [name]="getEntityInfo(ent).icon" size="18" aria-hidden="true"></ng-icon>
+              <span>{{ getEntityInfo(ent).label }}</span>
+            </button>
+            }
+          </div>
+        </div>
+
+        <!-- Basic Attributes -->
+        <div class="form-section">
+          <span class="section-title">2. Field Details</span>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="formLabelInput">Field Label *</label>
+              <input
+                id="formLabelInput"
+                type="text"
+                class="form-control"
+                placeholder="e.g. Visa Sponsorship Needed"
+                [ngModel]="formService.label()"
+                (ngModelChange)="formService.label.set($event)"
+                (input)="onLabelInput()"
+              />
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="formKeyInput">Key Identifier *</label>
+              <input
+                id="formKeyInput"
+                type="text"
+                class="form-control"
+                placeholder="e.g. visa_sponsorship_needed"
+                [ngModel]="formService.key()"
+                (ngModelChange)="formService.key.set($event)"
+                [disabled]="!!formService.editingId()"
+              />
+              <span class="input-hint">Unique snake_case identifier</span>
+            </div>
+          </div>
+
+          <!-- Field Type Picker -->
+          <div class="form-group">
+            <label>Data Type *</label>
+            <div class="field-types-grid" role="radiogroup" aria-label="Select data type">
+              @for (ft of getFieldTypes(); track ft) {
+              <button
+                type="button"
+                class="type-select-card"
+                [class.selected]="formService.fieldType() === ft"
+                [attr.aria-pressed]="formService.fieldType() === ft"
+                (click)="formService.fieldType.set(ft)"
+              >
+                <ng-icon [name]="getFieldTypeInfo(ft).icon" size="18" class="type-icon" aria-hidden="true"></ng-icon>
+                <div class="type-info">
+                  <span class="type-title">{{ getFieldTypeInfo(ft).label }}</span>
+                </div>
+              </button>
+              }
+            </div>
+          </div>
+
+          <!-- Options Manager (For Enum / Multi Select) -->
+          @if (formService.fieldType() === 'ENUM' || formService.fieldType() === 'MULTI_SELECT') {
+          <div class="form-group options-manager-box">
+            <label for="new-option-input">Predefined Options *</label>
+            <div class="options-add-row">
+              <input
+                id="new-option-input"
+                type="text"
+                class="form-control"
+                placeholder="Add an option (e.g. LinkedIn, Referral)"
+                [ngModel]="formService.newOptionInput()"
+                (ngModelChange)="formService.newOptionInput.set($event)"
+                (keydown.enter)="$event.preventDefault(); addOption()"
+              />
+              <button type="button" class="btn btn-secondary" (click)="addOption()">
+                <ng-icon name="tablerPlus" size="16" aria-hidden="true"></ng-icon>
+                <span>Add</span>
+              </button>
+            </div>
+
+            <!-- Quick Presets -->
+            <div class="quick-presets-row">
+              <span class="preset-label">Quick Presets:</span>
+              <button
+                type="button"
+                class="btn-preset-chip"
+                (click)="applyOptionPreset(['LinkedIn', 'Indeed', 'Referral', 'Career Page', 'Agency'])"
+              >
+                + Source Presets
+              </button>
+              <button
+                type="button"
+                class="btn-preset-chip"
+                (click)="applyOptionPreset(['Citizen / Permanent', 'Work Permit', 'Sponsorship Required'])"
+              >
+                + Visa Presets
+              </button>
+              <button
+                type="button"
+                class="btn-preset-chip"
+                (click)="applyOptionPreset(['Junior', 'Middle', 'Senior', 'Lead', 'Executive'])"
+              >
+                + Seniority
+              </button>
+            </div>
+
+            <!-- Tag List -->
+            <div class="tags-list">
+              @for (opt of formService.options(); track opt) {
+              <span class="tag-chip">
+                    <span>{{ opt }}</span>
+                    <button type="button" class="tag-remove-btn" (click)="removeOption(opt)" [attr.aria-label]="'Remove option ' + opt">
+                      <ng-icon name="tablerX" size="12" aria-hidden="true"></ng-icon>
+                    </button>
+                  </span>
+              }
+              @if (formService.options().length === 0) {
+              <span class="empty-tags-hint">No options added yet. Type above and click Add.</span>
+              }
+            </div>
+          </div>
+          }
+
+          <!-- Min/Max for Numeric -->
+          @if (formService.fieldType() === 'NUMBER') {
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="minValueInput">Minimum Value</label>
+              <input
+                id="minValueInput"
+                type="number"
+                class="form-control"
+                placeholder="e.g. 0"
+                [ngModel]="formService.minValue()"
+                (ngModelChange)="formService.minValue.set($event)"
+              />
+            </div>
+            <div class="form-group flex-1">
+              <label for="maxValueInput">Maximum Value</label>
+              <input
+                id="maxValueInput"
+                type="number"
+                class="form-control"
+                placeholder="e.g. 500000"
+                [ngModel]="formService.maxValue()"
+                (ngModelChange)="formService.maxValue.set($event)"
+              />
+            </div>
+          </div>
+          }
+
+          <!-- Helper Text & Placeholder -->
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="formPlaceholderInput">Placeholder Text</label>
+              <input
+                id="formPlaceholderInput"
+                type="text"
+                class="form-control"
+                placeholder="e.g. Enter full city name"
+                [ngModel]="formService.placeholder()"
+                (ngModelChange)="formService.placeholder.set($event)"
+              />
+            </div>
+            <div class="form-group flex-1">
+              <label for="formDescInput">Description / Tooltip</label>
+              <input
+                id="formDescInput"
+                type="text"
+                class="form-control"
+                placeholder="e.g. Current city of residence"
+                [ngModel]="formService.description()"
+                (ngModelChange)="formService.description.set($event)"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="formDefaultInput">Default Value</label>
+            <input
+              id="formDefaultInput"
+              type="text"
+              class="form-control"
+              placeholder="Optional initial value"
+              [ngModel]="formService.defaultValue()"
+              (ngModelChange)="formService.defaultValue.set($event)"
+            />
+          </div>
+        </div>
+
+        <!-- Section 3: Validation Rules -->
+        <div class="form-section">
+          <span class="section-title">3. Validation & Constraints</span>
+          <div class="toggles-row">
+            <label class="checkbox-label">
+              <input type="checkbox" [ngModel]="formService.required()" (ngModelChange)="formService.required.set($event)" />
+              <span><strong>Required Field</strong> (Must be completed in forms)</span>
+            </label>
+
+            <label class="checkbox-label">
+              <input type="checkbox" [ngModel]="formService.filterable()" (ngModelChange)="formService.filterable.set($event)" />
+              <span><strong>Filterable</strong> (Show in search & filter bars)</span>
+            </label>
+          </div>
+
+          <!-- Validation Presets -->
+          <div class="form-group mt-3">
+            <label for="validation-preset-select">Format Validation Rule</label>
+            <select
+              id="validation-preset-select"
+              class="form-control"
+              [ngModel]="formService.selectedValidationPreset()"
+              (ngModelChange)="formService.selectedValidationPreset.set($event); onValidationPresetChange()"
+            >
+              @for (p of formService.validationPresets; track p.id) {
+              <option [value]="p.id">{{ p.label }}</option>
+              }
+            </select>
+          </div>
+
+          @if (formService.selectedValidationPreset() !== 'none') {
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="regexInput">Regex Pattern</label>
+              <input
+                id="regexInput"
+                type="text"
+                class="form-control"
+                placeholder="^pattern$"
+                [ngModel]="formService.validationRegex()"
+                (ngModelChange)="formService.validationRegex.set($event)"
+              />
+            </div>
+            <div class="form-group flex-1">
+              <label for="validationMsgInput">Custom Error Message</label>
+              <input
+                id="validationMsgInput"
+                type="text"
+                class="form-control"
+                placeholder="e.g. Invalid format entered"
+                [ngModel]="formService.validationMessage()"
+                (ngModelChange)="formService.validationMessage.set($event)"
+              />
+            </div>
+          </div>
+          }
+        </div>
+
+        <!-- Section 4: Conditional Logic -->
+        <div class="form-section">
+          <span class="section-title">4. Conditional Display Logic</span>
+          <label class="checkbox-label">
+            <input type="checkbox" [ngModel]="formService.enableConditional()" (ngModelChange)="formService.enableConditional.set($event)" />
+            <span><strong>Enable Conditional Display</strong> (Show field only when criteria met)</span>
+          </label>
+
+          @if (formService.enableConditional()) {
+          <div class="conditional-builder-box">
+            <p class="builder-hint">
+              Show this field only when parent field on <strong>{{ getEntityInfo(formService.entityType()).label }}</strong> matches:
+            </p>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="parent-field-select">Parent Field</label>
+                <select id="parent-field-select" class="form-control" [ngModel]="formService.conditionalFieldKey()" (ngModelChange)="formService.conditionalFieldKey.set($event)">
+                  <option value="">-- Select Parent Field --</option>
+                  @for (pDef of potentialParentFields; track pDef.id) {
+                  <option [value]="pDef.key">{{ pDef.label }} ({{ pDef.key }})</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="conditional-val-input">Expected Trigger Value</label>
+                <input
+                  id="conditional-val-input"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. true, YES, Sponsorship Required"
+                  [ngModel]="formService.conditionalValue()"
+                  (ngModelChange)="formService.conditionalValue.set($event)"
+                />
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: LIVE INTERACTIVE PREVIEW -->
+      <div class="preview-col">
+        <div class="preview-sticky-card">
+          <div class="preview-header">
+            <ng-icon name="tablerEye" size="18" aria-hidden="true"></ng-icon>
+            <h4>Live Field Preview</h4>
+          </div>
+          <p class="preview-desc">
+            Here is how this field will render in the dynamic form:
+          </p>
+
+          <div class="preview-render-box">
+            <app-custom-fields-form
+              [entityType]="formService.entityType()"
+              [customDefinitions]="[livePreviewDefinition]"
+              layout="vertical"
+            ></app-custom-fields-form>
+          </div>
+
+          <div class="preview-meta-summary">
+            <div class="meta-line">
+              <span class="lbl">Key:</span>
+              <code>{{ formService.key() || 'not_set' }}</code>
+            </div>
+            <div class="meta-line">
+              <span class="lbl">Type:</span>
+              <span>{{ getFieldTypeInfo(formService.fieldType()).label }}</span>
+            </div>
+            <div class="meta-line">
+              <span class="lbl">Required:</span>
+              <span>{{ formService.required() ? 'Yes' : 'No' }}</span>
+            </div>
+            @if (formService.enableConditional() && formService.conditionalFieldKey()) {
+            <div class="meta-line">
+              <span class="lbl">Conditional:</span>
+              <span>{{ formService.conditionalFieldKey() }} == '{{ formService.conditionalValue() }}'</span>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="close.emit()" [disabled]="saving">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-primary btn-save" (click)="save.emit()" [disabled]="saving">
+        <ng-icon name="tablerDeviceFloppy" size="18" aria-hidden="true"></ng-icon>
+        <span>{{ saving ? 'Saving...' : (formService.editingId() ? 'Save Changes' : 'Create Custom Field') }}</span>
+      </button>
+    </div>
+  </div>
+</div>

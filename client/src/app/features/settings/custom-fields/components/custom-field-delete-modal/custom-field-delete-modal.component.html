@@ -1,0 +1,21 @@
+<div class="modal-backdrop" (click)="close.emit()" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title">
+  <div class="modal-card delete-modal" (click)="$event.stopPropagation()">
+    <div class="delete-icon-wrap" aria-hidden="true">
+      <ng-icon name="tablerTrash" size="32"></ng-icon>
+    </div>
+    <h3 id="delete-dialog-title">Delete Custom Field</h3>
+    <p>
+      Are you sure you want to delete <strong>{{ field?.label }}</strong> (<code>{{ field?.key }}</code>)?
+      All existing data stored in this field across existing entity records will also be permanently deleted.
+    </p>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" (click)="close.emit()" [disabled]="saving">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-danger" (click)="confirm.emit()" [disabled]="saving">
+        {{ saving ? 'Deleting...' : 'Yes, Delete Field' }}
+      </button>
+    </div>
+  </div>
+</div>
