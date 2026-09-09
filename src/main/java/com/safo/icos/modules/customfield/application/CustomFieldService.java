@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,9 +54,9 @@ public class CustomFieldService {
     String normalizedKey = request.getKey().trim().toLowerCase().replaceAll("[^a-z0-9_]", "_");
 
     definitionRepository.findByEntityTypeAndKey(request.getEntityType(), normalizedKey)
-        .ifPresent(existing -> {
-          throw new IllegalArgumentException("Field with key '" + normalizedKey + "' already exists for " + request.getEntityType());
-        });
+            .ifPresent(existing -> {
+              throw new IllegalArgumentException("Field with key '" + normalizedKey + "' already exists for " + request.getEntityType());
+            });
 
     CustomFieldDefinition definition = CustomFieldDefinition.builder()
             .entityType(request.getEntityType())
@@ -84,6 +85,10 @@ public class CustomFieldService {
 
   /**
    * Updates an existing custom field definition.
+   * <p>
+   * Only fields that are explicitly provided (non-null) in the request will be updated.
+   * Boolean flags {@code required} and {@code filterable} are always updated because they are primitive types.
+   * The {@code orderIndex} is also updated unconditionally (primitive int).
    *
    * @param id Identifier of the definition to update
    * @param request Updated field attributes
@@ -93,7 +98,7 @@ public class CustomFieldService {
   @Transactional
   public CustomFieldDefinition updateDefinition(UUID id, CustomFieldDefinitionRequest request) {
     CustomFieldDefinition definition = definitionRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Custom field definition not found for id: " + id));
+            .orElseThrow(() -> new NotFoundException("Custom field definition not found for id: " + id));
 
     if (request.getLabel() != null && !request.getLabel().trim().isEmpty()) {
       definition.setLabel(request.getLabel().trim());
@@ -101,20 +106,46 @@ public class CustomFieldService {
     if (request.getFieldType() != null) {
       definition.setFieldType(request.getFieldType());
     }
+    // Primitive types – always set
     definition.setRequired(request.isRequired());
     definition.setFilterable(request.isFilterable());
-    definition.setOptions(request.getOptions());
-    definition.setDescription(request.getDescription());
-    definition.setPlaceholder(request.getPlaceholder());
-    definition.setDefaultValue(request.getDefaultValue());
-    definition.setValidationRegex(request.getValidationRegex());
-    definition.setValidationMessage(request.getValidationMessage());
-    definition.setMinValue(request.getMinValue());
-    definition.setMaxValue(request.getMaxValue());
-    definition.setConditionalFieldKey(request.getConditionalFieldKey());
-    definition.setConditionalValue(request.getConditionalValue());
     definition.setOrderIndex(request.getOrderIndex());
-    definition.setRefEntityType(request.getRefEntityType());
+
+    // Reference types – update only if provided
+    if (request.getOptions() != null) {
+      definition.setOptions(request.getOptions());
+    }
+    if (request.getDescription() != null) {
+      definition.setDescription(request.getDescription());
+    }
+    if (request.getPlaceholder() != null) {
+      definition.setPlaceholder(request.getPlaceholder());
+    }
+    if (request.getDefaultValue() != null) {
+      definition.setDefaultValue(request.getDefaultValue());
+    }
+    if (request.getValidationRegex() != null) {
+      definition.setValidationRegex(request.getValidationRegex());
+    }
+    if (request.getValidationMessage() != null) {
+      definition.setValidationMessage(request.getValidationMessage());
+    }
+    if (request.getMinValue() != null) {
+      definition.setMinValue(request.getMinValue());
+    }
+    if (request.getMaxValue() != null) {
+      definition.setMaxValue(request.getMaxValue());
+    }
+    if (request.getConditionalFieldKey() != null) {
+      definition.setConditionalFieldKey(request.getConditionalFieldKey());
+    }
+    if (request.getConditionalValue() != null) {
+      definition.setConditionalValue(request.getConditionalValue());
+    }
+    if (request.getRefEntityType() != null) {
+      definition.setRefEntityType(request.getRefEntityType());
+    }
+
     definition.setUpdatedAt(LocalDateTime.now());
 
     log.info("Updated custom field definition id: {}", id);
@@ -143,7 +174,7 @@ public class CustomFieldService {
    */
   public CustomFieldDefinition getDefinition(UUID id) {
     return definitionRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Custom field definition not found for id: " + id));
+            .orElseThrow(() -> new NotFoundException("Custom field definition not found for id: " + id));
   }
 
   /**
@@ -181,12 +212,48 @@ public class CustomFieldService {
 
   /**
    * Sets or updates a single custom field value for an entity instance with validation.
+   * This method is transactional; it runs within its own transaction when called externally.
    *
    * @param request Payload containing entity type, entity ID, field key, and new value
    * @return The persisted CustomFieldValue
    */
   @Transactional
   public CustomFieldValue setValue(CustomFieldValueRequest request) {
+    return doSetValue(request);
+  }
+
+  /**
+   * Sets multiple custom field values for an entity instance in a single transaction.
+   * All operations run within one transaction; any failure rolls back the entire batch.
+   *
+   * @param requests List of field value requests
+   * @return List of persisted CustomFieldValue entities
+   */
+  @Transactional
+  public List<CustomFieldValue> setValues(List<CustomFieldValueRequest> requests) {
+    List<CustomFieldValue> results = new ArrayList<>();
+    for (CustomFieldValueRequest req : requests) {
+      results.add(doSetValue(req)); // Uses the same transaction as the outer method
+    }
+    return results;
+  }
+
+  /**
+   * Deletes a custom field value by its ID.
+   *
+   * @param id Value UUID
+   */
+  @Transactional
+  public void deleteValue(UUID id) {
+    valueRepository.deleteById(id);
+  }
+
+  // ----------------------------- PRIVATE HELPERS -----------------------------
+
+  /**
+   * Internal core logic for setting a value. Used by both {@link #setValue} and {@link #setValues}.
+   */
+  private CustomFieldValue doSetValue(CustomFieldValueRequest request) {
     CustomFieldDefinition definition = definitionRepository
             .findByEntityTypeAndKey(request.getEntityType(), request.getFieldKey())
             .orElseThrow(() -> new NotFoundException(
@@ -212,40 +279,12 @@ public class CustomFieldService {
   }
 
   /**
-   * Sets multiple custom field values for an entity instance in a single transaction.
-   *
-   * @param requests List of field value requests
-   * @return List of persisted CustomFieldValue entities
-   */
-  @Transactional
-  public List<CustomFieldValue> setValues(List<CustomFieldValueRequest> requests) {
-    List<CustomFieldValue> results = new ArrayList<>();
-    for (CustomFieldValueRequest req : requests) {
-      results.add(setValue(req));
-    }
-    return results;
-  }
-
-  /**
-   * Deletes a custom field value by its ID.
-   *
-   * @param id Value UUID
-   */
-  @Transactional
-  public void deleteValue(UUID id) {
-    valueRepository.deleteById(id);
-  }
-
-  /**
    * Validates user input against the field definition's constraints (required, enum options, regex, numerical range).
    */
   private void validateValue(Object value, CustomFieldDefinition definition) {
-    boolean isBlankOrNull = (value == null || value.toString().trim().isEmpty());
+    boolean isBlankOrNull = isBlankOrNull(value);
 
-    // 1. Check Required constraint
-    if (definition.isRequired() && isBlankOrNull) {
-      throw new IllegalArgumentException("Field '" + definition.getLabel() + "' is required");
-    }
+    validateRequired(definition, isBlankOrNull);
 
     if (isBlankOrNull) {
       return;
@@ -253,42 +292,87 @@ public class CustomFieldService {
 
     String stringVal = value.toString().trim();
 
-    // 2. Check ENUM / SELECT allowed options
-    if (definition.getFieldType() == FieldType.ENUM) {
-      if (definition.getOptions() != null && !definition.getOptions().contains(stringVal)) {
-        throw new IllegalArgumentException(
-                "Invalid choice for field '" + definition.getLabel() + "': " + stringVal + ". Allowed: " + definition.getOptions());
-      }
+    validateEnumChoice(stringVal, definition);
+    validateRegex(stringVal, definition);
+    validateNumberRange(stringVal, definition);
+  }
+
+  /**
+   * Checks if the value is null or blank.
+   */
+  private boolean isBlankOrNull(Object value) {
+    return value == null || value.toString().trim().isEmpty();
+  }
+
+  /**
+   * Validates that the field is not null/blank when required.
+   */
+  private void validateRequired(CustomFieldDefinition definition, boolean isBlankOrNull) {
+    if (definition.isRequired() && isBlankOrNull) {
+      throw new IllegalArgumentException("Field '" + definition.getLabel() + "' is required");
+    }
+  }
+
+  /**
+   * Validates that the value is among allowed options for ENUM fields.
+   */
+  private void validateEnumChoice(String stringVal, CustomFieldDefinition definition) {
+    if (definition.getFieldType() == FieldType.ENUM
+            && definition.getOptions() != null
+            && !definition.getOptions().contains(stringVal)) {
+      throw new IllegalArgumentException(
+              "Invalid choice for field '" + definition.getLabel() + "': " + stringVal +
+                      ". Allowed: " + definition.getOptions());
+    }
+  }
+
+  /**
+   * Validates the value against a regex pattern if defined.
+   * If the pattern itself is invalid (PatternSyntaxException), an IllegalArgumentException is thrown.
+   */
+  private void validateRegex(String stringVal, CustomFieldDefinition definition) {
+    if (definition.getValidationRegex() == null || definition.getValidationRegex().isBlank()) {
+      return;
     }
 
-    // 3. Check Regex validation
-    if (definition.getValidationRegex() != null && !definition.getValidationRegex().isBlank()) {
-      try {
-        if (!Pattern.compile(definition.getValidationRegex()).matcher(stringVal).matches()) {
-          String errMsg = (definition.getValidationMessage() != null && !definition.getValidationMessage().isBlank())
-              ? definition.getValidationMessage()
-              : "Invalid format for field '" + definition.getLabel() + "'";
-          throw new IllegalArgumentException(errMsg);
-        }
-      } catch (Exception e) {
-        if (e instanceof IllegalArgumentException) throw e;
-        log.warn("Invalid regex pattern defined on custom field {}: {}", definition.getKey(), definition.getValidationRegex());
+    try {
+      Pattern pattern = Pattern.compile(definition.getValidationRegex());
+      if (!pattern.matcher(stringVal).matches()) {
+        String errMsg = (definition.getValidationMessage() != null && !definition.getValidationMessage().isBlank())
+                ? definition.getValidationMessage()
+                : "Invalid format for field '" + definition.getLabel() + "'";
+        throw new IllegalArgumentException(errMsg);
       }
+    } catch (PatternSyntaxException e) {
+      log.error("Invalid regex pattern defined on custom field {}: {}", definition.getKey(), definition.getValidationRegex(), e);
+      throw new IllegalArgumentException("Invalid validation pattern for field '" + definition.getLabel() + "'");
+    }
+  }
+
+  /**
+   * Validates that a numeric value is within the defined min/max range.
+   */
+  private void validateNumberRange(String stringVal, CustomFieldDefinition definition) {
+    if (definition.getFieldType() != FieldType.NUMBER) {
+      return;
     }
 
-    // 4. Check Number Min / Max constraints
-    if (definition.getFieldType() == FieldType.NUMBER) {
-      try {
-        BigDecimal numVal = new BigDecimal(stringVal);
-        if (definition.getMinValue() != null && numVal.compareTo(definition.getMinValue()) < 0) {
-          throw new IllegalArgumentException("Field '" + definition.getLabel() + "' must be at least " + definition.getMinValue());
-        }
-        if (definition.getMaxValue() != null && numVal.compareTo(definition.getMaxValue()) > 0) {
-          throw new IllegalArgumentException("Field '" + definition.getLabel() + "' cannot exceed " + definition.getMaxValue());
-        }
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Invalid number format for field '" + definition.getLabel() + "': " + stringVal);
+    try {
+      BigDecimal numVal = new BigDecimal(stringVal);
+
+      if (definition.getMinValue() != null && numVal.compareTo(definition.getMinValue()) < 0) {
+        throw new IllegalArgumentException("Field '" + definition.getLabel() +
+                "' must be at least " + definition.getMinValue());
       }
+
+      if (definition.getMaxValue() != null && numVal.compareTo(definition.getMaxValue()) > 0) {
+        throw new IllegalArgumentException("Field '" + definition.getLabel() +
+                "' cannot exceed " + definition.getMaxValue());
+      }
+
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid number format for field '" +
+              definition.getLabel() + "': " + stringVal);
     }
   }
 
@@ -297,41 +381,67 @@ public class CustomFieldService {
    */
   private void mapValue(CustomFieldValue target, Object value, CustomFieldDefinition definition) {
     if (value == null || value.toString().trim().isEmpty()) {
-      target.setValueText(null);
-      target.setValueNumber(null);
-      target.setValueBool(null);
-      target.setValueDate(null);
-      target.setValueEntityId(null);
-      target.setValueEntityType(null);
+      clearValueFields(target);
       return;
     }
 
     switch (definition.getFieldType()) {
-      case STRING, MULTILINE, ENUM, MULTI_SELECT, URL -> target.setValueText(value.toString().trim());
-      case NUMBER -> target.setValueNumber(new BigDecimal(value.toString().trim()));
-      case BOOLEAN -> target.setValueBool(Boolean.valueOf(value.toString().trim()));
-      case DATE -> {
-        if (value instanceof LocalDateTime ldt) {
-          target.setValueDate(ldt);
-        } else if (value instanceof LocalDate ld) {
-          target.setValueDate(ld.atStartOfDay());
-        } else {
-          String dateStr = value.toString().trim();
-          try {
-            if (dateStr.length() == 10 && dateStr.contains("-")) {
-              target.setValueDate(LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay());
-            } else {
-              target.setValueDate(LocalDateTime.parse(dateStr, DateTimeFormatter.ISO_DATE_TIME));
-            }
-          } catch (DateTimeParseException e) {
-            target.setValueDate(LocalDateTime.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-          }
-        }
-      }
+      case STRING, MULTILINE, ENUM, MULTI_SELECT, URL ->
+              target.setValueText(value.toString().trim());
+      case NUMBER ->
+              target.setValueNumber(new BigDecimal(value.toString().trim()));
+      case BOOLEAN ->
+              target.setValueBool(Boolean.valueOf(value.toString().trim()));
+      case DATE ->
+              target.setValueDate(parseDate(value));
       case ENTITY_REF -> {
         target.setValueEntityId(UUID.fromString(value.toString().trim()));
         target.setValueEntityType(definition.getRefEntityType());
       }
     }
   }
-}
+
+  /**
+   * Clears all typed value fields on the target.
+   */
+  private void clearValueFields(CustomFieldValue target) {
+    target.setValueText(null);
+    target.setValueNumber(null);
+    target.setValueBool(null);
+    target.setValueDate(null);
+    target.setValueEntityId(null);
+    target.setValueEntityType(null);
+  }
+
+  /**
+   * Parses a value into a LocalDateTime using pattern matching (Java 17+).
+   */
+  private LocalDateTime parseDate(Object value) {
+    return switch (value) {
+      case LocalDateTime ldt -> ldt;
+      case LocalDate ld -> ld.atStartOfDay();
+      default -> parseDateString(value.toString().trim());
+    };
+  }
+
+  /**
+   * Parses a date string into a LocalDateTime.
+   */
+  private LocalDateTime parseDateString(String dateStr) {
+    try {
+      if (isIsoLocalDate(dateStr)) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay();
+      }
+      return LocalDateTime.parse(dateStr, DateTimeFormatter.ISO_DATE_TIME);
+    } catch (DateTimeParseException e) {
+      return LocalDateTime.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    }
+  }
+
+  /**
+   * Checks if the string is in ISO local date format (yyyy-MM-dd).
+   */
+  private boolean isIsoLocalDate(String dateStr) {
+    return dateStr.length() == 10 && dateStr.contains("-");
+  }
+}
