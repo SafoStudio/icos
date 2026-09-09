@@ -5,7 +5,6 @@ import com.safo.icos.modules.talent.recruitment.application.dto.CreateVacancyReq
 import com.safo.icos.modules.talent.recruitment.application.dto.KanbanBoardDto;
 import com.safo.icos.modules.talent.recruitment.application.dto.KanbanColumnDto;
 import com.safo.icos.modules.talent.recruitment.application.dto.VacancyDto;
-import com.safo.icos.modules.talent.recruitment.domain.model.Application;
 import com.safo.icos.modules.talent.recruitment.domain.model.Candidate;
 import com.safo.icos.modules.talent.recruitment.domain.model.enums.ApplicationStatus;
 import com.safo.icos.security.context.IcosUserPrincipal;
@@ -138,7 +137,7 @@ class ApplicationServiceIntegrationTest {
 
     assertThat(board.getColumns().getFirst().getApplications()).hasSize(2);
     assertThat(board.getColumns().getFirst().getApplications())
-            .extracting(Application::getId)
+            .extracting(ApplicationDto::getId)   // <-- исправлено
             .containsExactlyInAnyOrder(app1.getId(), app2.getId());
   }
 }

@@ -6,7 +6,6 @@ import com.safo.icos.modules.customfield.domain.model.CustomFieldDefinition;
 import com.safo.icos.modules.customfield.domain.model.CustomFieldValue;
 import com.safo.icos.modules.customfield.domain.model.enums.EntityType;
 import com.safo.icos.modules.customfield.domain.model.enums.FieldType;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,7 @@ class CustomFieldServiceTest {
         // 3. Retrieve values
         List<CustomFieldValue> values = customFieldService.getValues(EntityType.USER, userId);
         assertThat(values).hasSize(1);
-        assertThat(values.get(0).getValueText()).isEqualTo("XL");
+        assertThat(values.getFirst().getValueText()).isEqualTo("XL");
     }
 
     @Test
