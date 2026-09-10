@@ -30,4 +30,11 @@ export {
   getRoleCssClass,
   isRole
 } from './roles.model';
+export {
+  type NotificationType,
+  type AppNotification,
+  type NotificationPreference,
+  type NotificationCategoryMeta
+} from './notification.model';
+
 
