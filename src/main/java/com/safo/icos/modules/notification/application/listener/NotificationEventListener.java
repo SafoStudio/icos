@@ -3,6 +3,7 @@ package com.safo.icos.modules.notification.application.listener;
 import com.safo.icos.modules.calendar.api.event.CalendarEventCreatedEvent;
 import com.safo.icos.modules.notification.application.NotificationService;
 import com.safo.icos.modules.notification.domain.model.NotificationType;
+import com.safo.icos.modules.talent.offboarding.api.event.OffboardingTaskAssignedEvent;
 import com.safo.icos.modules.talent.onboarding.api.event.OnboardingTaskAssignedEvent;
 import com.safo.icos.modules.talent.recruitment.api.event.CandidateHiredEvent;
 import com.safo.icos.modules.talent.recruitment.api.event.CandidateStageChangedEvent;
@@ -82,6 +83,7 @@ public class NotificationEventListener {
   @Async
   @EventListener
   public void handleTaskAssigned(TaskAssignedEvent event) {
+    if (event.getAssigneeId() == null) return;
     log.info("Handling TaskAssignedEvent for task: {}", event.getTaskId());
     notificationService.createNotification(
             event.getAssigneeId(),
@@ -94,6 +96,7 @@ public class NotificationEventListener {
   @Async
   @EventListener
   public void handleTaskStatusChanged(TaskStatusChangedEvent event) {
+    if (event.getAssigneeId() == null) return;
     log.info("Handling TaskStatusChangedEvent for task: {}", event.getTaskId());
     notificationService.createNotification(
             event.getAssigneeId(),
@@ -109,14 +112,47 @@ public class NotificationEventListener {
   @EventListener
   public void handleCalendarEventCreated(CalendarEventCreatedEvent event) {
     log.info("Handling CalendarEventCreatedEvent for event: {}", event.getEventId());
+    
+    // Notify invited participants
+    if (event.getParticipantIds() != null) {
+      for (var participantId : event.getParticipantIds()) {
+        if (!participantId.equals(event.getUserId())) {
+          notificationService.createNotification(
+                  participantId,
+                  NotificationType.CALENDAR_EVENT_CREATED,
+                  "Calendar Event Invitation",
+                  "You have been invited to event: " + event.getTitle(),
+                  Map.of(
+                          KEY_EVENT_ID, event.getEventId().toString(),
+                          KEY_START_TIME, event.getStartTime().toString()));
+        }
+      }
+    }
+
+    // Notify event organizer / creator
+    if (event.getUserId() != null) {
+      notificationService.createNotification(
+              event.getUserId(),
+              NotificationType.CALENDAR_EVENT_CREATED,
+              "New Calendar Event Created",
+              "Event '" + event.getTitle() + "' has been added to your calendar.",
+              Map.of(
+                      KEY_EVENT_ID, event.getEventId().toString(),
+                      KEY_START_TIME, event.getStartTime().toString()));
+    }
+  }
+
+  @Async
+  @EventListener
+  public void handleOffboardingTaskAssigned(OffboardingTaskAssignedEvent event) {
+    if (event.getAssigneeId() == null) return;
+    log.info("Handling OffboardingTaskAssignedEvent for task: {}", event.getTaskId());
     notificationService.createNotification(
-            event.getUserId(),
-            NotificationType.CALENDAR_EVENT_CREATED,
-            "New Calendar Event",
-            "Event '" + event.getTitle() + "' has been added to your calendar.",
-            Map.of(
-                    KEY_EVENT_ID, event.getEventId().toString(),
-                    KEY_START_TIME, event.getStartTime().toString()));
+            event.getAssigneeId(),
+            NotificationType.ONBOARDING_TASK_ASSIGNED,
+            "New Offboarding Task",
+            "You have been assigned an offboarding task: " + event.getTaskTitle(),
+            Map.of(KEY_TASK_ID, event.getTaskId().toString()));
   }
 
   @Async

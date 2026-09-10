@@ -95,8 +95,13 @@ public class CalendarService {
 
     Event saved = eventRepository.save(event);
 
+    List<UUID> participantUserIds = participants.stream()
+            .map(EventParticipant::getUserId)
+            .filter(pId -> !pId.equals(userId))
+            .toList();
+
     eventPublisher.publishEvent(new CalendarEventCreatedEvent(
-            this, saved.getId(), userId, title, start));
+            this, saved.getId(), userId, title, start, participantUserIds));
 
     return saved;
   }

@@ -6,39 +6,52 @@ import com.safo.icos.modules.notification.domain.model.Notification;
 import com.safo.icos.modules.notification.domain.model.NotificationType;
 import com.safo.icos.modules.notification.domain.repository.NotificationRepository;
 
+import com.safo.icos.modules.notification.infrastructure.sse.NotificationBroadcaster;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Application service for notification management.
- * Handles creation, retrieval, and read-state updates.
+ * Handles creation, retrieval, and read-state updates with subscription preference checks
+ * and real-time SSE streaming.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class NotificationService {
 
   private final NotificationRepository notificationRepository;
+  private final NotificationPreferenceService preferenceService;
+  private final NotificationBroadcaster broadcaster;
 
   /**
-   * Creates a new notification for a user.
+   * Creates a new notification for a user if their notification preferences allow it.
+   * Also broadcasts the notification via real-time stream.
    *
    * @param userId   the recipient's UUID
    * @param type     notification type
    * @param title    notification title
    * @param message  notification body
    * @param metadata optional key-value pairs (e.g., related entity IDs)
-   * @return the created notification DTO
+   * @return the created notification DTO, or null if the user is unsubscribed
    */
   public NotificationDto createNotification(UUID userId, NotificationType type,
                                             String title, String message,
                                             Map<String, String> metadata) {
+    if (!preferenceService.isNotificationEnabled(userId, type)) {
+      log.debug("Notification of type {} skipped for user {} due to user preferences", type, userId);
+      return null;
+    }
+
     Notification notification = Notification.builder()
             .id(UUID.randomUUID())
             .userId(userId)
@@ -50,7 +63,9 @@ public class NotificationService {
             .createdAt(LocalDateTime.now())
             .build();
 
-    return toDto(notificationRepository.save(notification));
+    NotificationDto dto = toDto(notificationRepository.save(notification));
+    broadcaster.broadcast(userId, dto);
+    return dto;
   }
 
   /**
@@ -101,6 +116,15 @@ public class NotificationService {
    */
   public void markAllAsRead(UUID userId) {
     notificationRepository.markAllAsReadByUserId(userId);
+  }
+
+  /**
+   * Deletes a notification by its ID.
+   *
+   * @param notificationId the notification UUID
+   */
+  public void deleteNotification(UUID notificationId) {
+    notificationRepository.deleteById(notificationId);
   }
 
   private NotificationDto toDto(Notification notification) {

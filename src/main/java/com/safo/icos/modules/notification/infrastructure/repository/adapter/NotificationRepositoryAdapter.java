@@ -47,4 +47,10 @@ public class NotificationRepositoryAdapter implements NotificationRepository {
     public void markAllAsReadByUserId(UUID userId) {
         jpaRepository.markAllAsReadByUserId(userId);
     }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
 }

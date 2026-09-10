@@ -15,4 +15,5 @@ public interface NotificationRepository {
   List<Notification> findByUserId(UUID userId, int limit, int offset);
   long countUnreadByUserId(UUID userId);
   void markAllAsReadByUserId(UUID userId);
+  void deleteById(UUID id);
 }
