@@ -44,6 +44,26 @@
   }
 
   <div class="main-links">
+    <button
+      class="main-link"
+      (click)="openNotifications()"
+      type="button"
+      [attr.aria-label]="'Notifications: ' + unreadNotificationCount() + ' unread'"
+    >
+      <div class="main-link-inner">
+        <ng-icon name="tablerBell" class="main-link-icon" size="20"></ng-icon>
+        @if (!isCollapsed()) {
+        <span>Notifications</span>
+        }
+      </div>
+      @if (unreadNotificationCount() > 0) {
+      @if (!isCollapsed()) {
+      <span class="badge">{{ unreadNotificationCount() }}</span>
+      } @else {
+      <span class="badge collapsed-badge">{{ unreadNotificationCount() }}</span>
+      }
+      }
+    </button>
     @for (link of mainLinks; track link.label) {
     <button class="main-link" (click)="closeSidebar()">
       <div class="main-link-inner">

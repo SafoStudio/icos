@@ -1,0 +1,103 @@
+<div class="notification-settings-pane">
+  <div class="card-section header-card">
+    <div class="header-card-inner">
+      <div>
+        <h3>Notification Channels & Subscriptions</h3>
+        <p class="section-desc">
+          Choose which platform events trigger in-app updates in your notification center and which deliver email digests.
+          Events you disable will not generate in-app alerts or interrupt your workflow.
+        </p>
+      </div>
+
+      <div class="bulk-actions-group">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="enableAllInApp()"
+          title="Turn on all in-app notifications"
+        >
+          <ng-icon name="tablerCheck" size="16"></ng-icon>
+          <span>All In-App On</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline danger"
+          (click)="disableAllInApp()"
+          title="Turn off all in-app notifications"
+        >
+          <ng-icon name="tablerX" size="16"></ng-icon>
+          <span>Mute In-App</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveAll()"
+          [disabled]="isSaving()"
+        >
+          <ng-icon name="tablerDeviceFloppy" size="16"></ng-icon>
+          <span>{{ isSaving() ? 'Saving...' : 'Save Settings' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-section list-card">
+    <div class="settings-table-header">
+      <div class="col-event">Event Category</div>
+      <div class="col-channel">In-App Drawer</div>
+      <div class="col-channel">Email Digest</div>
+    </div>
+
+    <div class="settings-list">
+      @for (group of groups; track group.id) {
+        <div class="setting-item-row">
+          <div class="col-event item-details">
+            <div class="group-icon-box">
+              <ng-icon [name]="group.icon" size="20"></ng-icon>
+            </div>
+            <div class="group-text">
+              <div class="group-title">{{ group.title }}</div>
+              <div class="group-desc">{{ group.description }}</div>
+            </div>
+          </div>
+
+          <div class="col-channel channel-toggle-col">
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.checked]="inAppMap()[group.id]"
+              (click)="toggleInApp(group.id)"
+              [attr.aria-label]="'Toggle in-app for ' + group.title"
+              [attr.aria-checked]="inAppMap()[group.id]"
+              role="switch"
+            >
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-status-label">{{ inAppMap()[group.id] ? 'Enabled' : 'Muted' }}</span>
+            </button>
+          </div>
+
+          <div class="col-channel channel-toggle-col">
+            <button
+              type="button"
+              class="toggle-switch"
+              [class.checked]="emailMap()[group.id]"
+              (click)="toggleEmail(group.id)"
+              [attr.aria-label]="'Toggle email for ' + group.title"
+              [attr.aria-checked]="emailMap()[group.id]"
+              role="switch"
+            >
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-status-label">{{ emailMap()[group.id] ? 'Subscribed' : 'Off' }}</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
-import { AuthService, ThemeService } from '@services';
+import { AuthService, ThemeService, NotificationService } from '@services';
 import { AvatarService } from '@features/profile/avatar/avatar.service';
 
 interface MainLink {
@@ -29,7 +29,10 @@ export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly avatarService = inject(AvatarService);
+  private readonly notificationService = inject(NotificationService);
   readonly themeService = inject(ThemeService);
+
+  readonly unreadNotificationCount = computed(() => this.notificationService.unreadCount());
 
   private readonly isCollapsedSignal = signal(true);
 
@@ -92,6 +95,10 @@ export class SidebarComponent {
   goToProfile(): void {
     this.closeSidebar();
     this.router.navigate(['/profile']);
+  }
+
+  openNotifications(): void {
+    this.notificationService.togglePanel();
   }
 
   isActive(route: string): boolean {

@@ -1,12 +1,12 @@
 import { Component, inject, computed, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@services';
-import { ToastContainerComponent, SidebarComponent } from '@components';
+import { ToastContainerComponent, SidebarComponent, NotificationCenterComponent } from '@components';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, ToastContainerComponent],
+  imports: [RouterOutlet, SidebarComponent, ToastContainerComponent, NotificationCenterComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

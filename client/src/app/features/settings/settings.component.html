@@ -1,4 +1,4 @@
-﻿<div class="settings-layout-page">
+<div class="settings-layout-page">
   <div class="page-header">
     <div class="title-badge">
       <ng-icon name="tablerSettings" size="20" class="badge-icon" aria-hidden="true"></ng-icon>
@@ -19,6 +19,13 @@
       @if (activeTabId() === 'custom-fields') {
       <div class="tab-pane" role="tabpanel" aria-label="Custom fields settings">
         <app-custom-fields></app-custom-fields>
+      </div>
+      }
+
+      <!-- TAB: NOTIFICATIONS -->
+      @if (activeTabId() === 'notifications') {
+      <div class="tab-pane" role="tabpanel" aria-label="Notification and subscription settings">
+        <app-notification-settings></app-notification-settings>
       </div>
       }
 

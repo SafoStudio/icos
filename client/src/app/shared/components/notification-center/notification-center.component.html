@@ -1,0 +1,156 @@
+@if (isOpen()) {
+  <div class="notification-overlay" (click)="close()" aria-hidden="true"></div>
+}
+
+<aside class="notification-drawer" [class.open]="isOpen()" role="dialog" aria-label="Notifications Center">
+  <div class="drawer-header">
+    <div class="header-title-group">
+      <div class="header-icon-box">
+        <ng-icon name="tablerBell" size="20"></ng-icon>
+      </div>
+      <div>
+        <h2 class="drawer-title">Notifications</h2>
+        <span class="drawer-subtitle">
+          @if (unreadCount() > 0) {
+            {{ unreadCount() }} unread updates
+          } @else {
+            All caught up
+          }
+        </span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      @if (unreadCount() > 0) {
+        <button
+          type="button"
+          class="action-btn"
+          (click)="markAllAsRead()"
+          title="Mark all as read"
+          aria-label="Mark all as read"
+        >
+          <ng-icon name="tablerCheck" size="18"></ng-icon>
+        </button>
+      }
+
+      <button
+        type="button"
+        class="action-btn"
+        (click)="goToSettings()"
+        title="Notification Settings"
+        aria-label="Notification Settings"
+      >
+        <ng-icon name="tablerSettings" size="18"></ng-icon>
+      </button>
+
+      <button
+        type="button"
+        class="action-btn close-btn"
+        (click)="close()"
+        title="Close notifications"
+        aria-label="Close notifications"
+      >
+        <ng-icon name="tablerX" size="18"></ng-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'all'"
+      (click)="setFilter('all')"
+    >
+      All ({{ totalCount() }})
+    </button>
+    <button
+      type="button"
+      class="filter-pill"
+      [class.active]="activeFilter() === 'unread'"
+      (click)="setFilter('unread')"
+    >
+      Unread ({{ unreadCount() }})
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading notifications...</span>
+      </div>
+    } @else if (notifications().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <ng-icon name="tablerBell" size="36"></ng-icon>
+        </div>
+        <p class="empty-title">No notifications yet</p>
+        <p class="empty-text">
+          @if (activeFilter() === 'unread') {
+            You have read all your notifications.
+          } @else {
+            Events and updates you subscribe to will show up here.
+          }
+        </p>
+      </div>
+    } @else {
+      <div class="notification-list">
+        @for (item of notifications(); track item.id) {
+          <div
+            class="notification-card"
+            [class.unread]="!item.isRead"
+            (click)="onItemClick(item)"
+            role="button"
+            tabindex="0"
+          >
+            <div class="card-left-col">
+              <div class="icon-avatar" [class.unread-icon]="!item.isRead">
+                <ng-icon [name]="getIcon(item.type)" size="18"></ng-icon>
+              </div>
+            </div>
+
+            <div class="card-main-col">
+              <div class="card-header-row">
+                <span class="card-title">{{ item.title }}</span>
+                <span class="card-time">{{ formatTime(item.createdAt) }}</span>
+              </div>
+
+              @if (item.message) {
+                <p class="card-message">{{ item.message }}</p>
+              }
+
+              <div class="card-actions-row">
+                @if (!item.isRead) {
+                  <button
+                    type="button"
+                    class="card-action-btn mark-read"
+                    (click)="markAsRead(item.id, $event)"
+                    title="Mark as read"
+                  >
+                    <ng-icon name="tablerCheck" size="14"></ng-icon>
+                    <span>Mark read</span>
+                  </button>
+                }
+
+                <button
+                  type="button"
+                  class="card-action-btn delete-btn"
+                  (click)="deleteNotification(item.id, $event)"
+                  title="Remove notification"
+                >
+                  <ng-icon name="tablerTrash" size="14"></ng-icon>
+                  <span>Dismiss</span>
+                </button>
+              </div>
+            </div>
+
+            @if (!item.isRead) {
+              <div class="unread-indicator-dot" aria-label="Unread"></div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</aside>
