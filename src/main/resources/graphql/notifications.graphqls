@@ -8,14 +8,33 @@ type Notification {
     createdAt: String!
 }
 
+type NotificationPreference {
+    id: ID
+    userId: ID!
+    type: String!
+    inAppEnabled: Boolean!
+    emailEnabled: Boolean!
+}
+
+input NotificationPreferenceInput {
+    type: String!
+    inAppEnabled: Boolean!
+    emailEnabled: Boolean!
+}
+
 extend type Query {
     notifications(limit: Int = 20, offset: Int = 0): [Notification!]!
     unreadNotificationCount: Int!
+    notificationPreferences: [NotificationPreference!]!
 }
 
 extend type Mutation {
     markNotificationAsRead(id: ID!): Notification!
     markAllNotificationsAsRead: Boolean!
+    deleteNotification(id: ID!): Boolean!
+    updateNotificationPreference(type: String!, inAppEnabled: Boolean!, emailEnabled: Boolean!): NotificationPreference!
+    updateNotificationPreferences(preferences: [NotificationPreferenceInput!]!): [NotificationPreference!]!
 }
+
 
 
