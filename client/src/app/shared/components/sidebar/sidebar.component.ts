@@ -5,12 +5,6 @@ import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ThemeService, NotificationService } from '@services';
 import { AvatarService } from '@features/profile/avatar/avatar.service';
 
-interface MainLink {
-  label: string;
-  icon: string;
-  notifications?: number;
-}
-
 interface MenuItem {
   label: string;
   icon: string;
@@ -63,12 +57,6 @@ export class SidebarComponent {
   hasAvatar = computed(() => {
     return !!this.userAvatarUrl();
   });
-
-  mainLinks: MainLink[] = [
-    { label: 'Activity', icon: 'tablerBulb', notifications: 1 },
-    { label: 'Tasks', icon: 'tablerCheckbox', notifications: 4 },
-    { label: 'Messages', icon: 'tablerMail', notifications: 3 },
-  ];
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
