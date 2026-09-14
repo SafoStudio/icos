@@ -3,7 +3,7 @@
     <div class="header-left">
       <div class="title-badge">
         <ng-icon name="tablerCalendarEvent" size="22" class="badge-icon" aria-hidden="true"></ng-icon>
-        <span class="badge-text">Schedule & Meetings</span>
+        <span class="badge-text">Schedule &amp; Meetings</span>
       </div>
       <p class="header-subtitle">Plan meetings, track team schedules, and manage events seamlessly.</p>
     </div>
@@ -13,7 +13,12 @@
         <button type="button" class="btn-nav" (click)="prevMonth()" title="Previous Month" aria-label="Previous Month">
           <ng-icon name="tablerChevronLeft" size="18" aria-hidden="true"></ng-icon>
         </button>
-        <span class="month-display">{{ monthLabel() }}</span>
+
+        <div class="month-display">
+          <span class="month-name">{{ monthName() }}</span>
+          <span class="month-year">{{ monthYear() }}</span>
+        </div>
+
         <button type="button" class="btn-nav" (click)="nextMonth()" title="Next Month" aria-label="Next Month">
           <ng-icon name="tablerChevronRight" size="18" aria-hidden="true"></ng-icon>
         </button>
@@ -45,23 +50,42 @@
 
     <div class="days-grid">
       @for (day of calendarDays(); track day.dateString + day.dayNumber) {
-      <button
-        type="button"
+      <div
         class="day-cell"
         [class.other-month]="!day.isCurrentMonth"
         [class.is-today]="day.isToday"
-        (click)="openCreateSidebar(day.dateString)"
-        [attr.aria-label]="'Day ' + day.dayNumber + ' ' + (day.isCurrentMonth ? '' : 'from other month')"
+        [class.is-weekend]="day.isWeekend"
       >
         <div class="cell-top">
           <span class="day-number" [class.today-pill]="day.isToday">{{ day.dayNumber }}</span>
+
+          <button
+            type="button"
+            class="day-add-btn"
+            (click)="openCreateSidebar(day.dateString)"
+            [attr.aria-label]="'Add event on day ' + day.dayNumber"
+            title="Add event"
+          >
+            <ng-icon name="tablerPlus" size="14" aria-hidden="true"></ng-icon>
+          </button>
         </div>
+
+        @if (day.events.length > 0) {
+        <div
+          class="load-indicator"
+          [style.width.%]="Math.min(day.events.length * 25, 100)"
+          [attr.title]="day.events.length + (day.events.length === 1 ? ' event' : ' events')"
+        ></div>
+        }
 
         <div class="events-list">
           @for (evt of day.events; track evt.id) {
           <button
             type="button"
             class="event-pill"
+            [class.type-interview]="evt.type === 'INTERVIEW'"
+            [class.type-call]="evt.type === 'CALL'"
+            [class.type-meeting]="evt.type === 'MEETING'"
             [class.rsvp-accepted]="getCurrentUserStatus(evt) === 'ACCEPTED'"
             [class.rsvp-declined]="getCurrentUserStatus(evt) === 'DECLINED'"
             [class.rsvp-pending]="getCurrentUserStatus(evt) === 'PENDING' && !isOrganizer(evt)"
@@ -73,14 +97,14 @@
             <span class="event-title">{{ evt.title }}</span>
             @if (evt.participantIds && evt.participantIds.length > 1) {
             <span class="event-attendees-badge" title="{{ evt.participantIds.length }} participants">
-              <ng-icon name="tablerUsers" size="12" aria-hidden="true"></ng-icon>
+              <ng-icon name="tablerUsers" size="11" aria-hidden="true"></ng-icon>
               {{ evt.participantIds.length }}
             </span>
             }
           </button>
           }
         </div>
-      </button>
+      </div>
       }
     </div>
   </div>
@@ -100,7 +124,11 @@
     <div class="sidebar-header">
       <div>
         <h2>{{ isEditMode() ? 'Edit Calendar Event' : 'Schedule Calendar Event' }}</h2>
-        <p class="sidebar-subtitle">{{ isEditMode() ? 'Update meeting details and manage invited team members' : 'Fill details and invite colleagues to this event' }}</p>
+        <p class="sidebar-subtitle">
+          {{ isEditMode()
+          ? 'Update meeting details and manage invited team members'
+          : 'Fill details and invite colleagues to this event' }}
+        </p>
       </div>
       <button type="button" class="close-btn" (click)="closeCreateOrEditSidebar()" aria-label="Close sidebar">
         <ng-icon name="tablerX" size="22" aria-hidden="true"></ng-icon>
@@ -110,12 +138,22 @@
     <div class="sidebar-body">
       <div class="form-group">
         <label for="eventTitleInput">Event Title <span class="required-star">*</span></label>
-        <input id="eventTitleInput" type="text" [(ngModel)]="eventForm.title" placeholder="e.g. Weekly Product Sync & Review" />
+        <input
+          id="eventTitleInput"
+          type="text"
+          [(ngModel)]="eventForm.title"
+          placeholder="e.g. Weekly Product Sync & Review"
+        />
       </div>
 
       <div class="form-group">
         <label for="eventDescInput">Description / Agenda</label>
-        <textarea id="eventDescInput" rows="3" [(ngModel)]="eventForm.description" placeholder="Add meeting agenda, call link, or notes..."></textarea>
+        <textarea
+          id="eventDescInput"
+          rows="3"
+          [(ngModel)]="eventForm.description"
+          placeholder="Add meeting agenda, call link, or notes..."
+        ></textarea>
       </div>
 
       <div class="form-group">
@@ -153,13 +191,23 @@
           <div class="member-chip">
             <div class="chip-avatar">
               @if (getUserAvatarUrl(member)) {
-                <img [src]="getUserAvatarUrl(member)" [alt]="getUserDisplayName(member)" (error)="$any($event.target).style.display='none'" />
+              <img
+                [src]="getUserAvatarUrl(member)"
+                [alt]="getUserDisplayName(member)"
+                (error)="$any($event.target).style.display='none'"
+              />
               } @else {
-                <span>{{ getUserInitials(member) }}</span>
+              <span>{{ getUserInitials(member) }}</span>
               }
             </div>
             <span class="chip-name">{{ getUserDisplayName(member) }}</span>
-            <button type="button" class="chip-remove-btn" (click)="removeParticipant(member.id)" title="Remove attendee" aria-label="Remove attendee">
+            <button
+              type="button"
+              class="chip-remove-btn"
+              (click)="removeParticipant(member.id)"
+              title="Remove attendee"
+              aria-label="Remove attendee"
+            >
               <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
             </button>
           </div>
@@ -178,7 +226,12 @@
             class="search-input"
           />
           @if (memberSearchQuery()) {
-          <button type="button" class="clear-search-btn" (click)="memberSearchQuery.set('')" aria-label="Clear search">
+          <button
+            type="button"
+            class="clear-search-btn"
+            (click)="memberSearchQuery.set('')"
+            aria-label="Clear search"
+          >
             <ng-icon name="tablerX" size="14" aria-hidden="true"></ng-icon>
           </button>
           }
@@ -202,9 +255,13 @@
             <div class="member-info-col">
               <div class="picker-avatar">
                 @if (getUserAvatarUrl(member)) {
-                  <img [src]="getUserAvatarUrl(member)" [alt]="getUserDisplayName(member)" (error)="$any($event.target).style.display='none'" />
+                <img
+                  [src]="getUserAvatarUrl(member)"
+                  [alt]="getUserDisplayName(member)"
+                  (error)="$any($event.target).style.display='none'"
+                />
                 } @else {
-                  <span>{{ getUserInitials(member) }}</span>
+                <span>{{ getUserInitials(member) }}</span>
                 }
               </div>
               <div class="picker-text">
@@ -243,16 +300,30 @@
       </div>
 
       <div class="footer-right">
-        <button type="button" class="btn btn-secondary" (click)="closeCreateOrEditSidebar()" [disabled]="isSubmitting()">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeCreateOrEditSidebar()"
+          [disabled]="isSubmitting()"
+        >
           Cancel
         </button>
-        <button type="button" class="btn btn-primary" (click)="submitEventForm()" [disabled]="isSubmitting()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="submitEventForm()"
+          [disabled]="isSubmitting()"
+        >
           @if (isSubmitting()) {
-            <span class="btn-spinner"></span>
-            <span>Saving...</span>
+          <span class="btn-spinner"></span>
+          <span>Saving...</span>
           } @else {
-            <ng-icon [name]="isEditMode() ? 'tablerCheck' : 'tablerPlus'" size="16" aria-hidden="true"></ng-icon>
-            <span>{{ isEditMode() ? 'Save Changes' : 'Create Event' }}</span>
+          <ng-icon
+            [name]="isEditMode() ? 'tablerCheck' : 'tablerPlus'"
+            size="16"
+            aria-hidden="true"
+          ></ng-icon>
+          <span>{{ isEditMode() ? 'Save Changes' : 'Create Event' }}</span>
           }
         </button>
       </div>
@@ -279,8 +350,10 @@
           <ng-icon name="tablerClock" size="20" class="card-icon" aria-hidden="true"></ng-icon>
         </div>
         <div class="card-content">
-          <span class="card-label">Time & Duration</span>
-          <span class="card-value">{{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}</span>
+          <span class="card-label">Time &amp; Duration</span>
+          <span class="card-value">
+            {{ formatTime(selectedEvent()!.startAt) }} - {{ formatTime(selectedEvent()!.endAt) }}
+          </span>
         </div>
       </div>
 
@@ -288,16 +361,20 @@
       <div class="detail-card organizer-card">
         <div class="card-avatar">
           @if (getUserAvatarUrl(selectedEvent()?.organizer)) {
-            <img [src]="getUserAvatarUrl(selectedEvent()?.organizer)" [alt]="getUserDisplayName(selectedEvent()?.organizer)" (error)="$any($event.target).style.display='none'" />
+          <img
+            [src]="getUserAvatarUrl(selectedEvent()?.organizer)"
+            [alt]="getUserDisplayName(selectedEvent()?.organizer)"
+            (error)="$any($event.target).style.display='none'"
+          />
           } @else {
-            <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
+          <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
           }
         </div>
         <div class="card-content">
           <div class="organizer-header">
             <span class="card-label">Organizer</span>
             @if (isOrganizer(selectedEvent())) {
-              <span class="badge-self">You</span>
+            <span class="badge-self">You</span>
             }
           </div>
           <span class="card-value">{{ getUserDisplayName(selectedEvent()?.organizer) }}</span>
@@ -370,7 +447,11 @@
       <div class="detail-section attendees-detail-section">
         <div class="section-title-row">
           <h4 class="section-heading">
-            Attendees ({{ selectedEvent()?.participantDetails?.length || selectedEvent()?.participants?.length || 1 }})
+            Attendees ({{
+            selectedEvent()?.participantDetails?.length
+            || selectedEvent()?.participants?.length
+            || 1
+            }})
           </h4>
         </div>
 
@@ -379,9 +460,13 @@
           <div class="attendee-item">
             <div class="attendee-avatar">
               @if (getUserAvatarUrl(selectedEvent()?.organizer)) {
-                <img [src]="getUserAvatarUrl(selectedEvent()?.organizer)" [alt]="getUserDisplayName(selectedEvent()?.organizer)" (error)="$any($event.target).style.display='none'" />
+              <img
+                [src]="getUserAvatarUrl(selectedEvent()?.organizer)"
+                [alt]="getUserDisplayName(selectedEvent()?.organizer)"
+                (error)="$any($event.target).style.display='none'"
+              />
               } @else {
-                <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
+              <span>{{ getUserInitials(selectedEvent()?.organizer) }}</span>
               }
             </div>
             <div class="attendee-info">
@@ -402,26 +487,30 @@
 
           <!-- Other Participants -->
           @if (selectedEvent()?.participantDetails && selectedEvent()!.participantDetails!.length > 0) {
-            @for (p of selectedEvent()!.participantDetails; track p.userId) {
-              @if (p.userId !== selectedEvent()?.userId) {
-              <div class="attendee-item">
-                <div class="attendee-avatar">
-                  @if (getUserAvatarUrl(p.user)) {
-                    <img [src]="getUserAvatarUrl(p.user)" [alt]="getUserDisplayName(p.user)" (error)="$any($event.target).style.display='none'" />
-                  } @else {
-                    <span>{{ getUserInitials(p.user) }}</span>
-                  }
-                </div>
-                <div class="attendee-info">
+          @for (p of selectedEvent()!.participantDetails; track p.userId) {
+          @if (p.userId !== selectedEvent()?.userId) {
+          <div class="attendee-item">
+            <div class="attendee-avatar">
+              @if (getUserAvatarUrl(p.user)) {
+              <img
+                [src]="getUserAvatarUrl(p.user)"
+                [alt]="getUserDisplayName(p.user)"
+                (error)="$any($event.target).style.display='none'"
+              />
+              } @else {
+              <span>{{ getUserInitials(p.user) }}</span>
+              }
+            </div>
+            <div class="attendee-info">
                   <span class="attendee-name">
                     {{ getUserDisplayName(p.user) }}
                     @if (p.userId === currentUser()?.id) {
                       <span class="you-tag">(You)</span>
                     }
                   </span>
-                  <span class="attendee-sub">{{ p.user?.email || p.user?.role }}</span>
-                </div>
-                <div class="attendee-status">
+              <span class="attendee-sub">{{ p.user?.email || p.user?.role }}</span>
+            </div>
+            <div class="attendee-status">
                   <span
                     class="badge-rsvp"
                     [class.badge-accepted]="p.status === 'ACCEPTED'"
@@ -436,38 +525,42 @@
                       Pending
                     }
                   </span>
-                </div>
-              </div>
-              }
-            }
+            </div>
+          </div>
+          }
+          }
           } @else if (selectedEvent()?.participants && selectedEvent()!.participants!.length > 0) {
-            @for (p of selectedEvent()!.participants; track p.id) {
-              @if (p.id !== selectedEvent()?.userId) {
-              <div class="attendee-item">
-                <div class="attendee-avatar">
-                  @if (getUserAvatarUrl(p)) {
-                    <img [src]="getUserAvatarUrl(p)" [alt]="getUserDisplayName(p)" (error)="$any($event.target).style.display='none'" />
-                  } @else {
-                    <span>{{ getUserInitials(p) }}</span>
-                  }
-                </div>
-                <div class="attendee-info">
+          @for (p of selectedEvent()!.participants; track p.id) {
+          @if (p.id !== selectedEvent()?.userId) {
+          <div class="attendee-item">
+            <div class="attendee-avatar">
+              @if (getUserAvatarUrl(p)) {
+              <img
+                [src]="getUserAvatarUrl(p)"
+                [alt]="getUserDisplayName(p)"
+                (error)="$any($event.target).style.display='none'"
+              />
+              } @else {
+              <span>{{ getUserInitials(p) }}</span>
+              }
+            </div>
+            <div class="attendee-info">
                   <span class="attendee-name">
                     {{ getUserDisplayName(p) }}
                     @if (p.id === currentUser()?.id) {
                       <span class="you-tag">(You)</span>
                     }
                   </span>
-                  <span class="attendee-sub">{{ p.email }}</span>
-                </div>
-                <div class="attendee-status">
+              <span class="attendee-sub">{{ p.email }}</span>
+            </div>
+            <div class="attendee-status">
                   <span class="badge-rsvp badge-pending">
                     Invited
                   </span>
-                </div>
-              </div>
-              }
-            }
+            </div>
+          </div>
+          }
+          }
           }
         </div>
       </div>

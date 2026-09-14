@@ -3,7 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { ToastService, AuthService } from '@services';
-import { CalendarService, CalendarEvent, CalendarParticipant, EventParticipant } from './calendar.service';
+import {
+  CalendarService,
+  CalendarEvent,
+  CalendarParticipant,
+} from './calendar.service';
+
+export type RsvpStatus = 'ACCEPTED' | 'DECLINED' | 'PENDING';
+export type RsvpResponse = Extract<RsvpStatus, 'ACCEPTED' | 'DECLINED'>;
 
 export interface CalendarDay {
   date: Date;
@@ -11,121 +18,127 @@ export interface CalendarDay {
   dayNumber: number;
   isCurrentMonth: boolean;
   isToday: boolean;
+  isWeekend: boolean;
   events: CalendarEvent[];
 }
+
+interface EventFormModel {
+  title: string;
+  description: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const DAYS_IN_GRID = 42;
+const DEFAULT_START_TIME = '09:00';
+const DEFAULT_END_TIME = '10:00';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIconComponent],
   templateUrl: './calendar.component.html',
-  styleUrls: ['./calendar.component.scss']
+  styleUrls: ['./calendar.component.scss'],
 })
 export class CalendarComponent implements OnInit {
   private readonly calendarService = inject(CalendarService);
   private readonly authService = inject(AuthService);
   private readonly toast = inject(ToastService);
 
+  protected readonly Math = Math;
+
   readonly currentUser = computed(() => this.authService.currentUser());
 
-  currentDate = signal<Date>(new Date());
-  events = signal<CalendarEvent[]>([]);
-  isLoading = signal<boolean>(false);
-  isSubmitting = signal<boolean>(false);
-  showCreateOrEditSidebar = signal<boolean>(false);
-  isEditMode = signal<boolean>(false);
-  editingEventId = signal<string | null>(null);
-  selectedEvent = signal<CalendarEvent | null>(null);
-  availableMembers = signal<CalendarParticipant[]>([]);
-  memberSearchQuery = signal<string>('');
-  selectedParticipantIds = signal<string[]>([]);
+  readonly currentDate = signal<Date>(new Date());
+  readonly events = signal<CalendarEvent[]>([]);
 
-  eventForm = {
-    title: '',
-    description: '',
-    date: this.formatDate(new Date()),
-    startTime: '10:00',
-    endTime: '11:00'
-  };
+  readonly isLoading = signal<boolean>(false);
+  readonly isSubmitting = signal<boolean>(false);
 
-  readonly weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  readonly showCreateOrEditSidebar = signal<boolean>(false);
+  readonly isEditMode = signal<boolean>(false);
+  readonly editingEventId = signal<string | null>(null);
+  readonly selectedEvent = signal<CalendarEvent | null>(null);
 
-  monthLabel = computed(() => {
-    return this.currentDate().toLocaleString('en-US', { month: 'long', year: 'numeric' });
-  });
+  readonly availableMembers = signal<CalendarParticipant[]>([]);
+  readonly memberSearchQuery = signal<string>('');
+  readonly selectedParticipantIds = signal<string[]>([]);
 
-  filteredMembers = computed(() => {
+  eventForm: EventFormModel = this.createEmptyForm();
+
+  readonly weekDays = WEEK_DAYS;
+
+  readonly monthLabel = computed(() =>
+    this.currentDate().toLocaleString('en-US', { month: 'long', year: 'numeric' })
+  );
+
+  readonly monthName = computed(() =>
+    this.currentDate().toLocaleString('en-US', { month: 'long' })
+  );
+
+  readonly monthYear = computed(() => String(this.currentDate().getFullYear()));
+
+  readonly filteredMembers = computed(() => {
     const query = this.memberSearchQuery().toLowerCase().trim();
     const currentUserId = this.currentUser()?.id;
-    const all = this.availableMembers().filter(m => m.id !== currentUserId);
 
+    const all = this.availableMembers().filter((m) => m.id !== currentUserId);
     if (!query) return all;
-    return all.filter(m => {
-      const fullName = `${m.firstName || ''} ${m.lastName || ''}`.toLowerCase();
-      const email = (m.email || '').toLowerCase();
-      const role = (m.role || '').toLowerCase();
+
+    return all.filter((m) => {
+      const fullName = `${m.firstName ?? ''} ${m.lastName ?? ''}`.toLowerCase();
+      const email = (m.email ?? '').toLowerCase();
+      const role = (m.role ?? '').toLowerCase();
       return fullName.includes(query) || email.includes(query) || role.includes(query);
     });
   });
 
-  selectedMembersList = computed(() => {
+  readonly selectedMembersList = computed(() => {
     const selectedIds = new Set(this.selectedParticipantIds());
-    return this.availableMembers().filter(m => selectedIds.has(m.id));
+    return this.availableMembers().filter((m) => selectedIds.has(m.id));
   });
 
-  calendarDays = computed(() => {
+  readonly calendarDays = computed<CalendarDay[]>(() => {
     const current = this.currentDate();
     const year = current.getFullYear();
     const month = current.getMonth();
 
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
-
-    let startDayOfWeek = firstDayOfMonth.getDay();
-    startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-
-    const days: CalendarDay[] = [];
     const todayStr = this.formatDate(new Date());
 
+    const rawDow = firstDayOfMonth.getDay();
+    const leadingDays = rawDow === 0 ? 6 : rawDow - 1;
+
+    const days: CalendarDay[] = [];
+    const pushDay = (date: Date, isCurrentMonth: boolean): void => {
+      const dateStr = this.formatDate(date);
+      days.push({
+        date,
+        dateString: dateStr,
+        dayNumber: date.getDate(),
+        isCurrentMonth,
+        isToday: dateStr === todayStr,
+        isWeekend: this.isWeekend(date),
+        events: this.getEventsForDate(dateStr),
+      });
+    };
+
     const prevMonthLastDay = new Date(year, month, 0).getDate();
-    for (let i = startDayOfWeek - 1; i >= 0; i--) {
-      const d = new Date(year, month - 1, prevMonthLastDay - i);
-      const dateStr = this.formatDate(d);
-      days.push({
-        date: d,
-        dateString: dateStr,
-        dayNumber: d.getDate(),
-        isCurrentMonth: false,
-        isToday: dateStr === todayStr,
-        events: this.getEventsForDate(dateStr)
-      });
+    for (let i = leadingDays - 1; i >= 0; i--) {
+      pushDay(new Date(year, month - 1, prevMonthLastDay - i), false);
     }
 
-    for (let day = 1; day <= lastDayOfMonth.getDate(); day++) {
-      const d = new Date(year, month, day);
-      const dateStr = this.formatDate(d);
-      days.push({
-        date: d,
-        dateString: dateStr,
-        dayNumber: day,
-        isCurrentMonth: true,
-        isToday: dateStr === todayStr,
-        events: this.getEventsForDate(dateStr)
-      });
+    const lastDayNumber = lastDayOfMonth.getDate();
+    for (let day = 1; day <= lastDayNumber; day++) {
+      pushDay(new Date(year, month, day), true);
     }
 
-    const remainingDays = 42 - days.length;
-    for (let day = 1; day <= remainingDays; day++) {
-      const d = new Date(year, month + 1, day);
-      const dateStr = this.formatDate(d);
-      days.push({
-        date: d,
-        dateString: dateStr,
-        dayNumber: day,
-        isCurrentMonth: false,
-        isToday: dateStr === todayStr,
-        events: this.getEventsForDate(dateStr)
-      });
+    const remaining = DAYS_IN_GRID - days.length;
+    for (let day = 1; day <= remaining; day++) {
+      pushDay(new Date(year, month + 1, day), false);
     }
 
     return days;
@@ -141,17 +154,16 @@ export class CalendarComponent implements OnInit {
     if (!companyId) return;
 
     this.calendarService.getCompanyMembers(companyId).subscribe({
-      next: (members) => {
-        this.availableMembers.set(members);
-      },
+      next: (members) => this.availableMembers.set(members),
       error: (err) => {
         console.error('Failed to load company members for calendar:', err);
-      }
+      },
     });
   }
 
   loadMonthEvents(): void {
     this.isLoading.set(true);
+
     const current = this.currentDate();
     const year = current.getFullYear();
     const month = current.getMonth();
@@ -161,42 +173,48 @@ export class CalendarComponent implements OnInit {
 
     this.calendarService.getCalendarEvents(startRange, endRange).subscribe({
       next: (res) => {
-        const eventsList = res.calendarEvents || [];
-        this.events.set(eventsList);
+        const list = res.calendarEvents ?? [];
+        this.events.set(list);
         this.isLoading.set(false);
-
-        // Update selected event if open
-        const curSelected = this.selectedEvent();
-        if (curSelected) {
-          const updatedSelected = eventsList.find(e => e.id === curSelected.id);
-          if (updatedSelected) {
-            this.selectedEvent.set(updatedSelected);
-          }
-        }
+        this.refreshSelectedEvent(list);
       },
       error: (err) => {
-        this.toast.error('Failed to load calendar events: ' + (err.message || 'Error'));
+        this.toast.error('Failed to load calendar events: ' + (err.message ?? 'Error'));
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
-  getEventsForDate(dateStr: string): CalendarEvent[] {
-    return this.events().filter(e => {
-      const eventDate = this.formatDate(new Date(e.startAt));
-      return eventDate === dateStr;
-    });
+  private refreshSelectedEvent(list: CalendarEvent[]): void {
+    const current = this.selectedEvent();
+    if (!current) return;
+
+    const updated = list.find((e) => e.id === current.id);
+    if (updated) {
+      this.selectedEvent.set(updated);
+    }
+  }
+
+  private getEventsForDate(dateStr: string): CalendarEvent[] {
+    return this.events().filter(
+      (e) => this.formatDate(new Date(e.startAt)) === dateStr
+    );
+  }
+
+  private isWeekend(date: Date): boolean {
+    const dow = date.getDay();
+    return dow === 0 || dow === 6;
   }
 
   prevMonth(): void {
-    const current = this.currentDate();
-    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() - 1, 1));
+    const d = this.currentDate();
+    this.currentDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
     this.loadMonthEvents();
   }
 
   nextMonth(): void {
-    const current = this.currentDate();
-    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() + 1, 1));
+    const d = this.currentDate();
+    this.currentDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
     this.loadMonthEvents();
   }
 
@@ -207,18 +225,11 @@ export class CalendarComponent implements OnInit {
 
   openCreateSidebar(dateStr?: string): void {
     this.closeEventDetail();
-    const targetDate = dateStr || this.formatDate(new Date());
     this.isEditMode.set(false);
     this.editingEventId.set(null);
     this.memberSearchQuery.set('');
     this.selectedParticipantIds.set([]);
-    this.eventForm = {
-      title: '',
-      description: '',
-      date: targetDate,
-      startTime: '09:00',
-      endTime: '10:00'
-    };
+    this.eventForm = this.createEmptyForm(dateStr ?? this.formatDate(new Date()));
     this.showCreateOrEditSidebar.set(true);
   }
 
@@ -230,20 +241,19 @@ export class CalendarComponent implements OnInit {
 
     const startDate = new Date(event.startAt);
     const endDate = new Date(event.endAt);
-
-    // Extract participant IDs excluding organizer
     const currentUserId = this.currentUser()?.id;
-    const participantIds = (event.participantIds || [])
-      .filter(id => id !== event.userId && id !== currentUserId);
 
+    const participantIds = (event.participantIds ?? []).filter(
+      (id) => id !== event.userId && id !== currentUserId
+    );
     this.selectedParticipantIds.set(participantIds);
 
     this.eventForm = {
       title: event.title,
-      description: event.description || '',
+      description: event.description ?? '',
       date: this.formatDate(startDate),
       startTime: this.formatTime24(startDate),
-      endTime: this.formatTime24(endDate)
+      endTime: this.formatTime24(endDate),
     };
     this.showCreateOrEditSidebar.set(true);
   }
@@ -256,11 +266,10 @@ export class CalendarComponent implements OnInit {
 
   toggleParticipant(memberId: string): void {
     const current = this.selectedParticipantIds();
-    if (current.includes(memberId)) {
-      this.selectedParticipantIds.set(current.filter(id => id !== memberId));
-    } else {
-      this.selectedParticipantIds.set([...current, memberId]);
-    }
+    const next = current.includes(memberId)
+      ? current.filter((id) => id !== memberId)
+      : [...current, memberId];
+    this.selectedParticipantIds.set(next);
   }
 
   isParticipantSelected(memberId: string): boolean {
@@ -268,17 +277,24 @@ export class CalendarComponent implements OnInit {
   }
 
   removeParticipant(memberId: string): void {
-    this.selectedParticipantIds.set(this.selectedParticipantIds().filter(id => id !== memberId));
+    this.selectedParticipantIds.set(
+      this.selectedParticipantIds().filter((id) => id !== memberId)
+    );
   }
 
   submitEventForm(): void {
-    if (!this.eventForm.title || !this.eventForm.title.trim()) {
+    const title = this.eventForm.title?.trim();
+    if (!title) {
       this.toast.error('Event title is required');
       return;
     }
 
-    const startISO = new Date(`${this.eventForm.date}T${this.eventForm.startTime}:00`).toISOString();
-    const endISO = new Date(`${this.eventForm.date}T${this.eventForm.endTime}:00`).toISOString();
+    const startISO = new Date(
+      `${this.eventForm.date}T${this.eventForm.startTime}:00`
+    ).toISOString();
+    const endISO = new Date(
+      `${this.eventForm.date}T${this.eventForm.endTime}:00`
+    ).toISOString();
     const description = this.eventForm.description.trim() || null;
     const participantIds = this.selectedParticipantIds();
 
@@ -286,35 +302,31 @@ export class CalendarComponent implements OnInit {
 
     if (this.isEditMode()) {
       const eventId = this.editingEventId();
-      if (!eventId) return;
+      if (!eventId) {
+        this.isSubmitting.set(false);
+        return;
+      }
 
-      this.calendarService.updateCalendarEvent(
-        eventId,
-        this.eventForm.title.trim(),
-        description,
-        startISO,
-        endISO,
-        participantIds
-      ).subscribe({
-        next: (res) => {
-          this.toast.success(`Event "${res.updateCalendarEvent.title}" updated successfully!`);
-          this.isSubmitting.set(false);
-          this.closeCreateOrEditSidebar();
-          this.loadMonthEvents();
-        },
-        error: (err) => {
-          this.toast.error('Failed to update event: ' + (err.message || 'Error'));
-          this.isSubmitting.set(false);
-        }
-      });
-    } else {
-      this.calendarService.createCalendarEvent(
-        this.eventForm.title.trim(),
-        description,
-        startISO,
-        endISO,
-        participantIds
-      ).subscribe({
+      this.calendarService
+        .updateCalendarEvent(eventId, title, description, startISO, endISO, participantIds)
+        .subscribe({
+          next: (res) => {
+            this.toast.success(`Event "${res.updateCalendarEvent.title}" updated successfully!`);
+            this.isSubmitting.set(false);
+            this.closeCreateOrEditSidebar();
+            this.loadMonthEvents();
+          },
+          error: (err) => {
+            this.toast.error('Failed to update event: ' + (err.message ?? 'Error'));
+            this.isSubmitting.set(false);
+          },
+        });
+      return;
+    }
+
+    this.calendarService
+      .createCalendarEvent(title, description, startISO, endISO, participantIds)
+      .subscribe({
         next: (res) => {
           this.toast.success(`Event "${res.createCalendarEvent.title}" scheduled successfully!`);
           this.isSubmitting.set(false);
@@ -322,14 +334,13 @@ export class CalendarComponent implements OnInit {
           this.loadMonthEvents();
         },
         error: (err) => {
-          this.toast.error('Failed to create event: ' + (err.message || 'Error'));
+          this.toast.error('Failed to create event: ' + (err.message ?? 'Error'));
           this.isSubmitting.set(false);
-        }
+        },
       });
-    }
   }
 
-  submitAttendance(status: 'ACCEPTED' | 'DECLINED'): void {
+  submitAttendance(status: RsvpResponse): void {
     const event = this.selectedEvent();
     if (!event) return;
 
@@ -339,14 +350,13 @@ export class CalendarComponent implements OnInit {
         const updated = res.updateEventAttendance;
         this.selectedEvent.set(updated);
         this.isSubmitting.set(false);
-        const statusText = status === 'ACCEPTED' ? 'Going' : 'Declined';
-        this.toast.success(`Response updated: ${statusText}`);
+        this.toast.success(`Response updated: ${status === 'ACCEPTED' ? 'Going' : 'Declined'}`);
         this.loadMonthEvents();
       },
       error: (err) => {
-        this.toast.error('Failed to update RSVP: ' + (err.message || 'Error'));
+        this.toast.error('Failed to update RSVP: ' + (err.message ?? 'Error'));
         this.isSubmitting.set(false);
-      }
+      },
     });
   }
 
@@ -374,9 +384,9 @@ export class CalendarComponent implements OnInit {
         this.loadMonthEvents();
       },
       error: (err) => {
-        this.toast.error('Failed to delete event: ' + (err.message || 'Error'));
+        this.toast.error('Failed to delete event: ' + (err.message ?? 'Error'));
         this.isSubmitting.set(false);
-      }
+      },
     });
   }
 
@@ -396,57 +406,60 @@ export class CalendarComponent implements OnInit {
     return event.userId === currentUserId || event.organizer?.id === currentUserId;
   }
 
-  getCurrentUserStatus(event: CalendarEvent | null | undefined): 'ACCEPTED' | 'DECLINED' | 'PENDING' {
+  getCurrentUserStatus(event: CalendarEvent | null | undefined): RsvpStatus {
     if (!event) return 'PENDING';
     if (this.isOrganizer(event)) return 'ACCEPTED';
 
     if (event.currentUserStatus) {
-      return event.currentUserStatus as 'ACCEPTED' | 'DECLINED' | 'PENDING';
+      return event.currentUserStatus as RsvpStatus;
     }
 
     const currentUserId = this.currentUser()?.id;
     if (event.participantDetails && currentUserId) {
-      const match = event.participantDetails.find(p => p.userId === currentUserId);
+      const match = event.participantDetails.find((p) => p.userId === currentUserId);
       if (match) return match.status;
     }
 
     return 'PENDING';
   }
 
-  getParticipantStatus(event: CalendarEvent, userId: string): 'ACCEPTED' | 'DECLINED' | 'PENDING' {
+  getParticipantStatus(event: CalendarEvent, userId: string): RsvpStatus {
     if (userId === event.userId) return 'ACCEPTED';
+
     if (event.participantDetails) {
-      const match = event.participantDetails.find(p => p.userId === userId);
+      const match = event.participantDetails.find((p) => p.userId === userId);
       if (match) return match.status;
     }
+
     return 'PENDING';
   }
 
-  getUserAvatarUrl(user?: CalendarParticipant | { id?: string; profile?: { avatarPath?: string } } | null): string | null {
-    if (!user?.profile?.avatarPath) return null;
-    if (user.profile.avatarPath.startsWith('http')) {
-      return user.profile.avatarPath;
-    }
-    if (user.id) {
-      return `/api/storage/avatar/${user.id}`;
-    }
+  getUserAvatarUrl(
+    user?: CalendarParticipant | { id?: string; profile?: { avatarPath?: string } } | null
+  ): string | null {
+    const avatarPath = user?.profile?.avatarPath;
+    if (!avatarPath) return null;
+    if (avatarPath.startsWith('http')) return avatarPath;
+    if (user?.id) return `/api/storage/avatar/${user.id}`;
     return null;
   }
 
-  getUserInitials(nameOrUser?: CalendarParticipant | { firstName?: string; lastName?: string; email?: string } | null): string {
+  getUserInitials(
+    nameOrUser?: CalendarParticipant | { firstName?: string; lastName?: string; email?: string } | null
+  ): string {
     if (!nameOrUser) return 'U';
-    const first = nameOrUser.firstName?.charAt(0) || '';
-    const last = nameOrUser.lastName?.charAt(0) || '';
-    if (first || last) {
-      return (first + last).toUpperCase();
-    }
-    return (nameOrUser.email?.charAt(0) || 'U').toUpperCase();
+
+    const first = nameOrUser.firstName?.charAt(0) ?? '';
+    const last = nameOrUser.lastName?.charAt(0) ?? '';
+    if (first || last) return (first + last).toUpperCase();
+
+    return (nameOrUser.email?.charAt(0) ?? 'U').toUpperCase();
   }
 
   getUserDisplayName(user?: CalendarParticipant | null): string {
     if (!user) return 'Colleague';
     if (user.firstName || user.lastName) {
-      return `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      return `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
     }
     return user.email || 'Colleague';
   }
@@ -487,5 +500,15 @@ export class CalendarComponent implements OnInit {
     if (event.key === 'Escape') {
       this.closeAllSidebars();
     }
+  }
+
+  private createEmptyForm(date?: string): EventFormModel {
+    return {
+      title: '',
+      description: '',
+      date: date ?? this.formatDate(new Date()),
+      startTime: DEFAULT_START_TIME,
+      endTime: DEFAULT_END_TIME,
+    };
   }
 }
