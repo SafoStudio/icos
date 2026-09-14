@@ -2,7 +2,6 @@
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.25rem;
   border-bottom: 1px solid var(--border-color, #e5e7eb);
 
   &::-webkit-scrollbar {
@@ -51,6 +50,7 @@
 
 .toolbar-section {
   display: flex;
+  margin-top: 12px;
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;

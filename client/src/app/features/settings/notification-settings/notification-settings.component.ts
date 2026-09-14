@@ -1,9 +1,9 @@
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { NotificationService } from '@services';
-import { type NotificationType, type NotificationPreference } from '@models';
+import { type NotificationPreference } from '@models';
 
 export interface NotificationSettingGroup {
   id: string;
