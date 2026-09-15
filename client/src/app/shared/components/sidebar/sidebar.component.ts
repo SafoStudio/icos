@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { AuthService, ThemeService, NotificationService } from '@services';
 import { AvatarService } from '@features/profile/avatar/avatar.service';
+import { NotificationBellComponent } from '../notification-center/notification-bell/notification-bell.component';
 
 interface MenuItem {
   label: string;
@@ -15,9 +16,14 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgIconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    NgIconComponent,
+    NotificationBellComponent,
+  ],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent {
   private readonly router = inject(Router);
@@ -26,7 +32,9 @@ export class SidebarComponent {
   private readonly notificationService = inject(NotificationService);
   readonly themeService = inject(ThemeService);
 
-  readonly unreadNotificationCount = computed(() => this.notificationService.unreadCount());
+  readonly unreadNotificationCount = computed(() =>
+    this.notificationService.unreadCount(),
+  );
 
   private readonly isCollapsedSignal = signal(true);
 
@@ -54,9 +62,7 @@ export class SidebarComponent {
     return this.avatarService.getAvatarUrl(user?.id, user?.profile?.avatarPath);
   });
 
-  hasAvatar = computed(() => {
-    return !!this.userAvatarUrl();
-  });
+  hasAvatar = computed(() => !!this.userAvatarUrl());
 
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
@@ -65,7 +71,7 @@ export class SidebarComponent {
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
-    { label: 'Settings', icon: 'tablerSettings', route: '/settings' }
+    { label: 'Settings', icon: 'tablerSettings', route: '/settings' },
   ];
 
   toggleSidebar(): void {
@@ -90,9 +96,12 @@ export class SidebarComponent {
   }
 
   isActive(route: string): boolean {
-    return this.router.url === route || this.router.url.startsWith(route + '/') || this.router.url.startsWith(route + '?');
+    return (
+      this.router.url === route ||
+      this.router.url.startsWith(route + '/') ||
+      this.router.url.startsWith(route + '?')
+    );
   }
-
 
   toggleTheme(): void {
     this.themeService.toggleTheme();

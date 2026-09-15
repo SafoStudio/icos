@@ -7,11 +7,7 @@
   >
     <div class="avatar">
       @if (hasAvatar()) {
-      <img
-        [src]="userAvatarUrl()"
-        [alt]="userName()"
-        class="avatar-image"
-      />
+      <img [src]="userAvatarUrl()" [alt]="userName()" class="avatar-image" />
       } @else {
       <span class="avatar-letter">{{ userInitial() }}</span>
       }
@@ -25,11 +21,17 @@
   <div class="divider"></div>
 
   @if (!isCollapsed()) {
-  <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
+  <button
+    class="collapse-btn collapsed"
+    (click)="$event.stopPropagation(); toggleSidebar()"
+  >
     <ng-icon name="tablerChevronLeft" size="16"></ng-icon>
   </button>
   } @else {
-  <button class="collapse-btn collapsed" (click)="$event.stopPropagation(); toggleSidebar()">
+  <button
+    class="collapse-btn collapsed"
+    (click)="$event.stopPropagation(); toggleSidebar()"
+  >
     <ng-icon name="tablerChevronRight" size="16"></ng-icon>
   </button>
   }
@@ -51,11 +53,16 @@
       [attr.aria-label]="'Notifications: ' + unreadNotificationCount() + ' unread'"
     >
       <div class="main-link-inner">
-        <ng-icon name="tablerBell" class="main-link-icon" size="20"></ng-icon>
+        <app-notification-bell
+          [hasUnread]="unreadNotificationCount() > 0"
+          size="lg"
+        ></app-notification-bell>
+
         @if (!isCollapsed()) {
         <span>Notifications</span>
         }
       </div>
+
       @if (unreadNotificationCount() > 0) {
       @if (!isCollapsed()) {
       <span class="badge">{{ unreadNotificationCount() }}</span>
@@ -107,13 +114,19 @@
       [attr.aria-label]="isDark() ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
     >
       <div class="theme-btn-inner">
-        <ng-icon [name]="isDark() ? 'tablerSun' : 'tablerMoon'" class="theme-icon" size="20"></ng-icon>
+        <ng-icon
+          [name]="isDark() ? 'tablerSun' : 'tablerMoon'"
+          class="theme-icon"
+          size="20"
+        ></ng-icon>
         @if (!isCollapsed()) {
         <span>{{ isDark() ? 'Light Theme' : 'Dark Theme' }}</span>
         }
       </div>
       @if (!isCollapsed()) {
-      <span class="theme-pill" [class.dark]="isDark()">{{ isDark() ? 'DARK' : 'LIGHT' }}</span>
+      <span class="theme-pill" [class.dark]="isDark()">
+          {{ isDark() ? 'DARK' : 'LIGHT' }}
+        </span>
       }
     </button>
 

@@ -1,0 +1,12 @@
+<div
+  class="notif-bell"
+  [ngClass]="wrapperClasses()"
+  [class.is-active]="isActiveCycle()"
+  [style]="bellStyles()"
+>
+  <ng-icon name="tablerBell" class="notif-bell__icon"></ng-icon>
+
+  @if (isActiveCycle() && showPulse()) {
+  <span class="notif-bell__pulse"></span>
+  }
+</div>
