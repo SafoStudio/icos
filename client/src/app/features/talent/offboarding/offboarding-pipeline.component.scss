@@ -23,23 +23,10 @@
   flex-wrap: wrap;
 
   .header-left {
-    .title-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
     .header-subtitle {
       margin: 0.25rem 0 0;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
       color: var(--text-secondary, #94a3b8);
     }
   }
@@ -636,11 +623,13 @@
   transition: background-color 0.15s;
 
   &.btn-primary {
-    background: #ef4444;
-    color: #ffffff;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
 
     &:hover:not(:disabled) {
-      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
     }
 
     &:disabled {

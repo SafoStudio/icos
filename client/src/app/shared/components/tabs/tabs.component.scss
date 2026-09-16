@@ -42,7 +42,8 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-secondary, #6c757d);
+  letter-spacing: 1px;
+  color: var(--tab-color, var(--text-secondary, #6c757d));
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -52,12 +53,12 @@
   flex-shrink: 0;
 
   &:hover:not(.disabled) {
-    color: var(--text-primary, #495057);
+    color: var(--tab-color, var(--text-primary, #495057));
     background: var(--bg-surface-hover, rgba(102, 126, 234, 0.05));
   }
 
   &.active {
-    color: var(--accent-indigo, #667eea);
+    color: var(--tab-color, var(--accent-indigo, #667eea));
     font-weight: 600;
 
     &::after {
@@ -67,7 +68,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--accent-indigo, #667eea);
+      background: var(--tab-color, var(--accent-indigo, #667eea));
       border-radius: 2px;
     }
   }

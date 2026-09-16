@@ -7,6 +7,7 @@ export interface TabItem {
   label: string;
   icon?: string;
   disabled?: boolean;
+  color?: string;
 }
 
 @Component({

@@ -15,9 +15,9 @@ export class TalentComponent {
   private readonly router = inject(Router);
 
   readonly tabs: TabItem[] = [
-    { id: 'recruitment', label: 'Recruitment', icon: 'tablerBriefcase' },
-    { id: 'onboarding', label: 'Onboarding', icon: 'tablerUserPlus' },
-    { id: 'offboarding', label: 'Offboarding', icon: 'tablerUserX' }
+    { id: 'recruitment', label: 'Recruitment', icon: 'tablerBriefcase', color: '#818cf8' },
+    { id: 'onboarding',  label: 'Onboarding',  icon: 'tablerUserPlus', color: '#10b981' },
+    { id: 'offboarding', label: 'Offboarding', icon: 'tablerUserX',    color: '#f87171' },
   ];
 
   readonly activeTabId = signal<string>('recruitment');

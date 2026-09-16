@@ -24,23 +24,10 @@
   flex-wrap: wrap;
 
   .header-left {
-    .title-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-indigo, #818cf8);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      border: 1px solid rgba(99, 102, 241, 0.3);
-    }
-
     .header-subtitle {
       margin: 0.35rem 0 0;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
       color: var(--text-secondary, #94a3b8);
     }
   }
@@ -110,8 +97,8 @@
   border: none;
 
   &.btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    color: #ffffff;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent-indigo, #818cf8);
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 
     &:hover:not(:disabled) {

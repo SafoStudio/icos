@@ -5,6 +5,7 @@
       class="tab-btn"
       [class.active]="isActive(tab.id)"
       [class.disabled]="isDisabled(tab)"
+      [style.--tab-color]="tab.color || null"
       (click)="onTabClick(tab)"
       role="tab"
       [attr.aria-selected]="isActive(tab.id)"
