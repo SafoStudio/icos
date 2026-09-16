@@ -66,6 +66,7 @@ input CreateVacancyInput {
     departmentId: UUID
     positionId: UUID
     title: String!
+    status: String
     description: String
     requirements: String
 }
