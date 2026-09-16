@@ -123,14 +123,13 @@ app-pagination {
   transition: all 0.2s ease;
 
   &-primary {
-    background: #6366f1;
-    color: #ffffff;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+     background: rgba(180, 83, 9, 0.08);
+       color: #b45309;
+       border: 2px dashed rgba(180, 83, 9, 0.25);
 
     &:hover {
-      background: #4f46e5;
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+      box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35);
     }
 
     &:disabled {

@@ -94,16 +94,15 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
+  border: 2px dashed;
 
   &.btn-primary {
     background: rgba(99, 102, 241, 0.15);
     color: var(--accent-indigo, #818cf8);
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
     }
 
     &:disabled {
@@ -862,15 +861,4 @@
 
 .detail-sidebar {
   width: 440px;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
 }

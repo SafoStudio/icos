@@ -34,11 +34,13 @@
   transition: all 0.15s ease;
 
   &.btn-primary {
-    background: var(--primary, #4f46e5);
-    color: #ffffff;
+     background: rgba(180, 83, 9, 0.08);
+     color: #b45309;
+     border: 2px dashed rgba(180, 83, 9, 0.25);
 
     &:hover:not(:disabled) {
-      background: var(--primary-hover, #4338ca);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35);
     }
   }
 
@@ -48,9 +50,8 @@
     color: var(--text-primary, #374151);
 
     &:hover:not(:disabled) {
-      background: var(--bg-hover, #f9fafb);
-      border-color: var(--primary, #4f46e5);
-      color: var(--primary, #4f46e5);
+      background: rgba(180, 83, 9, 0.08);
+      border-color: #b45309;
     }
   }
 

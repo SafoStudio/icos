@@ -43,7 +43,7 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 1px;
-  color: var(--tab-color, var(--text-secondary, #6c757d));
+  color: var(--text-secondary, #6c757d);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
@@ -58,7 +58,7 @@
   }
 
   &.active {
-    color: var(--tab-color, var(--accent-indigo, #667eea));
+    color: var(--tab-color, #b45309);
     font-weight: 600;
 
     &::after {

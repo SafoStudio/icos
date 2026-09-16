@@ -57,17 +57,16 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
+  border: 2px dashed;
 
   &.btn-primary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+     background: rgba(16, 185, 129, 0.15);
+     color: #10b981;
 
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
-    }
+     &:hover:not(:disabled) {
+       transform: translateY(-1px);
+       box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+     }
   }
 
   &.btn-secondary {

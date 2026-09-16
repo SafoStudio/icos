@@ -76,16 +76,17 @@
 }
 
 .btn-primary {
-  background: var(--primary, #4f46e5);
-  color: #ffffff;
+  background: rgba(180, 83, 9, 0.08);
+  color: #b45309;
+  border: 2px dashed rgba(180, 83, 9, 0.25);
 
   &:hover:not(:disabled) {
-    background: var(--primary-hover, #4338ca);
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35);
   }
 
   &:active:not(:disabled) {
-    background: var(--primary-active, #3730a3);
+    background: rgba(180, 83, 9, 0.28);
   }
 }
 
