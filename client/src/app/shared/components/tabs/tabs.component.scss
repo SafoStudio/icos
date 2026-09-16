@@ -101,9 +101,22 @@
 
 .tabs-content {
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  padding-left: 10px;
   background: var(--bg-surface, #ffffff);
   color: var(--text-primary, #0f172a);
 
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease;
+
+  &:hover {
+    scrollbar-color: var(--border-color, #c1c7cd) transparent;
+  }
+
+  /* WebKit / Blink */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -113,16 +126,17 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--border-color, #c1c7cd);
+    background: transparent;
     border-radius: 3px;
-
-    &:hover {
-      background: var(--text-muted, #a8afb6);
-    }
   }
 
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-color, #c1c7cd) transparent;
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--border-color, #c1c7cd);
+  }
+
+  &:hover::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted, #a8afb6);
+  }
 }
 
 @media (max-width: 768px) {
