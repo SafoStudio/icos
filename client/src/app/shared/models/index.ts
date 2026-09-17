@@ -36,5 +36,10 @@ export {
   type NotificationPreference,
   type NotificationCategoryMeta
 } from './notification.model';
+export {
+  type Compensation,
+  type SalaryRevision,
+  type UpdateSalaryInput
+} from './compensation.model';
 
 
