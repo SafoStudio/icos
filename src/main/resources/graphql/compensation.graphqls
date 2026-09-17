@@ -1,0 +1,26 @@
+type Compensation {
+    id: ID!
+    userId: ID!
+    baseSalary: Float!
+    currency: String
+    payFrequency: String
+    effectiveDate: Date
+}
+
+type SalaryRevision {
+    id: ID!
+    userId: ID!
+    previousSalary: Float
+    newSalary: Float!
+    reason: String
+    effectiveDate: Date
+}
+
+extend type Query {
+    compensation(userId: ID!): Compensation
+    salaryHistory(userId: ID!): [SalaryRevision!]!
+}
+
+extend type Mutation {
+    updateSalary(userId: ID!, newSalary: Float!, reason: String!, effectiveDate: String!): Compensation!
+}

@@ -25,17 +25,26 @@ public class CompensationGraphQLResolver {
 
     @QueryMapping
     public CompensationDto compensation(@Argument UUID userId) {
-        return mapper.toDto(compensationService.getCompensation(userId));
+        try {
+            return mapper.toDto(compensationService.getCompensation(userId));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @QueryMapping
     public List<SalaryRevisionDto> salaryHistory(@Argument UUID userId) {
-        return compensationService.getSalaryHistory(userId).stream().map(mapper::toDto).toList();
+        try {
+            return compensationService.getSalaryHistory(userId).stream().map(mapper::toDto).toList();
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 
     @MutationMapping
     public CompensationDto updateSalary(@AuthenticationPrincipal IcosUserPrincipal principal,
                                           @Argument UUID userId, @Argument BigDecimal newSalary, @Argument String reason, @Argument String effectiveDate) {
-        return mapper.toDto(compensationService.updateSalary(userId, newSalary, reason, LocalDate.parse(effectiveDate), principal.getUserId()));
+        UUID approverId = principal != null ? principal.getUserId() : userId;
+        return mapper.toDto(compensationService.updateSalary(userId, newSalary, reason, LocalDate.parse(effectiveDate), approverId));
     }
 }

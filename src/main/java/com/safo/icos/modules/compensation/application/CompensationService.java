@@ -28,8 +28,15 @@ public class CompensationService {
   @Transactional
   public CompensationRecord updateSalary(UUID userId, BigDecimal newSalary, String reason,
                                          LocalDate effectiveDate, UUID approvedBy) {
-    CompensationRecord current = compensationRepository.findByUserId(userId)
-            .orElseThrow(() -> new NotFoundException("Compensation record not found"));
+    CompensationRecord current = compensationRepository.findByUserId(userId).orElse(null);
+    if (current == null) {
+      CompensationRecord initial = CompensationRecord.create(userId, newSalary, "USD", PayFrequency.MONTHLY, effectiveDate);
+      CompensationRecord saved = compensationRepository.save(initial);
+      SalaryRevision revision = SalaryRevision.create(userId, BigDecimal.ZERO, newSalary,
+              reason != null && !reason.isBlank() ? reason : "Initial salary", effectiveDate, approvedBy);
+      compensationRepository.saveRevision(revision);
+      return saved;
+    }
     SalaryRevision revision = SalaryRevision.create(userId, current.getBaseSalary(), newSalary,
             reason, effectiveDate, approvedBy);
     compensationRepository.saveRevision(revision);
