@@ -1,0 +1,231 @@
+<div class="compensation-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading compensation details...</p>
+    </div>
+  } @else {
+    <div class="comp-header">
+      <div>
+        <h3 class="comp-title">Salary & Compensation</h3>
+        <p class="comp-subtitle">View active compensation package and salary revision history.</p>
+      </div>
+
+      @if (canManage) {
+        <button class="btn btn-primary" (click)="openModal()" type="button">
+          <ng-icon name="tablerCoin" size="18"></ng-icon>
+          <span>{{ compensation() ? 'Adjust Salary' : 'Set Salary' }}</span>
+        </button>
+      }
+    </div>
+
+    @if (compensation()) {
+      <div class="cards-grid">
+        <div class="comp-card primary-card">
+          <div class="card-icon">
+            <ng-icon name="tablerCoin" size="24"></ng-icon>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Base Salary</span>
+            <div class="salary-display">
+              <span class="salary-amount">{{ formatCurrency(compensation()?.baseSalary, compensation()?.currency) }}</span>
+              <span class="salary-period">/ {{ (compensation()?.payFrequency || 'Monthly') | lowercase }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="card-icon">
+            <ng-icon name="tablerCalendar" size="22"></ng-icon>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Effective Date</span>
+            <span class="card-value">{{ formatDate(compensation()?.effectiveDate) }}</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="card-icon">
+            <ng-icon name="tablerClock" size="22"></ng-icon>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Pay Frequency</span>
+            <span class="card-value frequency-badge">{{ compensation()?.payFrequency || 'MONTHLY' }}</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="card-icon">
+            <ng-icon name="tablerBuilding" size="22"></ng-icon>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Currency</span>
+            <span class="card-value">{{ compensation()?.currency || 'USD' }}</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="empty-compensation-card">
+        <div class="empty-icon">
+          <ng-icon name="tablerCoin" size="40"></ng-icon>
+        </div>
+        <h4>No compensation record on file</h4>
+        <p>Compensation details have not been assigned to this account yet.</p>
+        @if (canManage) {
+          <button class="btn btn-primary" (click)="openModal()" type="button">
+            <ng-icon name="tablerPlus" size="18"></ng-icon>
+            <span>Set Initial Salary</span>
+          </button>
+        }
+      </div>
+    }
+
+    <div class="history-section">
+      <div class="history-header">
+        <div class="history-title-row">
+          <ng-icon name="tablerClipboardList" size="20"></ng-icon>
+          <h4>Salary Revision History</h4>
+          <span class="badge-count">{{ salaryHistory().length }}</span>
+        </div>
+      </div>
+
+      @if (salaryHistory().length > 0) {
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Effective Date</th>
+                <th>Previous Salary</th>
+                <th>New Salary</th>
+                <th>Adjustment</th>
+                <th>Reason / Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rev of salaryHistory(); track rev.id) {
+                <tr>
+                  <td class="date-cell">
+                    <ng-icon name="tablerCalendar" size="15"></ng-icon>
+                    <span>{{ formatDate(rev.effectiveDate) }}</span>
+                  </td>
+                  <td class="amount-cell text-muted">
+                    {{ rev.previousSalary ? formatCurrency(rev.previousSalary, compensation()?.currency) : '—' }}
+                  </td>
+                  <td class="amount-cell font-semibold">
+                    {{ formatCurrency(rev.newSalary, compensation()?.currency) }}
+                  </td>
+                  <td>
+                    @if (rev.previousSalary && rev.previousSalary > 0) {
+                      @let delta = calcDelta(rev.previousSalary, rev.newSalary);
+                      <span class="delta-pill" [class]="delta.type">
+                        @if (delta.type === 'positive') {
+                          <ng-icon name="tablerArrowUp" size="14"></ng-icon>
+                        } @else if (delta.type === 'negative') {
+                          <ng-icon name="tablerArrowDown" size="14"></ng-icon>
+                        }
+                        <span>{{ delta.text }}</span>
+                      </span>
+                    } @else {
+                      <span class="delta-pill initial">Initial Setup</span>
+                    }
+                  </td>
+                  <td class="reason-cell">
+                    {{ rev.reason || 'Routine compensation review' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-history">
+          <p>No revision history recorded.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal: Adjust / Set Salary -->
+@if (showUpdateModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon name="tablerCoin" size="20"></ng-icon>
+          <h3>{{ compensation() ? 'Adjust Employee Salary' : 'Set Initial Salary' }}</h3>
+        </div>
+        <button class="btn-close-modal" (click)="closeModal()" type="button" aria-label="Close">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveSalary()">
+        <div class="modal-body">
+          @if (compensation()) {
+            <div class="current-salary-banner">
+              <span class="lbl">Current Base Salary:</span>
+              <span class="val">{{ formatCurrency(compensation()?.baseSalary, compensation()?.currency) }}</span>
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="newSalary">New Base Salary Amount ({{ compensation()?.currency || 'USD' }}) *</label>
+            <div class="input-with-prefix">
+              <span class="prefix">{{ getCurrencySymbol(compensation()?.currency) }}</span>
+              <input
+                id="newSalary"
+                type="number"
+                min="0"
+                step="100"
+                [(ngModel)]="newSalary"
+                name="newSalary"
+                class="form-control"
+                placeholder="e.g. 95000"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="effectiveDate">Effective Date *</label>
+            <input
+              id="effectiveDate"
+              type="date"
+              [(ngModel)]="effectiveDate"
+              name="effectiveDate"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="reason">Adjustment Reason *</label>
+            <input
+              id="reason"
+              type="text"
+              [(ngModel)]="reason"
+              name="reason"
+              class="form-control"
+              placeholder="e.g. Annual merit increase, Promotion to Senior Engineer"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="saving()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span>Saving...</span>
+            } @else {
+              <span>{{ compensation() ? 'Update Salary' : 'Save Compensation' }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
