@@ -9,11 +9,12 @@ import { AuthService, ToastService, CustomFieldsService } from '@services';
 import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole, CustomFieldValueInput, CustomFieldValue } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
+import { CompensationTabComponent } from '../../compensation/compensation-tab/compensation-tab.component';
 
 @Component({
   selector: 'app-member-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, CustomFieldsFormComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, CustomFieldsFormComponent, CompensationTabComponent],
   templateUrl: './member-profile.component.html',
   styleUrls: ['./member-profile.component.scss']
 })

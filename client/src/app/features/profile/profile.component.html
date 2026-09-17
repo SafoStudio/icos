@@ -235,25 +235,13 @@
 
       @if (activeTabId() === 'compensation') {
       <div class="tab-content">
-        <div class="section-header"></div>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="label">Salary</span>
-            <span class="value">$120,000</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Bonus</span>
-            <span class="value">$10,000</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Currency</span>
-            <span class="value">USD</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pay Period</span>
-            <span class="value">Monthly</span>
-          </div>
-        </div>
+        @if (user()?.id) {
+          <app-compensation-tab
+            [userId]="user()!.id"
+            [canManage]="false"
+            [isPersonal]="true"
+          ></app-compensation-tab>
+        }
       </div>
       }
 

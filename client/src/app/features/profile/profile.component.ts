@@ -9,11 +9,12 @@ import { type User, type UserProfile, getRoleLabel, type UserRole, CustomFieldVa
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 import { AvatarComponent } from './avatar/avatar.component';
+import { CompensationTabComponent } from '../compensation/compensation-tab/compensation-tab.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, AvatarComponent, CustomFieldsFormComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, AvatarComponent, CustomFieldsFormComponent, CompensationTabComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })

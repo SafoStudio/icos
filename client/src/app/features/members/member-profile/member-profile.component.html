@@ -356,25 +356,13 @@
 
       @if (activeTabId() === 'compensation') {
       <div>
-        <div class="section-header"></div>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="label">Base Salary</span>
-            <span class="value">$95,000 / year</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Performance Bonus</span>
-            <span class="value">$8,000 / year</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Currency</span>
-            <span class="value">USD</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Pay Frequency</span>
-            <span class="value">Semi-Monthly</span>
-          </div>
-        </div>
+        @if (member()?.id) {
+          <app-compensation-tab
+            [userId]="member()!.id"
+            [canManage]="canManage()"
+            [isPersonal]="false"
+          ></app-compensation-tab>
+        }
       </div>
       }
 
