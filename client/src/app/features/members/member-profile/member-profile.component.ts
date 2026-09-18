@@ -10,11 +10,12 @@ import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, 
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
 import { CompensationTabComponent } from '../../compensation/compensation-tab/compensation-tab.component';
+import { PerformanceTabComponent } from '../../performance/performance-tab/performance-tab.component';
 
 @Component({
   selector: 'app-member-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, CustomFieldsFormComponent, CompensationTabComponent],
+  imports: [CommonModule, FormsModule, NgIconComponent, TabsComponent, CustomFieldsFormComponent, CompensationTabComponent, PerformanceTabComponent],
   templateUrl: './member-profile.component.html',
   styleUrls: ['./member-profile.component.scss']
 })
@@ -45,6 +46,7 @@ export class MemberProfileComponent implements OnInit {
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
     { id: 'hr_management', label: 'Actions & Roles', icon: 'tablerBuilding' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
+    { id: 'performance', label: 'Performance', icon: 'tablerChartBar' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
 

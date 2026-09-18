@@ -366,6 +366,18 @@
       </div>
       }
 
+      @if (activeTabId() === 'performance') {
+      <div>
+        @if (member()?.id) {
+          <app-performance-tab
+            [userId]="member()!.id"
+            [canManage]="canManage()"
+            [isPersonal]="false"
+          ></app-performance-tab>
+        }
+      </div>
+      }
+
       @if (activeTabId() === 'documents') {
       <div>
         <div class="section-header"></div>
