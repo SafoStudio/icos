@@ -41,5 +41,17 @@ export {
   type SalaryRevision,
   type UpdateSalaryInput
 } from './compensation.model';
+export {
+  type Objective,
+  type PerformanceReview,
+  type CreateObjectiveInput,
+  type SubmitReviewInput
+} from './performance.model';
+export {
+  type LeaveType,
+  type LeaveBalance,
+  type LeaveRequest,
+  type CreateLeaveRequestInput
+} from './timeoff.model';
 
 

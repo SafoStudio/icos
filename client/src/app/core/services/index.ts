@@ -5,6 +5,8 @@ export { ThemeService, type ThemeMode } from './theme.service';
 export { CustomFieldsService } from './custom-fields.service';
 export { NotificationService } from './notification.service';
 export { CompensationService } from '../../features/compensation/compensation.service';
+export { PerformanceService } from '../../features/performance/performance.service';
+export { TimeoffService } from '../../features/timeoff/timeoff.service';
 
 
 
