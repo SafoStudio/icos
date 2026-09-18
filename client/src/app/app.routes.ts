@@ -10,6 +10,8 @@ import { DepartmentDetailComponent } from './features/org/departments/department
 import { PositionsComponent } from './features/org/positions/positions.component';
 import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { PerformanceComponent } from './features/performance/performance.component';
+import { TimeoffComponent } from './features/timeoff/timeoff.component';
 import { authGuard, publicGuard } from './core/guards/auth.guard';
 
 import { TaskBoardComponent } from './features/tasks/task-board.component';
@@ -25,6 +27,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent, canActivate: [publicGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'calendar', component: CalendarComponent, canActivate: [authGuard] },
+  { path: 'timeoff', component: TimeoffComponent, canActivate: [authGuard] },
+  { path: 'performance', component: PerformanceComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
   { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },

@@ -67,8 +67,10 @@ export class SidebarComponent {
   menuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
     { label: 'Calendar', icon: 'tablerCalendarClock', route: '/calendar' },
+    { label: 'Time Off', icon: 'tablerCalendarEvent', route: '/timeoff' },
     { label: 'Talent', icon: 'tablerBriefcase', route: '/talent' },
     { label: 'Tasks', icon: 'tablerClipboardList', route: '/tasks' },
+    { label: 'Performance', icon: 'tablerChartBar', route: '/performance' },
     { label: 'Members', icon: 'tablerUsers', route: '/members' },
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
     { label: 'Settings', icon: 'tablerSettings', route: '/settings' },
