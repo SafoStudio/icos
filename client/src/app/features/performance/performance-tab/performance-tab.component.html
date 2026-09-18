@@ -1,0 +1,321 @@
+<div class="perf-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading performance data...</p>
+    </div>
+  } @else {
+    <!-- Sub-navigation: Objectives vs Reviews -->
+    <div class="perf-subnav">
+      <div class="subnav-tabs">
+        <button
+          class="subnav-btn"
+          [class.active]="activeSubTab() === 'objectives'"
+          (click)="activeSubTab.set('objectives')"
+          type="button"
+        >
+          <ng-icon name="tablerClipboardList" size="18"></ng-icon>
+          <span>Objectives & OKRs</span>
+          <span class="tab-pill">{{ objectives().length }}</span>
+        </button>
+
+        <button
+          class="subnav-btn"
+          [class.active]="activeSubTab() === 'reviews'"
+          (click)="activeSubTab.set('reviews')"
+          type="button"
+        >
+          <ng-icon name="tablerChartBar" size="18"></ng-icon>
+          <span>Performance Reviews</span>
+          <span class="tab-pill">{{ reviews().length }}</span>
+        </button>
+      </div>
+
+      <div class="action-buttons">
+        @if (activeSubTab() === 'objectives') {
+          <button class="btn btn-primary" (click)="openObjectiveModal()" type="button">
+            <ng-icon name="tablerPlus" size="18"></ng-icon>
+            <span>New Objective</span>
+          </button>
+        } @else if (canManage) {
+          <button class="btn btn-primary" (click)="openReviewModal()" type="button">
+            <ng-icon name="tablerPlus" size="18"></ng-icon>
+            <span>Conduct Review</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- TAB 1: OKRs & Objectives -->
+    @if (activeSubTab() === 'objectives') {
+      <div class="objectives-view">
+        <!-- Summary Stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-lbl">Total Objectives</span>
+            <span class="stat-num">{{ objectives().length }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-lbl">Active</span>
+            <span class="stat-num text-primary">{{ activeObjectivesCount() }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-lbl">Average Progress</span>
+            <span class="stat-num text-success">{{ avgProgress() }}%</span>
+          </div>
+        </div>
+
+        @if (objectives().length > 0) {
+          <div class="objectives-list">
+            @for (obj of objectives(); track obj.id) {
+              <div class="objective-card">
+                <div class="obj-header">
+                  <div class="obj-info">
+                    <h4 class="obj-title">{{ obj.title }}</h4>
+                    @if (obj.description) {
+                      <p class="obj-desc">{{ obj.description }}</p>
+                    }
+                  </div>
+                  <span class="status-pill" [class]="(obj.status || 'ACTIVE').toLowerCase()">
+                    {{ obj.status || 'ACTIVE' }}
+                  </span>
+                </div>
+
+                <div class="progress-section">
+                  <div class="progress-labels">
+                    <span class="progress-lbl">Goal Progress</span>
+                    <span class="progress-val">{{ obj.progress || 0 }}%</span>
+                  </div>
+                  <div class="progress-bar-bg">
+                    <div
+                      class="progress-bar-fill"
+                      [style.width.%]="obj.progress || 0"
+                      [class.completed]="(obj.progress || 0) >= 100"
+                    ></div>
+                  </div>
+                </div>
+
+                @if (obj.startDate || obj.endDate) {
+                  <div class="obj-dates">
+                    <ng-icon name="tablerCalendar" size="15"></ng-icon>
+                    <span>Timeline: {{ formatDate(obj.startDate) }} — {{ formatDate(obj.endDate) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-perf-state">
+            <div class="empty-icon">
+              <ng-icon name="tablerClipboardList" size="36"></ng-icon>
+            </div>
+            <h4>No objectives set yet</h4>
+            <p>Define strategic objectives and key results (OKRs) to track performance.</p>
+            <button class="btn btn-primary" (click)="openObjectiveModal()" type="button">
+              <ng-icon name="tablerPlus" size="18"></ng-icon>
+              <span>Create First Objective</span>
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TAB 2: Performance Reviews -->
+    @if (activeSubTab() === 'reviews') {
+      <div class="reviews-view">
+        @if (reviews().length > 0) {
+          <div class="reviews-list">
+            @for (rev of reviews(); track rev.id) {
+              <div class="review-card">
+                <div class="review-header">
+                  <div class="rating-stars">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                      <span class="star" [class.filled]="(rev.rating || 0) >= star">★</span>
+                    }
+                    <span class="rating-score">{{ rev.rating || 0 }} / 5</span>
+                  </div>
+                  <span class="status-pill" [class]="(rev.status || 'FINALIZED').toLowerCase()">
+                    {{ rev.status || 'FINALIZED' }}
+                  </span>
+                </div>
+
+                <div class="review-body">
+                  <p class="review-summary">"{{ rev.summary || 'Performance criteria successfully met.' }}"</p>
+                </div>
+
+                @if (rev.finalizedAt) {
+                  <div class="review-footer">
+                    <ng-icon name="tablerCalendar" size="15"></ng-icon>
+                    <span>Finalized on {{ formatDate(rev.finalizedAt) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-perf-state">
+            <div class="empty-icon">
+              <ng-icon name="tablerChartBar" size="36"></ng-icon>
+            </div>
+            <h4>No performance reviews on record</h4>
+            <p>Formal performance evaluations will appear here once conducted.</p>
+            @if (canManage) {
+              <button class="btn btn-primary" (click)="openReviewModal()" type="button">
+                <ng-icon name="tablerPlus" size="18"></ng-icon>
+                <span>Conduct Review</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Modal: Create Objective -->
+@if (showObjectiveModal()) {
+  <div class="modal-backdrop" (click)="closeObjectiveModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon name="tablerClipboardList" size="20"></ng-icon>
+          <h3>Add New Objective</h3>
+        </div>
+        <button class="btn-close-modal" (click)="closeObjectiveModal()" type="button">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveObjective()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="objTitle">Objective Title *</label>
+            <input
+              id="objTitle"
+              type="text"
+              [(ngModel)]="newObjTitle"
+              name="objTitle"
+              class="form-control"
+              placeholder="e.g. Accelerate API Response Times by 30%"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="objDesc">Description & Scope</label>
+            <textarea
+              id="objDesc"
+              rows="3"
+              [(ngModel)]="newObjDesc"
+              name="objDesc"
+              class="form-control"
+              placeholder="Detail the expected key deliverables and business impact..."
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="startDate">Start Date *</label>
+              <input
+                id="startDate"
+                type="date"
+                [(ngModel)]="newObjStartDate"
+                name="startDate"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group flex-1">
+              <label for="endDate">Target End Date *</label>
+              <input
+                id="endDate"
+                type="date"
+                [(ngModel)]="newObjEndDate"
+                name="endDate"
+                class="form-control"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeObjectiveModal()" [disabled]="saving()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span>Saving...</span>
+            } @else {
+              <span>Create Objective</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal: Conduct Review -->
+@if (showReviewModal()) {
+  <div class="modal-backdrop" (click)="closeReviewModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon name="tablerChartBar" size="20"></ng-icon>
+          <h3>Conduct Performance Review</h3>
+        </div>
+        <button class="btn-close-modal" (click)="closeReviewModal()" type="button">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveReview()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Performance Rating (1 - 5 Stars) *</label>
+            <div class="rating-picker">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <button
+                  type="button"
+                  class="star-btn"
+                  [class.active]="newReviewRating >= star"
+                  (click)="newReviewRating = star"
+                >★</button>
+              }
+              <span class="rating-text">
+                {{ getRatingLabel(newReviewRating) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reviewSummary">Review Summary & Evaluation Notes *</label>
+            <textarea
+              id="reviewSummary"
+              rows="4"
+              [(ngModel)]="newReviewSummary"
+              name="reviewSummary"
+              class="form-control"
+              placeholder="Highlight achievements, leadership, quality of deliverable work, and growth opportunities..."
+              required
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeReviewModal()" [disabled]="saving()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span>Finalizing...</span>
+            } @else {
+              <span>Finalize & Submit Review</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

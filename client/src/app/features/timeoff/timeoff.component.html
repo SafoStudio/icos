@@ -1,0 +1,227 @@
+<div class="timeoff-page">
+  <div class="page-header">
+    <div class="header-left">
+      <h2 class="page-title">Time Off & Leaves</h2>
+      <p class="page-subtitle">Manage leave balances, request paid time off, and track absence requests.</p>
+    </div>
+
+    <button class="btn btn-primary" (click)="openRequestModal()" type="button">
+      <ng-icon name="tablerPlus" size="18"></ng-icon>
+      <span>Request Time Off</span>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading time off balances and requests...</p>
+    </div>
+  } @else {
+    <!-- Leave Balances Cards -->
+    <div class="balances-section">
+      <h3 class="section-title">Your Leave Balances</h3>
+      <div class="balances-grid">
+        @for (b of balances(); track b.id) {
+          @let type = getLeaveType(b.leaveTypeId);
+          <div class="balance-card">
+            <div class="balance-card-header">
+              <span class="type-dot" [style.background-color]="type?.color || '#6366f1'"></span>
+              <h4 class="type-name">{{ type?.name || 'Leave' }}</h4>
+            </div>
+            <div class="balance-numbers">
+              <span class="remaining-days">{{ b.remainingDays }}</span>
+              <span class="days-label">days available</span>
+            </div>
+            <div class="balance-meter">
+              <div
+                class="balance-meter-fill"
+                [style.width.%]="calcUsedPercent(b.usedDays, b.totalDays)"
+                [style.background-color]="type?.color || '#6366f1'"
+              ></div>
+            </div>
+            <div class="balance-subtext">
+              <span>Used: {{ b.usedDays }} d</span>
+              <span>Total: {{ b.totalDays }} d</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Leave Requests Section -->
+    <div class="requests-section">
+      <div class="section-header-row">
+        <h3 class="section-title">Leave Request History</h3>
+        <span class="badge-count">{{ requests().length }} requests</span>
+      </div>
+
+      @if (requests().length > 0) {
+        <div class="requests-table-wrapper">
+          <table class="requests-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Dates</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Reason</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (req of requests(); track req.id) {
+                @let type = getLeaveType(req.leaveTypeId);
+                <tr>
+                  <td>
+                    <div class="type-cell">
+                      <span class="type-dot" [style.background-color]="type?.color || '#6366f1'"></span>
+                      <span class="type-title">{{ type?.name || 'Leave' }}</span>
+                    </div>
+                  </td>
+                  <td class="date-cell">
+                    {{ formatDate(req.startDate) }} — {{ formatDate(req.endDate) }}
+                  </td>
+                  <td class="days-cell">
+                    <strong>{{ req.totalDays }}</strong> days
+                  </td>
+                  <td>
+                    <span class="status-pill" [class]="req.status.toLowerCase()">
+                      {{ req.status }}
+                    </span>
+                  </td>
+                  <td class="reason-cell">
+                    {{ req.reason || '—' }}
+                  </td>
+                  <td>
+                    @if (req.status === 'PENDING') {
+                      <div class="actions-group">
+                        @if (canManage()) {
+                          <button class="btn btn-sm btn-success" (click)="approve(req.id)" title="Approve Request">
+                            <ng-icon name="tablerCheck" size="14"></ng-icon>
+                            <span>Approve</span>
+                          </button>
+                          <button class="btn btn-sm btn-danger" (click)="reject(req.id)" title="Reject Request">
+                            <ng-icon name="tablerX" size="14"></ng-icon>
+                            <span>Reject</span>
+                          </button>
+                        }
+                        <button class="btn btn-sm btn-cancel" (click)="cancel(req.id)" title="Cancel Request">
+                          Cancel
+                        </button>
+                      </div>
+                    } @else if (req.status === 'APPROVED') {
+                      <button class="btn btn-sm btn-cancel" (click)="cancel(req.id)" title="Cancel Approved Leave">
+                        Cancel Leave
+                      </button>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-requests">
+          <p>No leave requests found. Click "Request Time Off" above to submit a new absence request.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal: Request Time Off -->
+@if (showRequestModal()) {
+  <div class="modal-backdrop" (click)="closeRequestModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <ng-icon name="tablerCalendarEvent" size="20"></ng-icon>
+          <h3>Request Time Off</h3>
+        </div>
+        <button class="btn-close-modal" (click)="closeRequestModal()" type="button">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="submitRequest()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="leaveTypeSelect">Leave Type *</label>
+            <select
+              id="leaveTypeSelect"
+              [(ngModel)]="selectedLeaveTypeId"
+              name="leaveTypeId"
+              class="form-control"
+              required
+            >
+              @for (t of leaveTypes(); track t.id) {
+                <option [value]="t.id">{{ t.name }} ({{ t.code }})</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="startDateInput">Start Date *</label>
+              <input
+                id="startDateInput"
+                type="date"
+                [(ngModel)]="requestStartDate"
+                (ngModelChange)="onDateChange()"
+                name="startDate"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group flex-1">
+              <label for="endDateInput">End Date *</label>
+              <input
+                id="endDateInput"
+                type="date"
+                [(ngModel)]="requestEndDate"
+                (ngModelChange)="onDateChange()"
+                name="endDate"
+                class="form-control"
+                required
+              />
+            </div>
+          </div>
+
+          @if (calculatedDays() > 0) {
+            <div class="days-summary-banner">
+              <span>Requested Duration:</span>
+              <strong>{{ calculatedDays() }} working days</strong>
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="reasonInput">Reason / Handover Notes</label>
+            <textarea
+              id="reasonInput"
+              rows="3"
+              [(ngModel)]="requestReason"
+              name="reason"
+              class="form-control"
+              placeholder="e.g. Summer family vacation, Doctor appointment..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeRequestModal()" [disabled]="saving()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="saving() || calculatedDays() <= 0">
+            @if (saving()) {
+              <span>Submitting...</span>
+            } @else {
+              <span>Submit Request</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

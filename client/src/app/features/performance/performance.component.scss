@@ -1,0 +1,99 @@
+.performance-page {
+  padding: 24px 32px;
+  color: var(--text-primary, #212529);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary, #1e293b);
+    margin: 0 0 4px 0;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #64748b);
+    margin: 0;
+  }
+}
+
+.member-selector-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  padding: 6px 12px;
+
+  label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary, #64748b);
+    white-space: nowrap;
+  }
+
+  select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color, #cbd5e1);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: var(--bg-surface, #ffffff);
+    color: var(--text-primary, #1e293b);
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary, #6366f1);
+    }
+  }
+}
+
+.performance-content {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark mode */
+:host-context([data-theme="dark"]),
+:host-context(body:not(.light-theme)) {
+  .page-header {
+    .page-title {
+      color: var(--text-primary, #f8fafc);
+    }
+
+    .page-subtitle {
+      color: var(--text-secondary, #94a3b8);
+    }
+  }
+
+  .member-selector-box {
+    background: var(--bg-surface, #1e293b);
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+
+    label {
+      color: var(--text-secondary, #94a3b8);
+    }
+
+    select {
+      background: #0f172a;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary, #f8fafc);
+    }
+  }
+
+  .performance-content {
+    background: var(--bg-surface, #1e293b);
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+  }
+}

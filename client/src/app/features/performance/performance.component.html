@@ -1,0 +1,37 @@
+<div class="performance-page">
+  <div class="page-header">
+    <div class="header-left">
+      <h2 class="page-title">Performance & OKRs</h2>
+      <p class="page-subtitle">Track individual strategic goals, progress key results, and evaluation reviews.</p>
+    </div>
+
+    @if (canManage()) {
+      <div class="member-selector-box">
+        <label for="memberSelect">Viewing Employee:</label>
+        <select
+          id="memberSelect"
+          class="form-control"
+          [ngModel]="selectedMemberId()"
+          (ngModelChange)="onMemberSelect($event)"
+        >
+          <option [value]="currentUser()?.id">Myself ({{ currentUser()?.firstName }} {{ currentUser()?.lastName }})</option>
+          @for (member of members(); track member.id) {
+            @if (member.id !== currentUser()?.id) {
+              <option [value]="member.id">{{ member.firstName }} {{ member.lastName }} ({{ member.role }})</option>
+            }
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  <div class="performance-content">
+    @if (selectedMemberId()) {
+      <app-performance-tab
+        [userId]="selectedMemberId()!"
+        [canManage]="canManage() && selectedMemberId() !== currentUser()?.id"
+        [isPersonal]="selectedMemberId() === currentUser()?.id"
+      ></app-performance-tab>
+    }
+  </div>
+</div>
