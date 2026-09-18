@@ -124,8 +124,11 @@ public class PerformanceMapper {
         return ObjectiveDto.builder()
                 .id(domain.getId())
                 .title(domain.getTitle())
+                .description(domain.getDescription())
+                .startDate(domain.getStartDate())
+                .endDate(domain.getEndDate())
                 .progress(domain.getProgress())
-                .status(domain.getStatus().name())
+                .status(domain.getStatus() != null ? domain.getStatus().name() : null)
                 .build();
     }
 
@@ -133,9 +136,11 @@ public class PerformanceMapper {
         if (domain == null) return null;
         return PerformanceReviewDto.builder()
                 .id(domain.getId())
+                .employeeId(domain.getEmployeeId())
                 .rating(domain.getRating())
                 .summary(domain.getSummary())
                 .status(domain.getStatus())
+                .finalizedAt(domain.getFinalizedAt())
                 .build();
     }
 }

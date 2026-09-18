@@ -43,6 +43,18 @@ public class PerformanceService {
     return saved;
   }
 
+  @Transactional
+  public PerformanceReview submitReview(UUID employeeId, UUID managerId, Integer rating, String summary) {
+    ReviewCycle cycle = cycleRepository.findAll().stream().findFirst().orElseGet(() ->
+        cycleRepository.save(ReviewCycle.create("Annual Review " + LocalDate.now().getYear(), LocalDate.now().minusMonths(6), LocalDate.now().plusMonths(6)))
+    );
+    PerformanceReview review = PerformanceReview.create(cycle.getId(), employeeId, managerId);
+    PerformanceReview finalized = review.finalize(rating, summary);
+    PerformanceReview saved = reviewRepository.save(finalized);
+    eventPublisher.publishEvent(new PerformanceReviewFinalizedEvent(this, saved));
+    return saved;
+  }
+
   public List<PerformanceReview> getEmployeeReviews(UUID employeeId) {
     return reviewRepository.findByEmployeeId(employeeId);
   }

@@ -1,0 +1,31 @@
+type Objective {
+    id: ID!
+    title: String!
+    description: String
+    startDate: Date
+    endDate: Date
+    progress: Float
+    status: String
+}
+
+type PerformanceReview {
+    id: ID!
+    employeeId: ID
+    rating: Int
+    summary: String
+    status: String
+    finalizedAt: String
+}
+
+extend type Query {
+    myObjectives: [Objective!]!
+    userObjectives(userId: ID!): [Objective!]!
+    employeeReviews(employeeId: ID!): [PerformanceReview!]!
+}
+
+extend type Mutation {
+    createObjective(title: String!, description: String, startDate: String!, endDate: String!): Objective!
+    createUserObjective(userId: ID!, title: String!, description: String, startDate: String!, endDate: String!): Objective!
+    finalizeReview(id: ID!, rating: Int!, summary: String!): PerformanceReview!
+    submitReview(employeeId: ID!, rating: Int!, summary: String!): PerformanceReview!
+}
