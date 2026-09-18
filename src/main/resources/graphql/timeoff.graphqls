@@ -1,0 +1,43 @@
+type LeaveType {
+    id: ID!
+    name: String!
+    code: String!
+    requiresBalance: Boolean!
+    color: String
+    isActive: Boolean!
+}
+
+type LeaveBalance {
+    id: ID!
+    userId: ID!
+    leaveTypeId: ID!
+    totalDays: Float!
+    usedDays: Float!
+    remainingDays: Float!
+}
+
+type LeaveRequest {
+    id: ID!
+    userId: ID!
+    leaveTypeId: ID!
+    startDate: Date!
+    endDate: Date!
+    totalDays: Float!
+    status: String!
+    reason: String
+}
+
+extend type Query {
+    myLeaveRequests: [LeaveRequest!]!
+    myLeaveBalances: [LeaveBalance!]!
+    userLeaveRequests(userId: ID!): [LeaveRequest!]!
+    userLeaveBalances(userId: ID!): [LeaveBalance!]!
+    leaveTypes: [LeaveType!]!
+}
+
+extend type Mutation {
+    createLeaveRequest(leaveTypeId: ID!, startDate: String!, endDate: String!, reason: String): LeaveRequest!
+    approveLeaveRequest(id: ID!): LeaveRequest!
+    rejectLeaveRequest(id: ID!, comment: String): LeaveRequest!
+    cancelLeaveRequest(id: ID!): LeaveRequest!
+}

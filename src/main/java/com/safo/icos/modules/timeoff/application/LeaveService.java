@@ -61,7 +61,16 @@ public class LeaveService {
 
     if (type.isRequiresBalance()) {
       LeaveBalance balance = balanceRepository.findByUserIdAndLeaveTypeId(userId, leaveTypeId)
-              .orElseThrow(() -> new BusinessException("No leave balance found for this type", "BALANCE_NOT_FOUND"));
+              .orElseGet(() -> balanceRepository.save(
+                  LeaveBalance.builder()
+                      .id(UUID.randomUUID())
+                      .userId(userId)
+                      .leaveTypeId(leaveTypeId)
+                      .totalDays(BigDecimal.valueOf(20))
+                      .usedDays(BigDecimal.ZERO)
+                      .remainingDays(BigDecimal.valueOf(20))
+                      .build()
+              ));
 
       if (balance.getRemainingDays().compareTo(totalDays) < 0) {
         throw new BusinessException("Insufficient leave balance. Remaining: " + balance.getRemainingDays(), "INSUFFICIENT_BALANCE");
@@ -156,6 +165,23 @@ public class LeaveService {
   }
 
   public List<LeaveBalance> getMyBalances(UUID userId) {
-    return balanceRepository.findByUserId(userId);
+    List<LeaveBalance> balances = balanceRepository.findByUserId(userId);
+    if (balances.isEmpty()) {
+      for (LeaveType type : typeRepository.findAllActive()) {
+        if (type.isRequiresBalance()) {
+          LeaveBalance b = LeaveBalance.builder()
+              .id(UUID.randomUUID())
+              .userId(userId)
+              .leaveTypeId(type.getId())
+              .totalDays(BigDecimal.valueOf(20))
+              .usedDays(BigDecimal.ZERO)
+              .remainingDays(BigDecimal.valueOf(20))
+              .build();
+          balanceRepository.save(b);
+        }
+      }
+      return balanceRepository.findByUserId(userId);
+    }
+    return balances;
   }
 }
