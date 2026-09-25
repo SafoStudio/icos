@@ -1,4 +1,5 @@
 <div class="dashboard-content">
+  <!-- Key HR Metrics -->
   <div class="metrics-grid">
     @for (metric of metrics; track metric.label) {
     <div class="metric-card">
@@ -11,10 +12,77 @@
     }
   </div>
 
+  <!-- Analytics Row 1: Hiring Funnel & Candidate Sources -->
+  <div class="charts-grid-row">
+    <div class="chart-card large">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>ATS Recruitment Funnel</h3>
+          <p class="subtitle">Candidate volume & stage-by-stage conversion drop-off</p>
+        </div>
+        <span class="badge-tag live">Pipeline</span>
+      </div>
+      <div class="card-body">
+        @if (funnelDatasets.length > 0) {
+          <app-bar-chart
+            [labels]="funnelLabels"
+            [datasets]="funnelDatasets"
+            [horizontal]="true"
+            [height]="260"
+            [showLegend]="false"
+          ></app-bar-chart>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Acquisition Channels</h3>
+          <p class="subtitle">Where qualified applicants originate</p>
+        </div>
+      </div>
+      <div class="card-body doughnut-body">
+        @if (sourceData.length > 0) {
+          <app-doughnut-chart
+            [labels]="sourceLabels"
+            [data]="sourceData"
+            [height]="240"
+            cutout="68%"
+          ></app-doughnut-chart>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Row 2: Leave & Absence Utilization -->
+  <div class="charts-grid-row single-chart">
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Team Leave & PTO Utilization</h3>
+          <p class="subtitle">Days taken across leave categories this quarter</p>
+        </div>
+      </div>
+      <div class="card-body doughnut-body">
+        @if (leaveData.length > 0) {
+          <app-doughnut-chart
+            [labels]="leaveLabels"
+            [data]="leaveData"
+            [colors]="leaveColors"
+            [height]="220"
+            cutout="65%"
+          ></app-doughnut-chart>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Candidates Table -->
   <div class="table-section">
     <div class="section-header">
       <h3>Recent Candidates</h3>
-      <button class="btn-text">View All</button>
+      <button class="btn-text">View All Candidates</button>
     </div>
     <div class="table-wrapper">
       <table class="data-table">
@@ -32,9 +100,9 @@
           <td>{{ candidate.name }}</td>
           <td>{{ candidate.position }}</td>
           <td>
-                <span class="status-badge" [class]="candidate.status.toLowerCase()">
-                  {{ candidate.status }}
-                </span>
+            <span class="status-badge" [class]="candidate.status.toLowerCase()">
+              {{ candidate.status }}
+            </span>
           </td>
           <td>{{ candidate.date }}</td>
         </tr>

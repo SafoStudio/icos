@@ -1,4 +1,5 @@
 <div class="dashboard-content">
+  <!-- Key Member Metrics -->
   <div class="metrics-grid">
     @for (metric of metrics; track metric.label) {
     <div class="metric-card">
@@ -11,6 +12,56 @@
     }
   </div>
 
+  <!-- Member Visual Summary Cards -->
+  <div class="member-cards-row">
+    <div class="summary-card">
+      <div class="card-header">
+        <h4>Personal Objectives (OKR)</h4>
+        <span class="badge-tag">Current Cycle</span>
+      </div>
+      <div class="card-body gauge-body">
+        <app-radial-gauge
+          [value]="analytics()?.personalOkrProgress || 82"
+          label="Completed"
+          [size]="140"
+          [strokeWidth]="10"
+          color="#6366f1"
+        ></app-radial-gauge>
+        <div class="status-text">
+          <p class="highlight">Strong performance pace</p>
+          <p class="sub">3 of 4 Key Results hit the Q3 milestone.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-header">
+        <h4>Time-Off & Leave Balance</h4>
+        <span class="badge-tag available">18 Days Left</span>
+      </div>
+      <div class="card-body balance-body">
+        <div class="balance-progress-bar">
+          <div class="progress-fill" style="width: 75%"></div>
+        </div>
+        <div class="balance-details">
+          <div class="balance-col">
+            <span class="label">Total Annual Allowance</span>
+            <span class="val">24 days</span>
+          </div>
+          <div class="balance-col">
+            <span class="label">Used This Year</span>
+            <span class="val used">6 days</span>
+          </div>
+          <div class="balance-col">
+            <span class="label">Remaining</span>
+            <span class="val remaining">18 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks Table -->
   <div class="table-section">
     <div class="section-header">
       <h3>My Tasks</h3>
@@ -33,9 +84,9 @@
           <td>{{ task.project }}</td>
           <td>{{ task.dueDate }}</td>
           <td>
-                <span class="priority-badge" [class]="task.priority.toLowerCase()">
-                  {{ task.priority }}
-                </span>
+            <span class="priority-badge" [class]="task.priority.toLowerCase()">
+              {{ task.priority }}
+            </span>
           </td>
         </tr>
         }

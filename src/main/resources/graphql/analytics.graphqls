@@ -1,0 +1,19 @@
+extend type Query {
+    executiveAnalytics: ExecutiveAnalytics!
+    recruitmentAnalytics: RecruitmentAnalytics!
+}
+
+type ExecutiveAnalytics {
+    totalEmployees: Int!
+    activeProjects: Int!
+    turnoverRate: Float!
+    monthlyPayroll: Float!
+    overallOkrProgress: Float!
+}
+
+type RecruitmentAnalytics {
+    openVacancies: Int!
+    totalCandidates: Int!
+    avgTimeToHireDays: Int!
+    offerAcceptanceRate: Float!
+}

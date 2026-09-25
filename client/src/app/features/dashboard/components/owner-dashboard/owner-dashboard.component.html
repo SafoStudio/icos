@@ -1,4 +1,5 @@
 <div class="dashboard-content">
+  <!-- Key Metrics Row -->
   <div class="metrics-grid">
     @for (metric of metrics; track metric.label) {
     <div class="metric-card">
@@ -11,6 +12,103 @@
     }
   </div>
 
+  <!-- Visual Analytics Section: Row 1 (Headcount Growth & Department Split) -->
+  <div class="charts-grid-row">
+    <div class="chart-card large">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Headcount Growth & Hiring Velocity</h3>
+          <p class="subtitle">Monthly total active employees vs new hires</p>
+        </div>
+        <span class="badge-tag live">Real-time</span>
+      </div>
+      <div class="card-body">
+        @if (headcountDatasets.length > 0) {
+          <app-line-chart
+            [labels]="headcountLabels"
+            [datasets]="headcountDatasets"
+            [height]="280"
+            [showLegend]="true"
+          ></app-line-chart>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Department Distribution</h3>
+          <p class="subtitle">Headcount share across business units</p>
+        </div>
+      </div>
+      <div class="card-body doughnut-body">
+        @if (deptData.length > 0) {
+          <app-doughnut-chart
+            [labels]="deptLabels"
+            [data]="deptData"
+            [height]="240"
+            cutout="68%"
+          ></app-doughnut-chart>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Analytics Section: Row 2 (Payroll Distribution & OKR Progress) -->
+  <div class="charts-grid-row">
+    <div class="chart-card large">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Payroll Budget by Department</h3>
+          <p class="subtitle">Monthly compensation allocation ($ USD)</p>
+        </div>
+      </div>
+      <div class="card-body">
+        @if (payrollDatasets.length > 0) {
+          <app-bar-chart
+            [labels]="payrollLabels"
+            [datasets]="payrollDatasets"
+            [height]="260"
+            valuePrefix="$"
+          ></app-bar-chart>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card gauge-card">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Strategic OKR Progress</h3>
+          <p class="subtitle">Q3 company key results completion</p>
+        </div>
+      </div>
+      <div class="card-body gauge-body">
+        <app-radial-gauge
+          [value]="analytics()?.overallOkrProgress || 78"
+          label="Target Attained"
+          [size]="180"
+          [strokeWidth]="14"
+          color="#10b981"
+        ></app-radial-gauge>
+        <div class="gauge-sub-info">
+          <div class="info-item">
+            <span class="dot achieved"></span>
+            <span>12 Achieved</span>
+          </div>
+          <div class="info-item">
+            <span class="dot in-progress"></span>
+            <span>4 On Track</span>
+          </div>
+          <div class="info-item">
+            <span class="dot at-risk"></span>
+            <span>1 At Risk</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Section: Heads of Departments -->
   <div class="table-section">
     <div class="section-header">
       <h3>Heads of departments</h3>
@@ -34,9 +132,9 @@
           <td>{{ member.position }}</td>
           <td>{{ member.department }}</td>
           <td>
-                <span class="status-badge" [class]="member.status.toLowerCase().replace(' ', '-')">
-                  {{ member.status }}
-                </span>
+            <span class="status-badge" [class]="member.status.toLowerCase().replace(' ', '-')">
+              {{ member.status }}
+            </span>
           </td>
           <td>{{ member.email }}</td>
         </tr>
@@ -46,6 +144,7 @@
     </div>
   </div>
 
+  <!-- Tables Section: Active Projects -->
   <div class="table-section">
     <div class="section-header">
       <h3>Active Projects</h3>
@@ -69,14 +168,14 @@
           <td>{{ project.team }} members</td>
           <td>{{ project.deadline }}</td>
           <td>
-                <span class="status-badge" [class]="project.status.toLowerCase().replace(' ', '-')">
-                  {{ project.status }}
-                </span>
+            <span class="status-badge" [class]="project.status.toLowerCase().replace(' ', '-')">
+              {{ project.status }}
+            </span>
           </td>
           <td>
-                <span class="priority-badge" [class]="project.priority.toLowerCase()">
-                  {{ project.priority }}
-                </span>
+            <span class="priority-badge" [class]="project.priority.toLowerCase()">
+              {{ project.priority }}
+            </span>
           </td>
         </tr>
         }

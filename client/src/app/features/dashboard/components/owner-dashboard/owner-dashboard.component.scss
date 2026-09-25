@@ -10,6 +10,110 @@
   gap: 16px;
 }
 
+.charts-grid-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .header-titles {
+      h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin: 0 0 4px 0;
+      }
+
+      .subtitle {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+
+    .badge-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 12px;
+
+      &.live {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+    }
+  }
+
+  .card-body {
+    flex: 1;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.doughnut-body {
+      padding: 8px 0;
+    }
+
+    &.gauge-body {
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+
+  .gauge-sub-info {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #6b7280;
+      font-weight: 500;
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+
+        &.achieved { background: #10b981; }
+        &.in-progress { background: #6366f1; }
+        &.at-risk { background: #ef4444; }
+      }
+    }
+  }
+}
+
 .metric-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -226,6 +330,34 @@
 
       &.negative {
         color: #f87171;
+      }
+    }
+  }
+
+  .chart-card {
+    background: var(--bg-surface, #1e293b);
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      .header-titles {
+        h3 {
+          color: var(--text-primary, #f8fafc);
+        }
+
+        .subtitle {
+          color: var(--text-muted, #94a3b8);
+        }
+      }
+    }
+
+    .gauge-sub-info {
+      .info-item {
+        color: var(--text-secondary, #94a3b8);
       }
     }
   }
