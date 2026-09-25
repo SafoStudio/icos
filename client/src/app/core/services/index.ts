@@ -7,6 +7,18 @@ export { NotificationService } from './notification.service';
 export { CompensationService } from '../../features/compensation/compensation.service';
 export { PerformanceService } from '../../features/performance/performance.service';
 export { TimeoffService } from '../../features/timeoff/timeoff.service';
+export {
+  AnalyticsService,
+  type ExecutiveAnalytics,
+  type HrAnalytics,
+  type MemberAnalytics,
+  type MonthlyMetric,
+  type DepartmentHeadcountMetric,
+  type DepartmentPayrollMetric,
+  type FunnelStageMetric,
+  type CandidateSourceMetric,
+  type LeaveCategoryMetric
+} from './analytics.service';
 
 
 
