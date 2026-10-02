@@ -17,12 +17,12 @@ export {
   type DepartmentPayrollMetric,
   type FunnelStageMetric,
   type CandidateSourceMetric,
-  type LeaveCategoryMetric
+  type LeaveCategoryMetric,
+  type HeadcountPoint,
+  type DepartmentHeadcount,
+  type TimeOffDay,
+  type SalaryBucket,
+  type BonusPoint,
+  type KeyResultProgress,
+  type ObjectiveProgress
 } from './analytics.service';
-
-
-
-
-
-
-

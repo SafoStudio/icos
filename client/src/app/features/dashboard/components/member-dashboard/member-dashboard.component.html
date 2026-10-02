@@ -29,7 +29,7 @@
         ></app-radial-gauge>
         <div class="status-text">
           <p class="highlight">Strong performance pace</p>
-          <p class="sub">3 of 4 Key Results hit the Q3 milestone.</p>
+          <p class="sub">Key Results are well on track for the current milestone.</p>
         </div>
       </div>
     </div>
@@ -58,6 +58,56 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- OKR Objectives Grid with Radial Gauges (PUNKT 5) -->
+  <div class="okr-section">
+    <div class="section-header">
+      <div class="header-titles">
+        <h3>Objective & Key Results (OKR) Progress</h3>
+        <p class="subtitle">Weighted progress evaluation against strategic milestones</p>
+      </div>
+    </div>
+    <div class="okr-cards-grid">
+      @for (obj of objectives(); track obj.id) {
+        <div class="okr-card">
+          <div class="okr-card-top">
+            <div class="okr-gauge-wrapper">
+              <app-radial-gauge
+                [value]="obj.progress"
+                [size]="110"
+                [strokeWidth]="8"
+                [color]="getGaugeColor(obj.progress)"
+              ></app-radial-gauge>
+            </div>
+            <div class="okr-meta">
+              <h4 class="okr-title">{{ obj.title }}</h4>
+              <span class="okr-status-pill" [class.on-track]="obj.progress >= 70" [class.at-risk]="obj.progress >= 40 && obj.progress < 70" [class.off-track]="obj.progress < 40">
+                {{ obj.progress >= 70 ? 'On Track' : (obj.progress >= 40 ? 'At Risk' : 'Off Track') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="key-results-list">
+            @for (kr of obj.keyResults; track kr.id) {
+              <div class="kr-item">
+                <div class="kr-info">
+                  <span class="kr-title">{{ kr.title }}</span>
+                  <span class="kr-progress-pct">{{ kr.progress }}%</span>
+                </div>
+                <div class="kr-progress-track">
+                  <div
+                    class="kr-progress-fill"
+                    [style.width.%]="kr.progress"
+                    [style.background-color]="getGaugeColor(kr.progress)"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
   </div>
 

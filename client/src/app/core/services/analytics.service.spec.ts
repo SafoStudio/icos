@@ -94,4 +94,80 @@ describe('AnalyticsService', () => {
       });
     });
   });
+
+  describe('getHeadcountTrend', () => {
+    it('should return headcount trends', (done) => {
+      const mockPoints = [
+        { period: '2026-08', headcount: 140, hired: 5, fired: 1, turnoverRate: 0.7 },
+        { period: '2026-09', headcount: 145, hired: 6, fired: 1, turnoverRate: 0.7 }
+      ];
+      apiServiceSpy.graphql.and.returnValue(of({ headcountTrend: mockPoints }));
+
+      service.getHeadcountTrend(2).subscribe((res) => {
+        expect(res.length).toBe(2);
+        expect(res[0].headcount).toBe(140);
+        done();
+      });
+    });
+  });
+
+  describe('getTimeOffHeatmap', () => {
+    it('should return heatmap daily data', (done) => {
+      const mockDays = [
+        {
+          date: '2026-10-01',
+          departmentId: 'd1',
+          departmentName: 'Engineering',
+          absentCount: 2,
+          totalCount: 20,
+          loadPercent: 10.0
+        }
+      ];
+      apiServiceSpy.graphql.and.returnValue(of({ timeOffHeatmap: mockDays }));
+
+      service.getTimeOffHeatmap('2026-10-01', '2026-10-02').subscribe((res) => {
+        expect(res.length).toBe(1);
+        expect(res[0].absentCount).toBe(2);
+        done();
+      });
+    });
+  });
+
+  describe('getSalaryDistribution', () => {
+    it('should return salary grade buckets', (done) => {
+      const mockBuckets = [
+        { label: 'Junior', min: 1000, max: 2000, avg: 1500, count: 5 }
+      ];
+      apiServiceSpy.graphql.and.returnValue(of({ salaryDistribution: mockBuckets }));
+
+      service.getSalaryDistribution().subscribe((res) => {
+        expect(res.length).toBe(1);
+        expect(res[0].avg).toBe(1500);
+        done();
+      });
+    });
+  });
+
+  describe('getObjectiveProgress', () => {
+    it('should return OKR progress and key results', (done) => {
+      const mockOkrs = [
+        {
+          id: '1',
+          title: 'Infrastructure SLA',
+          progress: 88,
+          keyResults: [
+            { id: '1-1', title: 'Target 99.9%', progress: 90, weight: 1, status: 'ON_TRACK' }
+          ]
+        }
+      ];
+      apiServiceSpy.graphql.and.returnValue(of({ objectiveProgress: mockOkrs }));
+
+      service.getObjectiveProgress().subscribe((res) => {
+        expect(res.length).toBe(1);
+        expect(res[0].progress).toBe(88);
+        expect(res[0].keyResults.length).toBe(1);
+        done();
+      });
+    });
+  });
 });

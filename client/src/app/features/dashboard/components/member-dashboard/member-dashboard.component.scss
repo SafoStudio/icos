@@ -188,6 +188,145 @@
   }
 }
 
+.okr-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .section-header {
+    .header-titles {
+      h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin: 0 0 4px 0;
+      }
+
+      .subtitle {
+        font-size: 0.82rem;
+        color: #6b7280;
+        margin: 0;
+      }
+    }
+  }
+
+  .okr-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .okr-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .okr-card-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .okr-gauge-wrapper {
+        flex-shrink: 0;
+      }
+
+      .okr-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .okr-title {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #1a1a2e;
+          margin: 0;
+          line-height: 1.35;
+        }
+
+        .okr-status-pill {
+          display: inline-block;
+          font-size: 0.72rem;
+          font-weight: 600;
+          padding: 2px 8px;
+          border-radius: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          width: fit-content;
+
+          &.on-track {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+          }
+
+          &.at-risk {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+          }
+
+          &.off-track {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+          }
+        }
+      }
+    }
+
+    .key-results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f3f4f6;
+
+      .kr-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .kr-info {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.75rem;
+
+          .kr-title {
+            color: #4b5563;
+            font-weight: 500;
+          }
+
+          .kr-progress-pct {
+            font-weight: 600;
+            color: #1a1a2e;
+          }
+        }
+
+        .kr-progress-track {
+          width: 100%;
+          height: 6px;
+          background: #f3f4f6;
+          border-radius: 3px;
+          overflow: hidden;
+
+          .kr-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+          }
+        }
+      }
+    }
+  }
+}
+
 .table-section {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -427,6 +566,37 @@
     &.low {
       background: rgba(59, 130, 246, 0.2);
       color: #60a5fa;
+    }
+  }
+
+  .okr-section {
+    .section-header .header-titles {
+      h3 { color: var(--text-primary, #f8fafc); }
+      .subtitle { color: var(--text-muted, #94a3b8); }
+    }
+
+    .okr-card {
+      background: var(--bg-surface, #1e293b);
+      border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .okr-title { color: var(--text-primary, #f8fafc); }
+      .key-results-list {
+        border-top-color: rgba(255, 255, 255, 0.06);
+
+        .kr-item .kr-info {
+          .kr-title { color: var(--text-muted, #94a3b8); }
+          .kr-progress-pct { color: var(--text-primary, #f8fafc); }
+        }
+
+        .kr-progress-track {
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
     }
   }
 }

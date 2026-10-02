@@ -1,11 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   AnalyticsService,
   ExecutiveAnalytics,
   MonthlyMetric,
   DepartmentPayrollMetric,
-  DepartmentHeadcountMetric
+  DepartmentHeadcountMetric,
+  HeadcountPoint,
+  SalaryBucket,
+  BonusPoint
 } from '@services';
 import {
   BarChartComponent,
@@ -21,6 +25,7 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     BarChartComponent,
     LineChartComponent,
     DoughnutChartComponent,
@@ -35,15 +40,31 @@ export class OwnerDashboardComponent implements OnInit {
   readonly analytics = signal<ExecutiveAnalytics | null>(null);
   readonly isLoading = signal<boolean>(true);
 
-  // Chart datasets
+  // Department filter
+  selectedDepartmentId = '';
+  departments: { id: string; name: string }[] = [
+    { id: '', name: 'All Departments' }
+  ];
+
+  // Headcount & Turnover Trend
   headcountLabels: string[] = [];
   headcountDatasets: LineDataset[] = [];
+  currentTurnoverRate = 3.2;
 
+  // Department distribution
+  deptLabels: string[] = [];
+  deptData: number[] = [];
+
+  // Payroll by Department & Grade distribution
   payrollLabels: string[] = [];
   payrollDatasets: BarDataset[] = [];
 
-  deptLabels: string[] = [];
-  deptData: number[] = [];
+  salaryGradeLabels: string[] = [];
+  salaryGradeDatasets: BarDataset[] = [];
+
+  // Bonus & Base Salary Dynamics
+  bonusLabels: string[] = [];
+  bonusDatasets: LineDataset[] = [];
 
   metrics = [
     { label: 'Total Employees', value: '156', change: '+12 this quarter', changeType: 'positive' },
@@ -69,41 +90,131 @@ export class OwnerDashboardComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.loadExecutiveData();
+    this.loadHeadcountTrend();
+    this.loadSalaryAnalytics();
+    this.loadBonusDynamics();
+  }
+
+  private loadExecutiveData(): void {
     this.analyticsService.getExecutiveAnalytics().subscribe({
       next: (data) => {
         this.analytics.set(data);
-        this.setupCharts(data);
+        this.currentTurnoverRate = data.turnoverRate;
+        this.setupOverviewCharts(data);
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
       }
     });
+
+    this.analyticsService.getHeadcountByDepartment().subscribe({
+      next: (depts) => {
+        if (depts && depts.length > 0) {
+          this.departments = [
+            { id: '', name: 'All Departments' },
+            ...depts.map(d => ({ id: d.departmentId, name: d.departmentName }))
+          ];
+        }
+      }
+    });
   }
 
-  private setupCharts(data: ExecutiveAnalytics): void {
-    // 1. Headcount & Turnover Trend
-    this.headcountLabels = data.headcountTrends.map((t: MonthlyMetric) => t.month);
-    this.headcountDatasets = [
-      {
-        label: 'Total Headcount',
-        data: data.headcountTrends.map((t: MonthlyMetric) => t.headcount),
-        borderColor: '#6366f1',
-        backgroundColor: 'rgba(99, 102, 241, 0.15)',
-        tension: 0.35,
-        fill: true
-      },
-      {
-        label: 'New Hires',
-        data: data.headcountTrends.map((t: MonthlyMetric) => t.newHires),
-        borderColor: '#10b981',
-        backgroundColor: 'transparent',
-        tension: 0.2,
-        fill: false
-      }
-    ];
+  onDepartmentChange(deptId: string): void {
+    this.selectedDepartmentId = deptId;
+    this.loadHeadcountTrend(deptId || undefined);
+    this.loadSalaryAnalytics(deptId || undefined);
+  }
 
-    // 2. Payroll by Department
+  private loadHeadcountTrend(deptId?: string): void {
+    this.analyticsService.getHeadcountTrend(12, deptId).subscribe({
+      next: (points: HeadcountPoint[]) => {
+        this.headcountLabels = points.map(p => p.period);
+        this.headcountDatasets = [
+          {
+            label: 'Headcount',
+            data: points.map(p => p.headcount),
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+            tension: 0.35,
+            fill: true
+          },
+          {
+            label: 'Hired',
+            data: points.map(p => p.hired),
+            borderColor: '#10b981',
+            backgroundColor: 'transparent',
+            tension: 0.2,
+            fill: false
+          },
+          {
+            label: 'Fired / Left',
+            data: points.map(p => p.fired),
+            borderColor: '#ef4444',
+            backgroundColor: 'transparent',
+            tension: 0.2,
+            fill: false
+          }
+        ];
+
+        if (points.length > 0) {
+          const lastPoint = points[points.length - 1];
+          this.currentTurnoverRate = lastPoint.turnoverRate;
+        }
+      }
+    });
+  }
+
+  private loadSalaryAnalytics(deptId?: string): void {
+    this.analyticsService.getSalaryDistribution(deptId).subscribe({
+      next: (buckets: SalaryBucket[]) => {
+        this.salaryGradeLabels = buckets.map(b => b.label);
+        this.salaryGradeDatasets = [
+          {
+            label: 'Average Salary ($)',
+            data: buckets.map(b => b.avg),
+            backgroundColor: '#38bdf8',
+            borderRadius: 6
+          },
+          {
+            label: 'Max Salary ($)',
+            data: buckets.map(b => b.max),
+            backgroundColor: 'rgba(99, 102, 241, 0.65)',
+            borderRadius: 6
+          }
+        ];
+      }
+    });
+  }
+
+  private loadBonusDynamics(): void {
+    this.analyticsService.getBonusDynamics(12).subscribe({
+      next: (points: BonusPoint[]) => {
+        this.bonusLabels = points.map(p => p.period);
+        this.bonusDatasets = [
+          {
+            label: 'Base Payroll ($)',
+            data: points.map(p => p.totalBase),
+            borderColor: '#6366f1',
+            backgroundColor: 'transparent',
+            tension: 0.3
+          },
+          {
+            label: 'Bonus Pool ($)',
+            data: points.map(p => p.totalBonus),
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            tension: 0.3,
+            fill: true
+          }
+        ];
+      }
+    });
+  }
+
+  private setupOverviewCharts(data: ExecutiveAnalytics): void {
+    // Payroll by Department
     this.payrollLabels = data.payrollByDepartment.map((p: DepartmentPayrollMetric) => p.department);
     this.payrollDatasets = [
       {
@@ -114,7 +225,7 @@ export class OwnerDashboardComponent implements OnInit {
       }
     ];
 
-    // 3. Department distribution
+    // Department distribution
     this.deptLabels = data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.department);
     this.deptData = data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.headcount);
   }

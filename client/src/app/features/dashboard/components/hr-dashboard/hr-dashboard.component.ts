@@ -1,16 +1,19 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   AnalyticsService,
   HrAnalytics,
   FunnelStageMetric,
   CandidateSourceMetric,
-  LeaveCategoryMetric
+  LeaveCategoryMetric,
+  TimeOffDay
 } from '@services';
 import {
   BarChartComponent,
   BarDataset,
-  DoughnutChartComponent
+  DoughnutChartComponent,
+  HeatmapComponent
 } from '../../../../shared/components/charts';
 
 @Component({
@@ -18,8 +21,10 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     BarChartComponent,
-    DoughnutChartComponent
+    DoughnutChartComponent,
+    HeatmapComponent
   ],
   templateUrl: './hr-dashboard.component.html',
   styleUrls: ['./hr-dashboard.component.scss']
@@ -29,6 +34,18 @@ export class HrDashboardComponent implements OnInit {
 
   readonly analytics = signal<HrAnalytics | null>(null);
   readonly isLoading = signal<boolean>(true);
+
+  // Turnover rate tracking
+  turnoverRate = 3.2;
+
+  // Time-Off Heatmap
+  heatmapData: TimeOffDay[] = [];
+  selectedHeatmapDept = '';
+  selectedPeriodDays = 14;
+
+  departments: { id: string; name: string }[] = [
+    { id: '', name: 'All Departments' }
+  ];
 
   // Hiring Funnel datasets
   funnelLabels: string[] = [];
@@ -47,7 +64,7 @@ export class HrDashboardComponent implements OnInit {
     { label: 'Open Vacancies', value: '8', change: '2 critical', changeType: 'positive' },
     { label: 'Total Candidates', value: '142', change: '+28 this month', changeType: 'positive' },
     { label: 'Avg Time to Hire', value: '24 days', change: '-4 days vs Q1', changeType: 'positive' },
-    { label: 'Offer Acceptance', value: '88%', change: '+6% benchmark', changeType: 'positive' }
+    { label: 'Turnover Rate', value: '3.2%', change: 'Healthy (benchmark <15%)', changeType: 'positive' }
   ];
 
   candidates = [
@@ -66,6 +83,47 @@ export class HrDashboardComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
+      }
+    });
+
+    this.analyticsService.getExecutiveAnalytics().subscribe({
+      next: (exec) => {
+        this.turnoverRate = exec.turnoverRate;
+        const turnoverMetric = this.metrics.find(m => m.label === 'Turnover Rate');
+        if (turnoverMetric) {
+          turnoverMetric.value = `${exec.turnoverRate}%`;
+          turnoverMetric.change = exec.turnoverRate > 15 ? 'Above 15% critical alert' : 'Healthy pace (< 15%)';
+          turnoverMetric.changeType = exec.turnoverRate > 15 ? 'negative' : 'positive';
+        }
+      }
+    });
+
+    this.analyticsService.getHeadcountByDepartment().subscribe({
+      next: (depts) => {
+        if (depts && depts.length > 0) {
+          this.departments = [
+            { id: '', name: 'All Departments' },
+            ...depts.map(d => ({ id: d.departmentId, name: d.departmentName }))
+          ];
+        }
+      }
+    });
+
+    this.loadHeatmap();
+  }
+
+  onFilterChange(): void {
+    this.loadHeatmap();
+  }
+
+  private loadHeatmap(): void {
+    const now = new Date();
+    const fromDate = new Date(now.getTime() - 7 * 86400000).toISOString().split('T')[0];
+    const toDate = new Date(now.getTime() + (this.selectedPeriodDays - 7) * 86400000).toISOString().split('T')[0];
+
+    this.analyticsService.getTimeOffHeatmap(fromDate, toDate, this.selectedHeatmapDept || undefined).subscribe({
+      next: (days: TimeOffDay[]) => {
+        this.heatmapData = days;
       }
     });
   }

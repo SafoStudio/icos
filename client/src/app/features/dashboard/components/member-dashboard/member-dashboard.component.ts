@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AnalyticsService, MemberAnalytics } from '@services';
+import { AnalyticsService, MemberAnalytics, ObjectiveProgress } from '@services';
 import { RadialGaugeComponent } from '../../../../shared/components/charts';
 
 @Component({
@@ -14,6 +14,7 @@ export class MemberDashboardComponent implements OnInit {
   private readonly analyticsService = inject(AnalyticsService);
 
   readonly analytics = signal<MemberAnalytics | null>(null);
+  readonly objectives = signal<ObjectiveProgress[]>([]);
 
   metrics = [
     { label: 'Active Tasks', value: '5', change: '2 due today', changeType: 'neutral' },
@@ -35,5 +36,17 @@ export class MemberDashboardComponent implements OnInit {
         this.analytics.set(data);
       }
     });
+
+    this.analyticsService.getObjectiveProgress().subscribe({
+      next: (objs) => {
+        this.objectives.set(objs);
+      }
+    });
+  }
+
+  getGaugeColor(progress: number): string {
+    if (progress >= 70) return '#10b981';
+    if (progress >= 40) return '#f59e0b';
+    return '#ef4444';
   }
 }

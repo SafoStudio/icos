@@ -55,7 +55,46 @@
     </div>
   </div>
 
-  <!-- Analytics Row 2: Leave & Absence Utilization -->
+  <!-- Analytics Row 2: Team Availability & Time-Off Heatmap (PUNKT 3) -->
+  <div class="charts-grid-row full-width-row">
+    <div class="chart-card full-width">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Team Availability & Time-Off Heatmap</h3>
+          <p class="subtitle">Daily absence density across company departments</p>
+        </div>
+        <div class="header-controls">
+          <select
+            class="filter-select"
+            [(ngModel)]="selectedHeatmapDept"
+            (ngModelChange)="onFilterChange()"
+          >
+            @for (dept of departments; track dept.id) {
+              <option [value]="dept.id">{{ dept.name }}</option>
+            }
+          </select>
+          <select
+            class="filter-select"
+            [(ngModel)]="selectedPeriodDays"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option [ngValue]="14">14 Days</option>
+            <option [ngValue]="21">21 Days</option>
+            <option [ngValue]="30">30 Days</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body heatmap-card-body">
+        @if (heatmapData.length > 0) {
+          <app-heatmap [data]="heatmapData"></app-heatmap>
+        } @else {
+          <div class="empty-state">Loading heatmap data...</div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Row 3: Leave & Absence Utilization -->
   <div class="charts-grid-row single-chart">
     <div class="chart-card">
       <div class="card-header">

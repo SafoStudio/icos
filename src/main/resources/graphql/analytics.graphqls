@@ -1,6 +1,12 @@
 extend type Query {
     executiveAnalytics: ExecutiveAnalytics!
     recruitmentAnalytics: RecruitmentAnalytics!
+    headcountTrend(months: Int = 12, departmentId: ID): [HeadcountPoint!]!
+    headcountByDepartment(months: Int = 12): [DepartmentHeadcount!]!
+    timeOffHeatmap(from: String!, to: String!, departmentId: ID): [TimeOffDay!]!
+    salaryDistribution(departmentId: ID): [SalaryBucket!]!
+    bonusDynamics(months: Int = 12): [BonusPoint!]!
+    objectiveProgress(teamId: ID, period: String): [ObjectiveProgress!]!
 }
 
 type ExecutiveAnalytics {
@@ -16,4 +22,58 @@ type RecruitmentAnalytics {
     totalCandidates: Int!
     avgTimeToHireDays: Int!
     offerAcceptanceRate: Float!
+}
+
+type HeadcountPoint {
+    period: String!
+    headcount: Int!
+    hired: Int!
+    fired: Int!
+    turnoverRate: Float!
+}
+
+type DepartmentHeadcount {
+    departmentId: ID!
+    departmentName: String!
+    points: [HeadcountPoint!]!
+}
+
+type TimeOffDay {
+    date: String!
+    departmentId: ID!
+    departmentName: String!
+    absentCount: Int!
+    totalCount: Int!
+    loadPercent: Float!
+}
+
+type SalaryBucket {
+    label: String!
+    departmentId: ID
+    departmentName: String
+    min: Float!
+    max: Float!
+    avg: Float!
+    count: Int!
+}
+
+type BonusPoint {
+    period: String!
+    totalBonus: Float!
+    totalBase: Float!
+}
+
+type KeyResultProgress {
+    id: ID!
+    title: String!
+    progress: Float!
+    weight: Float!
+    status: String!
+}
+
+type ObjectiveProgress {
+    id: ID!
+    title: String!
+    progress: Float!
+    keyResults: [KeyResultProgress!]!
 }

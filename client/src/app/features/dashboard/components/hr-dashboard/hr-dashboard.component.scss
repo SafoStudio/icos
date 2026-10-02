@@ -15,13 +15,52 @@
   grid-template-columns: 1.6fr 1fr;
   gap: 16px;
 
-  &.single-chart {
+  &.single-chart,
+  &.full-width-row {
     grid-template-columns: 1fr;
   }
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
   }
+}
+
+.chart-card.full-width {
+  width: 100%;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .filter-select {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+
+    &:focus {
+      border-color: #6366f1;
+    }
+  }
+}
+
+.heatmap-card-body {
+  width: 100%;
+  padding: 0;
+  display: block !important;
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.85rem;
 }
 
 .chart-card {
@@ -370,5 +409,11 @@
       background: rgba(100, 116, 139, 0.2);
       color: var(--text-muted, #94a3b8);
     }
+  }
+
+  .filter-select {
+    background: #0f172a !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #f8fafc !important;
   }
 }
