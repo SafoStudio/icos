@@ -1,5 +1,6 @@
 import { UserProfile } from './user-profile.model';
 import { Department } from './department.model';
+import { UserDocument } from './user-document.model';
 
 export interface User {
   id: string;
@@ -13,4 +14,5 @@ export interface User {
   department?: Department;
   permissions?: string[];
   status?: string;
+  documents?: UserDocument[];
 }
