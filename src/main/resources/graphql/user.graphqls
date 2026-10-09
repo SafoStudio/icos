@@ -24,6 +24,17 @@ type User {
     status: String
     permissions: [String!]!
     profile: UserProfile
+    documents: [UserDocument!]
+}
+
+type UserDocument {
+    id: ID!
+    type: String!
+    filename: String!
+    filePath: String!
+    contentType: String
+    fileSize: Float
+    createdAt: String
 }
 
 type UserProfile {

@@ -210,6 +210,30 @@ public class UserService {
     documentRepository.deleteByUserIdAndTypeAndFilename(userId, type, filename);
   }
 
+  public UserDocumentJpaEntity getDocumentEntity(UUID userId, UUID documentId) {
+    return documentRepository.findById(documentId)
+            .filter(doc -> doc.getUserId().equals(userId))
+            .orElse(null);
+  }
+
+  public void deleteDocumentById(UUID userId, UUID documentId) {
+    documentRepository.findById(documentId).ifPresent(doc -> {
+      if (doc.getUserId().equals(userId)) {
+        documentRepository.delete(doc);
+      }
+    });
+  }
+
+  public DocumentResponseDto updateDocumentMetadata(UUID userId, UUID documentId, String newType) {
+    UserDocumentJpaEntity doc = getDocumentEntity(userId, documentId);
+    if (doc != null) {
+      doc.setType(newType);
+      doc = documentRepository.save(doc);
+      return toDocumentResponseDto(doc);
+    }
+    return null;
+  }
+
   // ---------- private mapping methods ----------
 
   private UserDto toUserDto(User user) {
