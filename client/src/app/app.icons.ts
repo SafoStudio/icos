@@ -72,10 +72,12 @@ import {
   tablerDeviceFloppy,
   tablerRefresh,
   tablerCopy,
-  tablerExternalLink
+  tablerExternalLink,
+  tablerDownload
 } from '@ng-icons/tabler-icons';
 
 export const APP_ICONS = provideIcons({
+  tablerDownload,
   tablerDashboard,
   tablerUserCheck,
   tablerBriefcase,
