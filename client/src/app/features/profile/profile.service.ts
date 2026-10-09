@@ -49,6 +49,15 @@ export class ProfileService {
             birthDate
             avatarPath
           }
+          documents {
+            id
+            type
+            filename
+            filePath
+            contentType
+            fileSize
+            createdAt
+          }
         }
       }
     `;
@@ -81,6 +90,15 @@ export class ProfileService {
             hireDate
             birthDate
             avatarPath
+          }
+          documents {
+            id
+            type
+            filename
+            filePath
+            contentType
+            fileSize
+            createdAt
           }
         }
       }

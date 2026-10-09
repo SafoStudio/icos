@@ -1,0 +1,366 @@
+<div class="documents-tab">
+  <!-- Header / Controls Bar -->
+  <div class="docs-header">
+    <div class="docs-search-filter">
+      <div class="search-box">
+        <ng-icon name="tablerSearch" size="16" class="search-icon"></ng-icon>
+        <input
+          type="text"
+          placeholder="Search documents..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          class="search-input"
+        />
+        @if (searchQuery()) {
+          <button class="clear-search" (click)="searchQuery.set('')">
+            <ng-icon name="tablerX" size="14"></ng-icon>
+          </button>
+        }
+      </div>
+
+      <div class="filter-box">
+        <select
+          [ngModel]="selectedTypeFilter()"
+          (ngModelChange)="selectedTypeFilter.set($event)"
+          class="filter-select"
+        >
+          <option value="ALL">All Categories</option>
+          @for (opt of typeOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (editable) {
+      <button class="btn-upload" (click)="openUploadModal()">
+        <ng-icon name="tablerUpload" size="16"></ng-icon>
+        <span>Upload Document</span>
+      </button>
+    }
+  </div>
+
+  <!-- Documents List -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading documents...</p>
+    </div>
+  } @else if (filteredDocuments().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrap">
+        <ng-icon name="tablerFile" size="48"></ng-icon>
+      </div>
+      @if (documents().length === 0) {
+        <h3>No documents uploaded yet</h3>
+        <p>Upload employment contracts, ID documents, certificates and more.</p>
+        @if (editable) {
+          <button class="btn-primary" (click)="openUploadModal()">
+            <ng-icon name="tablerUpload" size="16"></ng-icon>
+            <span>Upload First Document</span>
+          </button>
+        }
+      } @else {
+        <h3>No matching documents</h3>
+        <p>Try adjusting your search query or category filter.</p>
+        <button class="btn-secondary" (click)="searchQuery.set(''); selectedTypeFilter.set('ALL')">
+          Reset Filters
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="docs-grid">
+      @for (doc of filteredDocuments(); track doc.id || doc.filename) {
+        <div class="doc-card">
+          <div class="doc-icon-container" [class]="'ext-' + getFileIconType(doc.filename)">
+            <ng-icon name="tablerFile" size="24"></ng-icon>
+            <span class="ext-label">{{ getFileExtension(doc.filename) || 'FILE' }}</span>
+          </div>
+
+          <div class="doc-info">
+            <div class="doc-title-row">
+              <h4 class="doc-name" [title]="doc.filename" (click)="openPreview(doc)">
+                {{ doc.filename }}
+              </h4>
+            </div>
+
+            <div class="doc-meta-row">
+              <span class="doc-type-badge" [class]="getTypeBadgeClass(doc.type)">
+                {{ getTypeLabel(doc.type) }}
+              </span>
+              <span class="doc-size">{{ formatFileSize(doc.fileSize) }}</span>
+              <span class="doc-date">{{ formatDate(doc.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="doc-actions">
+            <button
+              class="action-btn btn-view"
+              title="Preview document"
+              (click)="openPreview(doc)"
+            >
+              <ng-icon name="tablerEye" size="16"></ng-icon>
+            </button>
+            <button
+              class="action-btn btn-download"
+              title="Download file"
+              (click)="downloadDocument(doc)"
+            >
+              <ng-icon name="tablerDownload" size="16"></ng-icon>
+            </button>
+            @if (editable) {
+              <button
+                class="action-btn btn-edit"
+                title="Change document category"
+                (click)="openEditModal(doc)"
+              >
+                <ng-icon name="tablerEdit" size="16"></ng-icon>
+              </button>
+              <button
+                class="action-btn btn-delete"
+                title="Delete document"
+                [disabled]="deletingId() === doc.id"
+                (click)="deleteDocument(doc)"
+              >
+                <ng-icon name="tablerTrash" size="16"></ng-icon>
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Upload Modal -->
+@if (isUploadModalOpen()) {
+  <div class="modal-backdrop" (click)="closeUploadModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <ng-icon name="tablerUpload" size="20" class="modal-title-icon"></ng-icon>
+          <h3>Upload Document</h3>
+        </div>
+        <button class="modal-close" (click)="closeUploadModal()">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Drag & Drop Zone -->
+        <div
+          class="dropzone"
+          [class.active]="isDragging()"
+          [class.has-file]="uploadFile() !== null"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="triggerFileInput()"
+        >
+          <input
+            #fileInput
+            type="file"
+            class="hidden-file-input"
+            (change)="onFileSelected($event)"
+          />
+
+          @if (!uploadFile()) {
+            <div class="dropzone-empty">
+              <div class="dropzone-icon">
+                <ng-icon name="tablerUpload" size="32"></ng-icon>
+              </div>
+              <p class="dropzone-text">
+                <strong>Click to browse</strong> or drag & drop a file here
+              </p>
+              <span class="dropzone-hint">PDF, DOC, DOCX, PNG, JPG up to 25MB</span>
+            </div>
+          } @else {
+            <div class="dropzone-selected">
+              <div class="selected-file-icon">
+                <ng-icon name="tablerFile" size="28"></ng-icon>
+              </div>
+              <div class="selected-file-details">
+                <div class="selected-file-name">{{ uploadFile()!.name }}</div>
+                <div class="selected-file-size">{{ formatFileSize(uploadFile()!.size) }}</div>
+              </div>
+              <button
+                type="button"
+                class="btn-remove-file"
+                (click)="$event.stopPropagation(); uploadFile.set(null)"
+              >
+                <ng-icon name="tablerX" size="16"></ng-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Document Type Selector -->
+        <div class="form-group">
+          <label for="doc-type-select">Document Category</label>
+          <select
+            id="doc-type-select"
+            [ngModel]="uploadDocType()"
+            (ngModelChange)="uploadDocType.set($event)"
+            class="modal-select"
+          >
+            @for (opt of typeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+            <option value="CUSTOM">Custom category...</option>
+          </select>
+        </div>
+
+        @if (uploadDocType() === 'CUSTOM') {
+          <div class="form-group">
+            <label for="custom-type-input">Custom Category Name</label>
+            <input
+              id="custom-type-input"
+              type="text"
+              placeholder="e.g. INSURANCE, CERTIFICATE"
+              [ngModel]="customUploadDocType()"
+              (ngModelChange)="customUploadDocType.set($event)"
+              class="modal-input"
+            />
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeUploadModal()"
+          [disabled]="uploading()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="submitUpload()"
+          [disabled]="uploading() || !uploadFile()"
+        >
+          @if (uploading()) {
+            <div class="btn-spinner"></div>
+            <span>Uploading...</span>
+          } @else {
+            <ng-icon name="tablerUpload" size="16"></ng-icon>
+            <span>Upload Document</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Edit Document Category Modal -->
+@if (isEditModalOpen() && editingDoc()) {
+  <div class="modal-backdrop" (click)="closeEditModal()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <ng-icon name="tablerEdit" size="20" class="modal-title-icon"></ng-icon>
+          <h3>Edit Document Category</h3>
+        </div>
+        <button class="modal-close" (click)="closeEditModal()">
+          <ng-icon name="tablerX" size="18"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="edit-doc-name">{{ editingDoc()!.filename }}</p>
+
+        <div class="form-group">
+          <label for="edit-category-select">Select Category</label>
+          <select
+            id="edit-category-select"
+            [ngModel]="editDocType()"
+            (ngModelChange)="editDocType.set($event)"
+            class="modal-select"
+          >
+            @for (opt of typeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeEditModal()"
+          [disabled]="updating()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="submitEditType()"
+          [disabled]="updating()"
+        >
+          @if (updating()) {
+            <div class="btn-spinner"></div>
+            <span>Saving...</span>
+          } @else {
+            <span>Save Category</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Document Preview Modal -->
+@if (isPreviewModalOpen() && previewDoc()) {
+  <div class="modal-backdrop preview-backdrop" (click)="closePreview()">
+    <div class="modal-card modal-lg preview-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="preview-title-wrap">
+          <ng-icon name="tablerFile" size="20" class="modal-title-icon"></ng-icon>
+          <div class="preview-meta">
+            <h3 class="preview-filename">{{ previewDoc()!.filename }}</h3>
+            <span class="doc-type-badge" [class]="getTypeBadgeClass(previewDoc()!.type)">
+              {{ getTypeLabel(previewDoc()!.type) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="preview-header-actions">
+          <button class="action-btn" title="Open in new window" (click)="openInNewTab(previewDoc()!)">
+            <ng-icon name="tablerExternalLink" size="16"></ng-icon>
+          </button>
+          <button class="action-btn" title="Download" (click)="downloadDocument(previewDoc()!)">
+            <ng-icon name="tablerDownload" size="16"></ng-icon>
+          </button>
+          <button class="modal-close" (click)="closePreview()">
+            <ng-icon name="tablerX" size="18"></ng-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-body">
+        @if (previewMode() === 'image') {
+          <div class="image-preview-container">
+            <img [src]="previewUrl()" [alt]="previewDoc()!.filename" class="preview-img" />
+          </div>
+        } @else if (previewMode() === 'pdf') {
+          <div class="pdf-preview-container">
+            <iframe [src]="safePreviewUrl()" class="preview-iframe" title="PDF Preview"></iframe>
+          </div>
+        } @else {
+          <div class="other-preview-container">
+            <ng-icon name="tablerFile" size="64" class="large-file-icon"></ng-icon>
+            <h4>{{ previewDoc()!.filename }}</h4>
+            <p>Preview is not directly supported in browser for this file type.</p>
+            <button class="btn-primary" (click)="downloadDocument(previewDoc()!)">
+              <ng-icon name="tablerDownload" size="16"></ng-icon>
+              <span>Download File ({{ formatFileSize(previewDoc()!.fileSize) }})</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

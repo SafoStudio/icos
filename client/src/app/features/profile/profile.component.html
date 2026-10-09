@@ -247,10 +247,13 @@
 
       @if (activeTabId() === 'documents') {
       <div class="tab-content">
-        <div class="section-header"></div>
-        <div class="documents-list">
-          <p class="empty-message">No documents uploaded yet.</p>
-        </div>
+        @if (user()?.id) {
+          <app-documents-tab
+            [userId]="user()!.id"
+            [editable]="true"
+            (documentsChanged)="loadProfile()"
+          ></app-documents-tab>
+        }
       </div>
       }
     </app-tabs>
