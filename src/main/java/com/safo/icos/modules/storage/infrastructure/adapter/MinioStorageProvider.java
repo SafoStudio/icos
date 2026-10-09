@@ -39,14 +39,27 @@ public class MinioStorageProvider implements StorageProvider {
     @SneakyThrows
     public void uploadFile(String path, InputStream inputStream, String contentType) {
         ensureBucketExists();
-        minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(path)
-                        .stream(inputStream, inputStream.available(), -1)
-                        .contentType(contentType)
-                        .build()
-        );
+        long size = inputStream.available();
+        if (size <= 0) {
+            byte[] bytes = inputStream.readAllBytes();
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(path)
+                            .stream(new java.io.ByteArrayInputStream(bytes), bytes.length, -1)
+                            .contentType(contentType)
+                            .build()
+            );
+        } else {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(path)
+                            .stream(inputStream, size, -1)
+                            .contentType(contentType)
+                            .build()
+            );
+        }
     }
 
     @Override
@@ -65,15 +78,18 @@ public class MinioStorageProvider implements StorageProvider {
 
     @Override
     public String getAvatarPath(UUID companyId, String email, String originalFilename) {
-        String emailSlug = email.replace("@", "_").replace(".", "_");
+        String comp = companyId != null ? companyId.toString() : "common";
+        String emailSlug = email != null ? email.replace("@", "_").replace(".", "_") : "user";
         String extension = getExtension(originalFilename);
-        return String.format("%s/%s/avatar/avatar%s", companyId, emailSlug, extension);
+        return String.format("%s/%s/avatar/avatar%s", comp, emailSlug, extension);
     }
 
     @Override
     public String getDocumentPath(UUID companyId, String email, String docType, String filename) {
-        String emailSlug = email.replace("@", "_").replace(".", "_");
-        return String.format("%s/%s/documents/%s/%s", companyId, emailSlug, docType.toLowerCase(), filename);
+        String comp = companyId != null ? companyId.toString() : "common";
+        String emailSlug = email != null ? email.replace("@", "_").replace(".", "_") : "user";
+        String cleanType = docType != null ? docType.toLowerCase() : "other";
+        return String.format("%s/%s/documents/%s/%s", comp, emailSlug, cleanType, filename);
     }
 
     @Override
