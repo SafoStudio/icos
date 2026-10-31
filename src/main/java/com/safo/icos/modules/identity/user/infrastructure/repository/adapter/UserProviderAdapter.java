@@ -6,8 +6,8 @@ import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.api.dto.UserPrincipalDto;
 import com.safo.icos.modules.identity.user.api.dto.UserProfileDto;
-import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.application.UserService;
+import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.MembershipJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.PermissionJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
@@ -15,6 +15,8 @@ import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.Members
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.entity.DepartmentJpaEntity;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentJpaRepository;
 import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentPermissionJpaRepository;
 import java.util.HashSet;
 import java.util.Optional;
@@ -32,6 +34,7 @@ public class UserProviderAdapter implements UserProvider {
   private final MembershipJpaRepository membershipJpaRepository;
   private final PermissionJpaRepository permissionJpaRepository;
   private final DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
+  private final DepartmentJpaRepository departmentJpaRepository;
   private final RoleJpaRepository roleJpaRepository;
   private final UserJpaRepository userJpaRepository;
 
@@ -77,7 +80,8 @@ public class UserProviderAdapter implements UserProvider {
   @Override
   public Optional<UserDto> findManagerByDepartmentId(UUID departmentId) {
     return roleJpaRepository.findByName("HEAD")
-            .flatMap(role -> membershipJpaRepository.findFirstByDepartmentIdAndRoleIdAndActiveTrue(departmentId, role.getId()))
+            .flatMap(role -> membershipJpaRepository
+                    .findFirstByDepartmentIdAndRoleIdAndActiveTrue(departmentId, role.getId()))
             .map(MembershipJpaEntity::getUserId)
             .flatMap(userJpaRepository::findById)
             .map(entity -> UserDto.builder()
@@ -99,7 +103,8 @@ public class UserProviderAdapter implements UserProvider {
   }
 
   @Override
-  public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId, UUID departmentId, UUID managerId) {
+  public MembershipDto createMembership(UUID userId, UUID companyId, UUID roleId,
+                                        UUID departmentId, UUID managerId) {
     return userService.createMembership(userId, companyId, roleId, departmentId, managerId);
   }
 
@@ -126,9 +131,8 @@ public class UserProviderAdapter implements UserProvider {
                 permissions = permissionJpaRepository.findAll().stream()
                         .map(PermissionJpaEntity::getName)
                         .collect(Collectors.toSet());
-              }
-              // other role have local department_permissions
-              else if (membership.getDepartmentId() != null) {
+              } else if (membership.getDepartmentId() != null) {
+                // other role have local department_permissions
                 permissions = departmentPermissionJpaRepository
                         .findByDepartmentIdAndRoleName(
                                 membership.getDepartmentId(),
@@ -139,12 +143,20 @@ public class UserProviderAdapter implements UserProvider {
                         .collect(Collectors.toSet());
               }
 
+              String departmentName = null;
+              if (membership.getDepartmentId() != null) {
+                departmentName = departmentJpaRepository.findById(membership.getDepartmentId())
+                        .map(DepartmentJpaEntity::getName)
+                        .orElse(null);
+              }
+
               return UserPrincipalDto.builder()
                       .userId(user.getId())
                       .email(user.getEmail())
                       .membershipId(membership.getId())
                       .companyId(membership.getCompanyId())
                       .departmentId(membership.getDepartmentId())
+                      .departmentName(departmentName)
                       .roleName(roleName)
                       .permissions(permissions)
                       .build();
