@@ -2,9 +2,6 @@ package com.safo.icos.seeder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safo.icos.seeder.exception.SeedDataLoadingException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -14,6 +11,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 
 @Slf4j
 public abstract class AbstractJsonSeeder<T> implements TableSeeder {

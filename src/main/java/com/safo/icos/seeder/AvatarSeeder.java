@@ -1,17 +1,16 @@
 package com.safo.icos.seeder;
 
 import com.safo.icos.modules.storage.api.StorageProvider;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 @Component
 @Profile({"dev", "seed"})
@@ -111,7 +110,7 @@ public class AvatarSeeder implements TableSeeder {
     }
   }
 
-  private record SeedResult(int uploaded, int skipped) {}
+  private record SeedResult(int uploaded, int skipped) { }
 
   @Override
   public int getOrder() {

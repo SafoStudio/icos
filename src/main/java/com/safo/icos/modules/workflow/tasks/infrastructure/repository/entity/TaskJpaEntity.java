@@ -30,46 +30,48 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskJpaEntity {
-    @Id
-    private UUID id;
+  @Id
+  private UUID id;
 
-    @Column(nullable = false)
-    private String title;
+  @Column(nullable = false)
+  private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TaskStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private TaskStatus status;
 
-    @Column(name = "assignee_id")
-    private UUID assigneeId;
+  @Column(name = "assignee_id")
+  private UUID assigneeId;
 
-    @Column(name = "department_id")
-    private UUID departmentId;
+  @Column(name = "department_id")
+  private UUID departmentId;
 
-    @ElementCollection
-    @CollectionTable(name = "task_metadata", joinColumns = @JoinColumn(name = "task_id"))
-    @MapKeyColumn(name = "key")
-    @Column(name = "value")
-    private Map<String, String> metadata;
+  @ElementCollection
+  @CollectionTable(name = "task_metadata", joinColumns = @JoinColumn(name = "task_id"))
+  @MapKeyColumn(name = "key")
+  @Column(name = "value")
+  private Map<String, String> metadata;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+  @Column(name = "updated_at", nullable = false)
+  private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        if (id == null) id = UUID.randomUUID();
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+  @PrePersist
+  protected void onCreate() {
+    if (id == null) {
+      id = UUID.randomUUID();
     }
+    createdAt = LocalDateTime.now();
+    updatedAt = LocalDateTime.now();
+  }
 
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+  @PreUpdate
+  protected void onUpdate() {
+    updatedAt = LocalDateTime.now();
+  }
 }

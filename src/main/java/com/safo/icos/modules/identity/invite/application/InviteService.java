@@ -10,13 +10,14 @@ import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
 import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.modules.identity.invite.infrastructure.email.EmailService;
+import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
+import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.DepartmentService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
-import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
-import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.security.context.IcosUserPrincipal;
+import com.safo.icos.security.permission.rule.SecurityRuleUtils;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.Base64;
@@ -67,10 +68,7 @@ public class InviteService {
   private void checkInvitePermissions() {
     IcosUserPrincipal principal = getPrincipal();
 
-    boolean isPrivilegedRole = principal.getRoleName().equals("ADMIN") || principal.getRoleName().equals("OWNER");
-    boolean isHrMember = principal.getDepartmentName() != null && principal.getDepartmentName().equalsIgnoreCase("HR");
-
-    if (!isPrivilegedRole && !isHrMember) {
+    if (!SecurityRuleUtils.isHrUser(principal.getRoleName(), principal.getDepartmentName())) {
       throw new BusinessException(
               "Access denied: Only ADMIN, OWNER or HR department members can manage invites",
               UserErrorCode.USER_NOT_ACTIVE

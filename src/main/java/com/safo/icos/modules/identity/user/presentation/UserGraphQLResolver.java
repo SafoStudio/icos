@@ -1,13 +1,14 @@
 package com.safo.icos.modules.identity.user.presentation;
 
+import com.safo.icos.modules.identity.user.api.dto.UserDto;
 import com.safo.icos.modules.identity.user.application.UserService;
 import com.safo.icos.modules.identity.user.application.dto.ProfileResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.ProfileUpdateDto;
 import com.safo.icos.modules.identity.user.application.dto.UserResponseDto;
 import com.safo.icos.modules.identity.user.application.dto.UserUpdateDto;
+import com.safo.icos.modules.org.application.DepartmentService;
 import com.safo.icos.modules.org.application.dto.DepartmentDto;
 import com.safo.icos.security.context.IcosUserPrincipal;
-import com.safo.icos.modules.org.application.DepartmentService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -60,10 +61,16 @@ public class UserGraphQLResolver {
   }
 
   @SchemaMapping(typeName = "User", field = "department")
-  public DepartmentDto getDepartment(UserResponseDto user) {
-    if (user.getDepartmentId() == null) {
+  public DepartmentDto getDepartment(Object source) {
+    UUID departmentId = null;
+    if (source instanceof UserResponseDto userResponse) {
+      departmentId = userResponse.getDepartmentId();
+    } else if (source instanceof UserDto userDto) {
+      departmentId = userDto.getDepartmentId();
+    }
+    if (departmentId == null) {
       return null;
     }
-    return departmentService.getDepartment(user.getDepartmentId());
+    return departmentService.getDepartment(departmentId);
   }
 }
