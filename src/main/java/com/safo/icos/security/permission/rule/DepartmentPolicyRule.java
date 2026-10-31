@@ -6,8 +6,8 @@ import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
 
 /**
- * Policy rule for department-related actions ({@code department:*}.
- * Grants full access to OWNER role, abstains for all others.
+ * Policy rule for department-related actions ({@code department:*}).
+ * Grants full access to OWNER role and users with granted authorities.
  */
 @Component
 public class DepartmentPolicyRule implements PolicyRule {
@@ -21,6 +21,9 @@ public class DepartmentPolicyRule implements PolicyRule {
   public PolicyResult check(IcosUserPrincipal user, String action, Object resource) {
     if ("OWNER".equals(user.getRoleName())) {
       return PolicyResult.allow("Owner has full access to departments");
+    }
+    if (user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(action))) {
+      return PolicyResult.allow("User has explicit permission: " + action);
     }
     return PolicyResult.abstain();
   }

@@ -24,8 +24,7 @@ public class InvitePolicyRule implements PolicyRule {
       return PolicyResult.allow("Admin/Owner has full access to invitations");
     }
 
-    if (user.getDepartmentName() != null
-            && user.getDepartmentName().equalsIgnoreCase("HR")) {
+    if (SecurityRuleUtils.isHrUser(user.getRoleName(), user.getDepartmentName())) {
       return PolicyResult.allow("HR department members can manage invitations");
     }
 

@@ -21,17 +21,13 @@ public class UserManagementPolicyRule implements PolicyRule {
       return PolicyResult.allow("Owner/Admin has full access to user management");
     }
 
-    if (isHrDepartment(user.getDepartmentName())) {
+    if (SecurityRuleUtils.isHrUser(user.getRoleName(), user.getDepartmentName())) {
       return PolicyResult.allow("HR department can manage users");
     }
 
     log.warn("User {} with role {} and department {} tried to manage users",
             user.getEmail(), user.getRoleName(), user.getDepartmentName());
     return PolicyResult.deny("Only HR, Owner, or Admin can manage user roles and departments");
-  }
-
-  private boolean isHrDepartment(String departmentName) {
-    return departmentName != null && departmentName.toUpperCase().contains("HR");
   }
 
   @Override

@@ -26,7 +26,7 @@ public class OnboardingPolicyRule implements PolicyRule {
       return PolicyResult.allow("Admin/Owner has full access to onboarding pipeline");
     }
 
-    if (isHr(user)) {
+    if (SecurityRuleUtils.isHrUser(user.getRoleName(), user.getDepartmentName())) {
       return PolicyResult.allow("HR department members can manage onboarding pipeline");
     }
 
@@ -35,14 +35,6 @@ public class OnboardingPolicyRule implements PolicyRule {
     }
 
     return PolicyResult.deny("Only ADMIN, OWNER, or HR department members can access onboarding pipeline");
-  }
-
-  private boolean isHr(IcosUserPrincipal user) {
-    if ("HR".equalsIgnoreCase(user.getRoleName())) {
-      return true;
-    }
-    return user.getDepartmentName() != null
-            && user.getDepartmentName().toUpperCase().contains("HR");
   }
 
   @Override

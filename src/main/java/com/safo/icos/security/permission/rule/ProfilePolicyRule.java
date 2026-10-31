@@ -45,16 +45,11 @@ public class ProfilePolicyRule implements PolicyRule {
     }
 
     // HR department head
-    if ("HEAD".equals(user.getRoleName()) && isHrDepartment(user.getDepartmentName())) {
+    if ("HEAD".equals(user.getRoleName()) && SecurityRuleUtils.isHrDepartment(user.getDepartmentName())) {
       return PolicyResult.allow("HR Head can edit employee profiles");
     }
 
     return PolicyResult.deny("No permission to edit this profile");
-  }
-
-  private boolean isHrDepartment(String deptName) {
-    return deptName != null
-            && (deptName.equalsIgnoreCase("HR") || deptName.toUpperCase().contains("HR"));
   }
 
   @Override

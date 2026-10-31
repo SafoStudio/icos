@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
  * Policy rule for custom field schema definitions and field values ({@code customfield:*}).
  * <p>
  * - {@code customfield:read}: Allowed for any authenticated user in the workspace to power dynamic forms.
- * - {@code customfield:manage}: Allowed for ADMIN, OWNER, HR department members, or users with explicit manage authority.
+ * - {@code customfield:manage}: Allowed for ADMIN, OWNER, HR department members,
+ *   or users with explicit manage authority.
  */
 @Slf4j
 @Component
@@ -45,7 +46,7 @@ public class CustomFieldPolicyRule implements PolicyRule {
         return PolicyResult.allow("Admin/Owner has full access to custom field definitions");
       }
 
-      if (isHrDepartment(user.getDepartmentName())) {
+      if (SecurityRuleUtils.isHrDepartment(user.getDepartmentName())) {
         return PolicyResult.allow("HR department members can manage custom field definitions");
       }
 
@@ -53,10 +54,6 @@ public class CustomFieldPolicyRule implements PolicyRule {
     }
 
     return PolicyResult.abstain();
-  }
-
-  private boolean isHrDepartment(String departmentName) {
-    return departmentName != null && departmentName.toUpperCase().contains("HR");
   }
 
   @Override
