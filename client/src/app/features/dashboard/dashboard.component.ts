@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '@services';
+import { PermissionService } from '@services';
 import { OwnerDashboardComponent } from './components/owner-dashboard/owner-dashboard.component';
 import { HrDashboardComponent } from './components/hr-dashboard/hr-dashboard.component';
 import { MemberDashboardComponent } from './components/member-dashboard/member-dashboard.component';
@@ -18,10 +18,15 @@ import { MemberDashboardComponent } from './components/member-dashboard/member-d
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
 
-  userRole = computed(() => {
-    const user = this.authService.currentUser();
-    return user?.role || 'SPECIALIST';
+  readonly dashboardType = computed<'OWNER' | 'HR' | 'MEMBER'>(() => {
+    if (this.permissionService.isAdmin()) {
+      return 'OWNER';
+    }
+    if (this.permissionService.isHr()) {
+      return 'HR';
+    }
+    return 'MEMBER';
   });
 }

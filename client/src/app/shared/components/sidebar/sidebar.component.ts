@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
-import { AuthService, ThemeService, NotificationService } from '@services';
+import { AuthService, ThemeService, NotificationService, PermissionService } from '@services';
 import { AvatarService } from '@features/profile/avatar/avatar.service';
 import { NotificationBellComponent } from '../notification-center/notification-bell/notification-bell.component';
 
@@ -28,6 +28,7 @@ interface MenuItem {
 export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly avatarService = inject(AvatarService);
   private readonly notificationService = inject(NotificationService);
   readonly themeService = inject(ThemeService);
@@ -64,7 +65,7 @@ export class SidebarComponent {
 
   hasAvatar = computed(() => !!this.userAvatarUrl());
 
-  menuItems: MenuItem[] = [
+  readonly allMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'tablerDashboard', route: '/dashboard' },
     { label: 'Calendar', icon: 'tablerCalendarClock', route: '/calendar' },
     { label: 'Time Off', icon: 'tablerCalendarEvent', route: '/timeoff' },
@@ -75,6 +76,13 @@ export class SidebarComponent {
     { label: 'Organization', icon: 'tablerBuildingCommunity', route: '/organization' },
     { label: 'Settings', icon: 'tablerSettings', route: '/settings' },
   ];
+
+  /**
+   * Filtered list of menu items dynamically based on the current user's role and department.
+   */
+  readonly menuItems = computed(() => {
+    return this.allMenuItems.filter(item => this.permissionService.canAccessRoute(item.route));
+  });
 
   toggleSidebar(): void {
     this.isCollapsedSignal.set(!this.isCollapsed());

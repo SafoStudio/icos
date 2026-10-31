@@ -12,7 +12,7 @@ import { ProfileComponent } from './features/profile/profile.component';
 import { SettingsComponent } from './features/settings/settings.component';
 import { PerformanceComponent } from './features/performance/performance.component';
 import { TimeoffComponent } from './features/timeoff/timeoff.component';
-import { authGuard, publicGuard } from './core/guards/auth.guard';
+import { authGuard, publicGuard, permissionGuard } from './core/guards/auth.guard';
 
 import { TaskBoardComponent } from './features/tasks/task-board.component';
 import { CalendarComponent } from './features/calendar/calendar.component';
@@ -30,13 +30,13 @@ export const routes: Routes = [
   { path: 'timeoff', component: TimeoffComponent, canActivate: [authGuard] },
   { path: 'performance', component: PerformanceComponent, canActivate: [authGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard, permissionGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
   { path: 'members/:id', component: MemberProfileComponent, canActivate: [authGuard] },
   {
     path: 'talent',
     component: TalentComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard],
     children: [
       { path: '', redirectTo: 'recruitment', pathMatch: 'full' },
       { path: 'recruitment', component: RecruitmentBoardComponent },
@@ -53,7 +53,7 @@ export const routes: Routes = [
   {
     path: 'organization',
     component: OrganizationComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard],
     children: [
       { path: '', redirectTo: 'departments', pathMatch: 'full' },
       { path: 'departments', component: DepartmentsComponent },
@@ -64,4 +64,3 @@ export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
 ];
-

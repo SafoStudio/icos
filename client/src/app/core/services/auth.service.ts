@@ -44,7 +44,11 @@ export class AuthService {
   private loadSession(): void {
     const savedUser = localStorage.getItem('current_user');
     if (savedUser) {
-      this.currentUser.set(JSON.parse(savedUser));
+      try {
+        this.currentUser.set(JSON.parse(savedUser));
+      } catch (e) {
+        localStorage.removeItem('current_user');
+      }
     }
   }
 
@@ -81,6 +85,11 @@ export class AuthService {
             companyId
             role
             departmentId
+            department {
+              id
+              name
+              description
+            }
             permissions
             profile {
               avatarPath
@@ -114,6 +123,11 @@ export class AuthService {
             companyId
             role
             departmentId
+            department {
+              id
+              name
+              description
+            }
             permissions
             profile {
               avatarPath
@@ -172,7 +186,12 @@ export class AuthService {
       return this.refreshToken().pipe(
         tap({
           next: () => {
-            this.currentUser.set(JSON.parse(savedUser));
+            try {
+              this.currentUser.set(JSON.parse(savedUser));
+            } catch (e) {
+              this.clearSession();
+            }
+            this.refreshUser();
           },
           error: () => {
             this.clearSession();
@@ -202,6 +221,11 @@ export class AuthService {
           role
           companyId
           departmentId
+          department {
+            id
+            name
+            description
+          }
           permissions
           profile {
             avatarPath
