@@ -21,12 +21,12 @@ class EmailChangePolicyRuleTest {
   }
 
   @Test
-  void shouldAllowAdmin() {
+  void shouldDenyAdmin() {
     IcosUserPrincipal admin = principalWithRole("ADMIN");
 
     PolicyResult result = rule.check(admin, "email:change", null);
 
-    assertThat(result.effect()).isEqualTo(PolicyResult.Effect.ALLOW);
+    assertThat(result.effect()).isEqualTo(PolicyResult.Effect.DENY);
   }
 
   @Test

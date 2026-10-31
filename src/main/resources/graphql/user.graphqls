@@ -56,6 +56,7 @@ input UserCreateInput {
 input UserUpdateInput {
     firstName: String
     lastName: String
+    email: String
     role: String
     departmentId: ID
 }
@@ -66,4 +67,3 @@ input ProfileUpdateInput {
     hireDate: Date
     birthDate: Date
 }
-

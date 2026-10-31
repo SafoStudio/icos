@@ -62,7 +62,7 @@
     </div>
 
     <app-tabs
-      [tabs]="tabs"
+      [tabs]="tabs()"
       [activeTabId]="activeTabId()"
       (tabChange)="activeTabId.set($event)"
     >
@@ -110,14 +110,36 @@
                 </div>
 
                 <div class="form-group">
-                  <label for="email-input">Email Address</label>
-                  <input
-                    id="email-input"
-                    type="email"
-                    [value]="member()?.email"
-                    disabled
-                    class="disabled-input"
-                  />
+                  <label for="email-input">
+                    Email Address
+                    @if (isOwner()) {
+                      <span style="color: #6366f1; font-size: 0.75rem; margin-left: 6px; font-weight: normal;">(Owner editable)</span>
+                    }
+                  </label>
+                  @if (isOwner()) {
+                    <input
+                      id="email-input"
+                      type="email"
+                      [(ngModel)]="editUser.email"
+                      name="email"
+                      placeholder="Email Address"
+                      required
+                    />
+                    <small style="color: #94a3b8; font-size: 0.75rem; display: block; margin-top: 4px;">
+                      Email is the primary login identifier in the system.
+                    </small>
+                  } @else {
+                    <input
+                      id="email-input"
+                      type="email"
+                      [value]="member()?.email"
+                      disabled
+                      class="disabled-input"
+                    />
+                    <small style="color: #94a3b8; font-size: 0.75rem; display: block; margin-top: 4px;">
+                      Only the workspace Owner can change email addresses.
+                    </small>
+                  }
                 </div>
 
                 <div class="form-group">

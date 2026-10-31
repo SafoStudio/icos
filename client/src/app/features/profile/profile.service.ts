@@ -14,6 +14,7 @@ export interface ProfileUpdateInput {
 export interface UserUpdateInput {
   firstName?: string;
   lastName?: string;
+  email?: string;
   role?: string;
   departmentId?: string;
 }

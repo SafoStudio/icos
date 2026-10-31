@@ -6,7 +6,8 @@ import com.safo.icos.security.permission.PolicyRule;
 import org.springframework.stereotype.Component;
 
 /**
- * Policy rule that grants full access to users with the ADMIN role.
+ * Policy rule that grants full access to users with the ADMIN role,
+ * except for actions strictly restricted to OWNER (such as email:change).
  * Runs first (highest priority).
  */
 @Component
@@ -14,7 +15,7 @@ public class AdminPolicyRule implements PolicyRule {
 
   @Override
   public boolean supports(String action) {
-    return true; // Admin can do anything
+    return !"email:change".equals(action);
   }
 
   @Override

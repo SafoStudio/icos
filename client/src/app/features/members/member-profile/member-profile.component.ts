@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService, ProfileUpdateInput, UserUpdateInput } from '../../profile/profile.service';
 import { DepartmentsService } from '../../org/departments/departments.service';
-import { AuthService, ToastService, CustomFieldsService } from '@services';
+import { AuthService, ToastService, CustomFieldsService, PermissionService, isHrDepartment } from '@services';
 import { type User, type UserProfile, type Department, getRoleLabel, ALL_ROLES, ROLES, type UserRole, CustomFieldValueInput, CustomFieldValue } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { TabsComponent, type TabItem, CustomFieldsFormComponent } from '@components';
@@ -26,6 +26,7 @@ export class MemberProfileComponent implements OnInit {
   private readonly profileService = inject(ProfileService);
   private readonly departmentsService = inject(DepartmentsService);
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly toastService = inject(ToastService);
   private readonly customFieldsService = inject(CustomFieldsService);
 
@@ -42,13 +43,24 @@ export class MemberProfileComponent implements OnInit {
 
   readonly rolesList = ALL_ROLES;
 
-  readonly tabs: TabItem[] = [
+  readonly allTabs: TabItem[] = [
     { id: 'personal', label: 'Personal & Work Info', icon: 'tablerUser' },
     { id: 'hr_management', label: 'Actions & Roles', icon: 'tablerBuilding' },
     { id: 'compensation', label: 'Compensation', icon: 'tablerCoin' },
     { id: 'performance', label: 'Performance', icon: 'tablerChartBar' },
     { id: 'documents', label: 'Documents', icon: 'tablerFile' }
   ];
+
+  readonly tabs = computed(() => {
+    return this.allTabs.filter(tab => {
+      if (tab.id === 'hr_management') {
+        return this.canManage();
+      }
+      return true;
+    });
+  });
+
+  readonly isOwner = computed(() => this.permissionService.isOwner());
 
   readonly backButtonText = computed(() => {
     const url = this.returnUrl();
@@ -67,12 +79,12 @@ export class MemberProfileComponent implements OnInit {
   });
 
   readonly canManage = computed(() => {
+    if (this.permissionService.isHr()) return true;
     const currentUser = this.authService.currentUser();
     if (!currentUser) return false;
-    if (currentUser.role === ROLES.ADMIN || currentUser.role === ROLES.OWNER) return true;
 
     const hrDept = this.departments().find((d: Department) => d.id === currentUser.departmentId);
-    return hrDept?.name?.toUpperCase() === 'HR';
+    return isHrDepartment(hrDept?.name);
   });
 
   readonly fullName = computed(() => {
@@ -183,6 +195,7 @@ export class MemberProfileComponent implements OnInit {
     this.editUser = {
       firstName: m.firstName,
       lastName: m.lastName,
+      email: m.email,
       role: m.role,
       departmentId: m.departmentId || ''
     };
@@ -217,6 +230,10 @@ export class MemberProfileComponent implements OnInit {
     }
     if (this.editUser.lastName && this.editUser.lastName !== m.lastName) {
       userUpdate.lastName = this.editUser.lastName;
+    }
+    // Only workspace Owner is allowed to change email address
+    if (this.isOwner() && this.editUser.email && this.editUser.email.trim().toLowerCase() !== m.email.toLowerCase()) {
+      userUpdate.email = this.editUser.email.trim().toLowerCase();
     }
     if (this.editUser.role && this.editUser.role !== m.role) {
       userUpdate.role = this.editUser.role;

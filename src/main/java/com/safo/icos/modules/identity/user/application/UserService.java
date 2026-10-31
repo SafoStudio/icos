@@ -1,5 +1,7 @@
 package com.safo.icos.modules.identity.user.application;
 
+import com.safo.icos.common.exception.BusinessException;
+import com.safo.icos.modules.identity.user.api.constant.UserErrorCode;
 import com.safo.icos.modules.identity.user.api.dto.MembershipDto;
 import com.safo.icos.modules.identity.user.api.dto.UserCreateDto;
 import com.safo.icos.modules.identity.user.api.dto.UserDto;
@@ -21,16 +23,20 @@ import com.safo.icos.modules.identity.user.infrastructure.repository.entity.Perm
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserDocumentJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.UserProfileJpaEntity;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserDocumentJpaRepository;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.UserProfileJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentPermissionJpaRepository;
+import com.safo.icos.security.context.IcosUserPrincipal;
+import com.safo.icos.security.permission.PermissionsService;
 import com.safo.icos.security.permission.RequirePermission;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +48,12 @@ public class UserService {
   private final UserRepository userRepository;
   private final MembershipRepository membershipRepository;
   private final RoleJpaRepository roleJpaRepository;
+  private final PermissionJpaRepository permissionJpaRepository;
+  private final DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
   private final UserProfileJpaRepository profileRepository;
   private final UserDocumentJpaRepository documentRepository;
   private final UserDomainService userDomainService;
+  private final PermissionsService permissionsService;
 
   public UserDto createUserFromAuth(UserCreateDto data) {
     User user = userDomainService.createUser(
@@ -138,6 +147,24 @@ public class UserService {
       user.updateName(user.getFirstName(), input.getLastName());
     }
 
+    // Email change is strictly restricted: only OWNER can change emails under email:change policy rule
+    if (input.getEmail() != null && !input.getEmail().isBlank()) {
+      String newEmailStr = input.getEmail().trim().toLowerCase();
+      if (!newEmailStr.equalsIgnoreCase(user.getEmail().value())) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof IcosUserPrincipal principal)) {
+          throw new AccessDeniedException("Authentication required to change email");
+        }
+        permissionsService.assertCan(principal, "email:change", user);
+
+        Email newEmail = Email.of(newEmailStr);
+        if (userRepository.existsByEmail(newEmail)) {
+          throw new BusinessException("User with email " + newEmailStr + " already exists", UserErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        user.changeEmail(newEmail);
+      }
+    }
+
     if (input.getRole() != null || input.getDepartmentId() != null) {
       membershipRepository.findFirstByUserIdAndActiveTrue(userId).ifPresent(membership -> {
         boolean updated = false;
@@ -166,10 +193,18 @@ public class UserService {
     UserProfileJpaEntity profile = profileRepository.findById(userId)
             .orElse(UserProfileJpaEntity.builder().userId(userId).build());
 
-    if (input.getPhoneNumber() != null) profile.setPhoneNumber(input.getPhoneNumber());
-    if (input.getAddress() != null) profile.setAddress(input.getAddress());
-    if (input.getHireDate() != null) profile.setHireDate(input.getHireDate());
-    if (input.getBirthDate() != null) profile.setBirthDate(input.getBirthDate());
+    if (input.getPhoneNumber() != null) {
+      profile.setPhoneNumber(input.getPhoneNumber());
+    }
+    if (input.getAddress() != null) {
+      profile.setAddress(input.getAddress());
+    }
+    if (input.getHireDate() != null) {
+      profile.setHireDate(input.getHireDate());
+    }
+    if (input.getBirthDate() != null) {
+      profile.setBirthDate(input.getBirthDate());
+    }
 
     UserProfileJpaEntity saved = profileRepository.save(profile);
     return toProfileResponseDto(saved);
@@ -281,12 +316,20 @@ public class UserService {
 
     UUID departmentId = membershipOpt.map(Membership::getDepartmentId).orElse(null);
 
-    List<String> permissions = membershipOpt.map(m -> roleJpaRepository.findById(m.getRoleId())
-                    .map(role -> role.getPermissions().stream()
-                            .map(PermissionJpaEntity::getName)
-                            .toList())
-                    .orElse(List.of()))
-            .orElse(List.of());
+    List<String> permissions;
+    if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
+      permissions = permissionJpaRepository.findAll().stream()
+              .map(PermissionJpaEntity::getName)
+              .toList();
+    } else if (departmentId != null) {
+      permissions = departmentPermissionJpaRepository
+              .findByDepartmentIdAndRoleName(departmentId, roleName)
+              .stream()
+              .map(dp -> dp.getPermission().getName())
+              .toList();
+    } else {
+      permissions = List.of();
+    }
 
     UUID companyId = membershipOpt.map(Membership::getCompanyId).orElse(null);
 

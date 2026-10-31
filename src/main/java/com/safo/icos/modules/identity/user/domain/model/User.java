@@ -10,8 +10,8 @@ import lombok.Getter;
 
 /**
  * Domain entity representing a registered user.
- * Supports status transitions ({@link #activate}, {@link #suspend}, {@link #terminate})
- * and name updates.
+ * Supports status transitions ({@link #activate}, {@link #suspend}, {@link #terminate}),
+ * name updates, and email updates.
  */
 @Getter
 @Builder
@@ -19,7 +19,7 @@ public class User {
   private final UUID id;
   private String firstName;
   private String lastName;
-  private final Email email;
+  private Email email;
   private final UUID createdBy;
   private final LocalDateTime createdAt;
   private UserStatus status;
@@ -51,6 +51,15 @@ public class User {
   public void updateName(String firstName, String lastName) {
     this.firstName = firstName;
     this.lastName = lastName;
+    this.updatedAt = LocalDateTime.now();
+  }
+
+  /**
+   * Updates the user's email address.
+   * Only the workspace Owner can perform this action under security rules.
+   */
+  public void changeEmail(Email newEmail) {
+    this.email = newEmail;
     this.updatedAt = LocalDateTime.now();
   }
 
