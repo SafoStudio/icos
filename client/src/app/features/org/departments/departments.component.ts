@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EditableTableComponent, TableColumn } from '@shared/components/editable-table/editable-table.component';
 import { DepartmentsService } from './departments.service';
-import { AuthService,ToastService } from '@services';
+import { AuthService, ToastService, PermissionService } from '@services';
 import { type Department } from '@models';
 
 @Component({
@@ -15,6 +15,7 @@ import { type Department } from '@models';
 })
 export class DepartmentsComponent {
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly departmentsService = inject(DepartmentsService);
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
@@ -22,6 +23,10 @@ export class DepartmentsComponent {
   readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
   readonly departments = signal<Department[]>([]);
   readonly loading = signal<boolean>(false);
+
+  readonly canEdit = computed(() => {
+    return this.permissionService.isAdmin() || this.permissionService.hasPermission('department:manage');
+  });
 
   readonly columns: TableColumn[] = [
     { key: 'name', label: 'Name', required: true },

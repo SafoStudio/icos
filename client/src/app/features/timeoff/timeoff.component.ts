@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgIconComponent } from '@ng-icons/core';
 import { forkJoin } from 'rxjs';
-import { TimeoffService, ToastService, AuthService } from '@services';
-import { LeaveType, LeaveBalance, LeaveRequest, ROLES } from '@models';
+import { TimeoffService, ToastService, AuthService, PermissionService } from '@services';
+import { LeaveType, LeaveBalance, LeaveRequest } from '@models';
 
 @Component({
   selector: 'app-timeoff',
@@ -17,6 +17,7 @@ export class TimeoffComponent implements OnInit {
   private readonly timeoffService = inject(TimeoffService);
   private readonly toastService = inject(ToastService);
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
 
   readonly currentUser = computed(() => this.authService.currentUser());
   readonly loading = signal<boolean>(true);
@@ -36,9 +37,7 @@ export class TimeoffComponent implements OnInit {
   calculatedDays = signal<number>(0);
 
   readonly canManage = computed(() => {
-    const user = this.currentUser();
-    if (!user) return false;
-    return user.role === ROLES.ADMIN || user.role === ROLES.OWNER || user.role === ROLES.HEAD;
+    return this.permissionService.isManager() || this.permissionService.isHr();
   });
 
   ngOnInit(): void {

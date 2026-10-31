@@ -6,7 +6,9 @@
         @for (col of columns; track col.key) {
         <th>{{ col.label }}</th>
         }
+        @if (!readOnly) {
         <th class="actions-column"></th>
+        }
       </tr>
       </thead>
 
@@ -39,12 +41,13 @@
         </td>
         }
 
+        @if (!readOnly) {
         <td
-        class="actions-cell"
-        (click)="$event.stopPropagation()"
-        (keydown)="$event.stopPropagation()"
-        tabindex="-1"
-      >
+          class="actions-cell"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+          tabindex="-1"
+        >
           @if (editingIndex() === rowIndex) {
           <div class="edit-actions">
             <button class="btn-save" (click)="saveRow(rowIndex)" title="Save">
@@ -81,12 +84,13 @@
           </div>
           }
         </td>
+        }
       </tr>
       }
 
       @if (isEmpty() && !loading) {
       <tr class="empty-row">
-        <td [attr.colspan]="columns.length + 1" class="empty-message">
+        <td [attr.colspan]="columns.length + (readOnly ? 0 : 1)" class="empty-message">
           No {{ title.toLowerCase() }} found. Click "Create" to add one.
         </td>
       </tr>
@@ -94,7 +98,7 @@
 
       @if (loading) {
       <tr class="loading-row">
-        <td [attr.colspan]="columns.length + 1">
+        <td [attr.colspan]="columns.length + (readOnly ? 0 : 1)">
           <div class="spinner">Loading...</div>
         </td>
       </tr>

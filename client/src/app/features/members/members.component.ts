@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal, computed, effect } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService, ToastService } from '@services';
+import { AuthService, ToastService, PermissionService, isHrDepartment } from '@services';
 import { NgIconComponent } from '@ng-icons/core';
 import { PaginationComponent } from '@components';
 import { MemberInviteComponent } from './member-invite/member-invite.component';
@@ -29,6 +29,7 @@ export type SortOption = 'name-asc' | 'name-desc' | 'role' | 'dept';
 })
 export class MembersComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly memberService = inject(MemberService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
@@ -100,19 +101,17 @@ export class MembersComponent implements OnInit {
   }
 
   canInvite = computed(() => {
-    const user = this.authService.currentUser();
-    if (!user) return false;
-    if (user.role === 'ADMIN' || user.role === 'OWNER') return true;
-    const userDept = this.departments().find(d => d.id === user.departmentId);
-    return userDept?.name?.toUpperCase() === 'HR';
+    return this.permissionService.isHr() || this.permissionService.hasPermission('invite:manage');
   });
 
   availableRoles = computed(() => {
-    const user = this.authService.currentUser();
-    if (user?.role === 'ADMIN' || user?.role === 'OWNER') {
+    if (this.permissionService.isOwner()) {
       return ALL_ROLES;
     }
-    return [ROLES.OWNER, ROLES.HEAD, ROLES.SPECIALIST];
+    if (this.permissionService.isAdmin()) {
+      return [ROLES.ADMIN, ROLES.HEAD, ROLES.SPECIALIST];
+    }
+    return [ROLES.HEAD, ROLES.SPECIALIST];
   });
 
   filteredMembers = computed(() => {
@@ -130,7 +129,6 @@ export class MembersComponent implements OnInit {
 
   totalCount = computed(() => this.members().length);
   activeCount = computed(() => this.members().filter(m => m.status === 'ACTIVE' || !m.status).length);
-
 
   ngOnInit(): void {
     this.loadData();
@@ -246,7 +244,6 @@ export class MembersComponent implements OnInit {
     this.currentPage.set(1);
   }
 
-
   navigateToProfile(memberId: string): void {
     this.router.navigate(['/members', memberId], {
       queryParams: { returnUrl: '/members' }
@@ -306,7 +303,7 @@ export class MembersComponent implements OnInit {
       if (member.profile.avatarPath.startsWith('http')) {
         return member.profile.avatarPath;
       }
-       return `/api/storage/avatar/${member.id}`;
+      return `/api/storage/avatar/${member.id}`;
     }
     return null;
   }

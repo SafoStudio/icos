@@ -1,10 +1,9 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '@services';
+import { AuthService, PermissionService } from '@services';
 import { MemberService, Member } from '../members/member.service';
 import { PerformanceTabComponent } from './performance-tab/performance-tab.component';
-import { ROLES } from '@models';
 
 @Component({
   selector: 'app-performance',
@@ -15,6 +14,7 @@ import { ROLES } from '@models';
 })
 export class PerformanceComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly memberService = inject(MemberService);
 
   readonly currentUser = computed(() => this.authService.currentUser());
@@ -22,9 +22,7 @@ export class PerformanceComponent implements OnInit {
   readonly members = signal<Member[]>([]);
 
   readonly canManage = computed(() => {
-    const user = this.currentUser();
-    if (!user) return false;
-    return user.role === ROLES.ADMIN || user.role === ROLES.OWNER || user.role === ROLES.HEAD;
+    return this.permissionService.isManager() || this.permissionService.isHr();
   });
 
   ngOnInit(): void {

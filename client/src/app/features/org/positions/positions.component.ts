@@ -2,7 +2,7 @@ import { Component, inject, computed, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EditableTableComponent, type TableColumn } from '@components';
 import { PositionsService } from './positions.service';
-import { AuthService, ToastService} from '@services';
+import { AuthService, ToastService, PermissionService } from '@services';
 import { type Position } from '@models';
 
 @Component({
@@ -14,12 +14,17 @@ import { type Position } from '@models';
 })
 export class PositionsComponent {
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly positionsService = inject(PositionsService);
   private readonly toastService = inject(ToastService);
 
   readonly companyId = computed(() => this.authService.currentUser()?.companyId || null);
   readonly positions = signal<Position[]>([]);
   readonly loading = signal<boolean>(false);
+
+  readonly canEdit = computed(() => {
+    return this.permissionService.isAdmin() || this.permissionService.hasPermission('position:manage');
+  });
 
   readonly columns: TableColumn[] = [
     { key: 'name', label: 'Name', required: true },

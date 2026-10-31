@@ -2,8 +2,8 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DepartmentsService } from '../departments.service';
-import { AuthService,ToastService } from '@services';
-import { type Department, type Permission, type DepartmentMember,type UserRole, ROLES } from '@models';
+import { AuthService, ToastService, PermissionService } from '@services';
+import { type Department, type Permission, type DepartmentMember, type UserRole, ROLES } from '@models';
 import { NgIconComponent } from '@ng-icons/core';
 import { DepartmentPermissionsComponent } from './components/department-permissions/department-permissions.component';
 import { DepartmentMembersComponent } from './components/department-members/department-members.component';
@@ -20,6 +20,7 @@ export class DepartmentDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly departmentsService = inject(DepartmentsService);
   private readonly authService = inject(AuthService);
+  private readonly permissionService = inject(PermissionService);
   private readonly toastService = inject(ToastService);
 
   departmentId = signal<string | null>(null);
@@ -31,9 +32,8 @@ export class DepartmentDetailComponent implements OnInit {
   specialistPermissions = signal<Permission[]>([]);
   saving = signal(false);
 
-  canEdit = computed(() => {
-    const user = this.authService.currentUser();
-    return user?.role === ROLES.OWNER || user?.role === ROLES.ADMIN;
+  readonly canEdit = computed(() => {
+    return this.permissionService.isAdmin() || this.permissionService.hasPermission('department:manage');
   });
 
   ngOnInit() {

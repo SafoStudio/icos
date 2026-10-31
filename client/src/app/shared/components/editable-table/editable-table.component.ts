@@ -29,6 +29,7 @@ export class EditableTableComponent implements OnInit {
   @Input() columns: TableColumn[] = [];
   @Input() data: any[] = [];
   @Input() loading: boolean = false;
+  @Input() readOnly: boolean = false;
   @Output() addItem = new EventEmitter<any>();
   @Output() updateItem = new EventEmitter<{ index: number; item: any }>();
   @Output() deleteItem = new EventEmitter<number>();

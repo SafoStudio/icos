@@ -5,6 +5,7 @@
   [columns]="columns"
   [data]="positions()"
   [loading]="loading()"
+  [readOnly]="!canEdit()"
   (addItem)="onAddPosition($event)"
   (updateItem)="onUpdatePosition($event)"
   (deleteItem)="onDeletePosition($event)"></app-editable-table>

@@ -5,6 +5,7 @@
   [columns]="columns"
   [data]="departments()"
   [loading]="loading()"
+  [readOnly]="!canEdit()"
   (addItem)="onAddDepartment($event)"
   (updateItem)="onUpdateDepartment($event)"
   (deleteItem)="onDeleteDepartment($event)"
