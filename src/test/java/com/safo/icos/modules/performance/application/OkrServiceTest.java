@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,39 +39,53 @@ class OkrServiceTest {
 
   @Test
   void shouldCreateObjective() {
-    when(objectiveRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(objectiveRepository.save(any(Objective.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
 
     Objective result = okrService.createObjective(USER_ID, "Grow revenue", "Increase by 20%",
             LocalDate.now(), LocalDate.now().plusMonths(3));
 
     assertThat(result.getTitle()).isEqualTo("Grow revenue");
     assertThat(result.getProgress()).isEqualByComparingTo("0");
-    verify(objectiveRepository).save(any());
+
+    verify(objectiveRepository).save(any(Objective.class));
   }
 
   @Test
   void shouldAddKeyResultAndRecalculateProgress() {
-    Objective objective = Objective.create(USER_ID, "Goal", "Desc", LocalDate.now(), LocalDate.now().plusMonths(3));
-    KeyResult kr = KeyResult.create(OBJECTIVE_ID, "KR1", BigDecimal.valueOf(100), "%", BigDecimal.ONE);
+    Objective objective = Objective.create(USER_ID, "Goal", "Desc",
+            LocalDate.now(), LocalDate.now().plusMonths(3));
+    KeyResult kr = KeyResult.create(OBJECTIVE_ID, "KR1",
+            BigDecimal.valueOf(100), "%", BigDecimal.ONE);
 
     when(objectiveRepository.findById(OBJECTIVE_ID)).thenReturn(Optional.of(objective));
-    when(keyResultRepository.save(any())).thenReturn(kr);
+    when(keyResultRepository.save(any(KeyResult.class))).thenReturn(kr);
     when(keyResultRepository.findByObjectiveId(OBJECTIVE_ID)).thenReturn(List.of(kr));
-    when(objectiveRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(objectiveRepository.save(any(Objective.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
 
-    KeyResult result = okrService.addKeyResult(OBJECTIVE_ID, "KR1", BigDecimal.valueOf(100), "%", BigDecimal.ONE);
+    KeyResult result = okrService.addKeyResult(
+            OBJECTIVE_ID, "KR1", BigDecimal.valueOf(100), "%", BigDecimal.ONE);
 
     assertThat(result.getTitle()).isEqualTo("KR1");
-    verify(objectiveRepository).findById(OBJECTIVE_ID);
+    assertThat(result.getObjectiveId()).isEqualTo(OBJECTIVE_ID);
+
+    verify(objectiveRepository, times(2)).findById(OBJECTIVE_ID);
+    verify(keyResultRepository).save(any(KeyResult.class));
+    verify(keyResultRepository).findByObjectiveId(OBJECTIVE_ID);
+    verify(objectiveRepository).save(any(Objective.class));
   }
 
   @Test
   void shouldThrowWhenAddingKeyResultToNonExistentObjective() {
     when(objectiveRepository.findById(OBJECTIVE_ID)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> okrService.addKeyResult(OBJECTIVE_ID, "KR", BigDecimal.ONE, "%", BigDecimal.ONE))
+    assertThatThrownBy(() -> okrService.addKeyResult(
+            OBJECTIVE_ID, "KR", BigDecimal.ONE, "%", BigDecimal.ONE))
             .isInstanceOf(NotFoundException.class)
             .hasMessageContaining("not found");
+
+    verify(keyResultRepository, times(0)).save(any());
   }
 
   @Test
@@ -79,28 +94,50 @@ class OkrServiceTest {
             .id(KR_ID).objectiveId(OBJECTIVE_ID).title("KR1")
             .targetValue(BigDecimal.valueOf(100)).currentValue(BigDecimal.ZERO)
             .unit("%").weight(BigDecimal.ONE).build();
-    Objective objective = Objective.create(USER_ID, "Goal", "Desc", LocalDate.now(), LocalDate.now().plusMonths(3));
+    Objective objective = Objective.create(USER_ID, "Goal", "Desc",
+            LocalDate.now(), LocalDate.now().plusMonths(3));
 
     when(keyResultRepository.findById(KR_ID)).thenReturn(Optional.of(kr));
-    when(keyResultRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(keyResultRepository.save(any(KeyResult.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
     when(objectiveRepository.findById(OBJECTIVE_ID)).thenReturn(Optional.of(objective));
     when(keyResultRepository.findByObjectiveId(OBJECTIVE_ID)).thenReturn(List.of(kr));
-    when(objectiveRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(objectiveRepository.save(any(Objective.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
 
     KeyResult result = okrService.updateKeyResultProgress(KR_ID, BigDecimal.valueOf(50));
 
     assertThat(result.getCurrentValue()).isEqualByComparingTo("50");
+
+    verify(keyResultRepository).findById(KR_ID);
+    verify(keyResultRepository).save(any(KeyResult.class));
+    verify(objectiveRepository).findById(OBJECTIVE_ID);
+  }
+
+  @Test
+  void shouldThrowWhenUpdatingNonExistentKeyResult() {
+    when(keyResultRepository.findById(KR_ID)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> okrService.updateKeyResultProgress(KR_ID, BigDecimal.valueOf(50)))
+            .isInstanceOf(NotFoundException.class)
+            .hasMessageContaining("not found");
+
+    verify(keyResultRepository, times(0)).save(any());
   }
 
   @Test
   void shouldReturnUserObjectives() {
-    Objective obj1 = Objective.create(USER_ID, "Goal 1", "Desc", LocalDate.now(), LocalDate.now().plusMonths(3));
-    Objective obj2 = Objective.create(USER_ID, "Goal 2", "Desc", LocalDate.now(), LocalDate.now().plusMonths(6));
+    Objective obj1 = Objective.create(USER_ID, "Goal 1", "Desc",
+            LocalDate.now(), LocalDate.now().plusMonths(3));
+    Objective obj2 = Objective.create(USER_ID, "Goal 2", "Desc",
+            LocalDate.now(), LocalDate.now().plusMonths(6));
 
     when(objectiveRepository.findByUserId(USER_ID)).thenReturn(List.of(obj1, obj2));
 
     List<Objective> result = okrService.getUserObjectives(USER_ID);
 
     assertThat(result).hasSize(2);
+
+    verify(objectiveRepository).findByUserId(USER_ID);
   }
 }

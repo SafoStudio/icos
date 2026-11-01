@@ -100,7 +100,6 @@ class OnboardingServiceTest {
   void shouldThrowWhenMembershipNotFoundOnStart() {
     LocalDate startDate = LocalDate.now();
 
-    when(processRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
     when(userProvider.findMembershipById(MEMBERSHIP_ID)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> onboardingService.startOnboarding(MEMBERSHIP_ID, TEMPLATE_ID, startDate))

@@ -35,17 +35,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -67,8 +64,6 @@ public class AuthService {
   private Duration refreshTokenTtl;
 
   public AuthResponseDto register(RegisterRequestDto request, String deviceInfo) {
-    log.debug("Registering new user with email: {}", request.getEmail());
-
     if (userProvider.existsByEmail(request.getEmail())) {
       throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
     }
@@ -95,8 +90,6 @@ public class AuthService {
   }
 
   public AuthResponseDto login(LoginRequestDto request, String deviceInfo) {
-    log.debug("Login attempt for email: {}", request.getEmail());
-
     UserDto user = userProvider.findByEmail(request.getEmail())
             .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
     validatePassword(user.getId(), request.getPassword());
@@ -123,8 +116,6 @@ public class AuthService {
   }
 
   public RefreshResponseDto refresh(String refreshTokenValue, String deviceInfo) {
-    log.debug("Refreshing token");
-
     TokenValue tokenHash = TokenValue.fromRaw(refreshTokenValue);
     RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash)
             .orElseThrow(() -> new BusinessException("Invalid refresh token", AuthErrorCode.TOKEN_NOT_FOUND));
@@ -158,8 +149,6 @@ public class AuthService {
   }
 
   public AuthResponseDto registerFromInvite(Invite invite, InviteAcceptDto request, String deviceInfo) {
-    log.debug("Registering user from invite for email: {}", invite.getEmail());
-
     if (userProvider.existsByEmail(invite.getEmail())) {
       throw new UserAlreadyExistsException("User with email " + invite.getEmail() + " already exists");
     }
@@ -192,8 +181,6 @@ public class AuthService {
             .user(userWithCompany)
             .build();
   }
-
-  // ---------- private helper methods ----------
 
   private UserDto createUserFromRequest(RegisterRequestDto request) {
     UserCreateDto createData = UserCreateDto.builder()
@@ -236,41 +223,6 @@ public class AuthService {
             .map(RoleJpaEntity::getId)
             .orElseThrow(() -> new RuntimeException("Role OWNER not found"));
     return userProvider.createMembership(userId, companyId, ownerRoleId, null, null);
-  }
-
-  private UserDto enrichUserWithCompany(UserDto user, MembershipDto membership) {
-    String roleName = roleJpaRepository.findById(membership.getRoleId())
-            .map(RoleJpaEntity::getName)
-            .orElse("");
-
-    Set<String> permissions = new HashSet<>();
-
-    if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
-      permissions = permissionJpaRepository.findAll().stream()
-              .map(PermissionJpaEntity::getName)
-              .collect(Collectors.toSet());
-    }
-    else if (membership.getDepartmentId() != null) {
-      permissions = departmentPermissionJpaRepository
-              .findByDepartmentIdAndRoleName(membership.getDepartmentId(), roleName)
-              .stream()
-              .map(dp -> dp.getPermission().getName())
-              .collect(Collectors.toSet());
-    }
-
-    return UserDto.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .companyId(membership.getCompanyId().toString())
-            .role(roleName)
-            .departmentId(membership.getDepartmentId())
-            .permissions(new ArrayList<>(permissions))
-            .status(user.getStatus())
-            .createdAt(user.getCreatedAt())
-            .updatedAt(user.getUpdatedAt())
-            .build();
   }
 
   private UserDto enrichUserWithCompanyAndProfile(UserDto user, MembershipDto membership) {

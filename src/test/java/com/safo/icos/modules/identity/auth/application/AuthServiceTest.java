@@ -19,6 +19,7 @@ import com.safo.icos.modules.identity.auth.infrastructure.repository.jpa.AuthCre
 import com.safo.icos.modules.identity.invite.application.dto.InviteAcceptDto;
 import com.safo.icos.modules.identity.invite.domain.model.Invite;
 import com.safo.icos.modules.identity.invite.domain.model.enums.InviteStatus;
+import com.safo.icos.modules.identity.invite.domain.repository.InviteRepository;
 import com.safo.icos.modules.org.application.CompanyService;
 import com.safo.icos.modules.org.application.dto.CompanyDto;
 import com.safo.icos.modules.identity.user.api.UserProvider;
@@ -28,6 +29,7 @@ import com.safo.icos.modules.identity.user.infrastructure.repository.entity.Perm
 import com.safo.icos.modules.identity.user.infrastructure.repository.entity.RoleJpaEntity;
 import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.RoleJpaRepository;
 import com.safo.icos.modules.org.domain.model.enums.RoleName;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.safo.icos.modules.identity.user.infrastructure.repository.jpa.PermissionJpaRepository;
+import com.safo.icos.modules.org.infrastructure.repository.jpa.DepartmentPermissionJpaRepository;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -63,6 +67,9 @@ class AuthServiceTest {
   @Mock private AuthCredentialsJpaRepository credentialsRepository;
   @Mock private CompanyService companyService;
   @Mock private RoleJpaRepository roleJpaRepository;
+  @Mock private PermissionJpaRepository permissionJpaRepository;
+  @Mock private DepartmentPermissionJpaRepository departmentPermissionJpaRepository;
+  @Mock private InviteRepository inviteRepository;
 
   @InjectMocks
   private AuthService authService;
@@ -108,6 +115,7 @@ class AuthServiceTest {
             .thenReturn(rtResult);
     when(refreshTokenRepository.save(rtResult.entity())).thenReturn(rtResult.entity());
     when(authTokenProvider.generateAccessToken(USER_ID, COMPANY_ID)).thenReturn(tokens);
+    when(permissionJpaRepository.findAll()).thenReturn(List.of());
 
     AuthResponseDto result = authService.register(request, DEVICE);
 
@@ -159,6 +167,7 @@ class AuthServiceTest {
             .thenReturn(rtResult);
     when(refreshTokenRepository.save(rtResult.entity())).thenReturn(rtResult.entity());
     when(authTokenProvider.generateAccessToken(USER_ID, COMPANY_ID)).thenReturn(tokens);
+    when(permissionJpaRepository.findAll()).thenReturn(List.of());
 
     AuthResponseDto result = authService.login(request, DEVICE);
 
@@ -317,6 +326,10 @@ class AuthServiceTest {
             .thenReturn(rtResult);
     when(refreshTokenRepository.save(rtResult.entity())).thenReturn(rtResult.entity());
     when(authTokenProvider.generateAccessToken(USER_ID, COMPANY_ID)).thenReturn(tokens);
+    when(departmentPermissionJpaRepository
+            .findByDepartmentIdAndRoleName(DEPARTMENT_ID, "SPECIALIST"))
+            .thenReturn(List.of());
+    when(inviteRepository.save(any(Invite.class))).thenAnswer(inv -> inv.getArgument(0));
 
     AuthResponseDto result = authService.registerFromInvite(invite, acceptDto, DEVICE);
 
@@ -329,11 +342,11 @@ class AuthServiceTest {
 
     verify(userProvider).existsByEmail(invite.getEmail());
     verify(userProvider).createUser(any());
-    verify(credentialsRepository).save(any());
     verify(roleJpaRepository).findByName("SPECIALIST");
     verify(authDomainService).createRefreshToken(MEMBERSHIP_ID, DEVICE, REFRESH_TTL);
     verify(refreshTokenRepository).save(any());
     verify(authTokenProvider).generateAccessToken(USER_ID, COMPANY_ID);
+    verify(inviteRepository).save(any(Invite.class));
   }
 
   @Test

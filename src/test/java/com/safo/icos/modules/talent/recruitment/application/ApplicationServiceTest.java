@@ -4,6 +4,8 @@ import com.safo.icos.common.exception.BusinessException;
 import com.safo.icos.modules.talent.recruitment.api.event.CandidateStageChangedEvent;
 import com.safo.icos.modules.talent.recruitment.application.dto.ApplicationDto;
 import com.safo.icos.modules.talent.recruitment.application.dto.KanbanBoardDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.KanbanColumnDto;
+import com.safo.icos.modules.talent.recruitment.application.dto.VacancyStageDto;
 import com.safo.icos.modules.talent.recruitment.domain.model.Application;
 import com.safo.icos.modules.talent.recruitment.domain.model.VacancyStage;
 import com.safo.icos.modules.talent.recruitment.domain.model.enums.ApplicationStatus;
@@ -51,22 +53,29 @@ class ApplicationServiceTest {
 
   @Test
   void shouldCreateApplication() {
-    VacancyStage stage = VacancyStage.create(VACANCY_ID, "Applied",
-            PipelineStageType.APPLIED, 0);
+    VacancyStage stage = VacancyStage.builder()
+            .id(STAGE_ID).vacancyId(VACANCY_ID)
+            .name("Applied").type(PipelineStageType.APPLIED)
+            .orderIndex(0).createdAt(LocalDateTime.now()).build();
     VacancyStageJpaEntity jpaEntity = new VacancyStageJpaEntity();
 
     when(vacancyStageJpaRepository.findByVacancyIdOrderByOrderIndexAsc(VACANCY_ID))
             .thenReturn(List.of(jpaEntity));
     when(mapper.toDomain(jpaEntity)).thenReturn(stage);
-    when(applicationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(applicationRepository.save(any(Application.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
+    when(mapper.toDto(any(Application.class)))
+            .thenAnswer(inv -> toApplicationDto(inv.getArgument(0)));
 
     ApplicationDto result = applicationService.createApplication(CANDIDATE_ID, VACANCY_ID);
 
     assertThat(result.getCandidateId()).isEqualTo(CANDIDATE_ID);
     assertThat(result.getVacancyId()).isEqualTo(VACANCY_ID);
     assertThat(result.getStatus()).isEqualTo(ApplicationStatus.ACTIVE);
+    assertThat(result.getCurrentStageId()).isEqualTo(STAGE_ID);
 
-    verify(applicationRepository).save(any());
+    verify(applicationRepository).save(any(Application.class));
+    verify(mapper).toDto(any(Application.class));
   }
 
   @Test
@@ -87,12 +96,17 @@ class ApplicationServiceTest {
             .status(ApplicationStatus.ACTIVE)
             .createdAt(LocalDateTime.now()).build();
 
-    when(applicationRepository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
+    when(applicationRepository.findById(APPLICATION_ID))
+            .thenReturn(Optional.of(application));
+    when(mapper.toDto(application))
+            .thenAnswer(inv -> toApplicationDto(inv.getArgument(0)));
 
     ApplicationDto result = applicationService.getApplication(APPLICATION_ID);
 
     assertThat(result.getId()).isEqualTo(APPLICATION_ID);
     assertThat(result.getStatus()).isEqualTo(ApplicationStatus.ACTIVE);
+
+    verify(applicationRepository).findById(APPLICATION_ID);
   }
 
   @Test
@@ -113,12 +127,14 @@ class ApplicationServiceTest {
             .createdAt(LocalDateTime.now()).build();
     UUID newStageId = UUID.randomUUID();
 
-    when(applicationRepository.findById(APPLICATION_ID)).thenReturn(Optional.of(application));
-    when(applicationRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    when(applicationRepository.findById(APPLICATION_ID))
+            .thenReturn(Optional.of(application));
+    when(applicationRepository.save(any(Application.class)))
+            .thenAnswer(inv -> inv.getArgument(0));
 
     applicationService.moveToStage(APPLICATION_ID, newStageId);
 
-    verify(applicationRepository).save(any());
+    verify(applicationRepository).save(any(Application.class));
 
     ArgumentCaptor<CandidateStageChangedEvent> captor =
             ArgumentCaptor.forClass(CandidateStageChangedEvent.class);
@@ -137,6 +153,12 @@ class ApplicationServiceTest {
             .id(STAGE_ID).vacancyId(VACANCY_ID)
             .name("Applied").type(PipelineStageType.APPLIED)
             .orderIndex(0).createdAt(LocalDateTime.now()).build();
+    VacancyStageDto stageDto = VacancyStageDto.builder()
+            .id(STAGE_ID)
+            .name("Applied")
+            .type(PipelineStageType.APPLIED.name())
+            .orderIndex(0)
+            .build();
 
     Application application = Application.builder()
             .id(APPLICATION_ID).candidateId(CANDIDATE_ID)
@@ -147,15 +169,31 @@ class ApplicationServiceTest {
     when(vacancyStageJpaRepository.findByVacancyIdOrderByOrderIndexAsc(VACANCY_ID))
             .thenReturn(List.of(jpaEntity));
     when(mapper.toDomain(jpaEntity)).thenReturn(stage);
-    when(applicationRepository.findByVacancyId(VACANCY_ID)).thenReturn(List.of(application));
+    when(mapper.toDto(stage)).thenReturn(stageDto);
+    when(applicationRepository.findByVacancyId(VACANCY_ID))
+            .thenReturn(List.of(application));
+    when(mapper.toDto(any(Application.class)))
+            .thenAnswer(inv -> toApplicationDto(inv.getArgument(0)));
 
     KanbanBoardDto board = applicationService.getKanbanBoard(VACANCY_ID);
 
     assertThat(board.getVacancyId()).isEqualTo(VACANCY_ID);
     assertThat(board.getColumns()).hasSize(1);
-    assertThat(board.getColumns().getFirst().getStage().getName()).isEqualTo("Applied");
-    assertThat(board.getColumns().getFirst().getApplications()).hasSize(1);
-    assertThat(board.getColumns().getFirst().getApplications().getFirst().getId())
-            .isEqualTo(APPLICATION_ID);
+
+    KanbanColumnDto column = board.getColumns().getFirst();
+    assertThat(column.getStage().getName()).isEqualTo("Applied");
+    assertThat(column.getApplications()).hasSize(1);
+    assertThat(column.getApplications().getFirst().getId()).isEqualTo(APPLICATION_ID);
+  }
+
+  private ApplicationDto toApplicationDto(Application app) {
+    return ApplicationDto.builder()
+            .id(app.getId())
+            .candidateId(app.getCandidateId())
+            .vacancyId(app.getVacancyId())
+            .currentStageId(app.getCurrentStageId())
+            .status(app.getStatus())
+            .createdAt(app.getCreatedAt())
+            .build();
   }
 }
