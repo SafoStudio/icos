@@ -109,11 +109,11 @@
 | ![Employee Profile](docs/screenshots/member-profile.png) <br> *(Placeholder: `docs/screenshots/member-profile.png`)* | ![Custom Fields](docs/screenshots/custom-fields.png) <br> *(Placeholder: `docs/screenshots/custom-fields.png`)* |
 | *Detailed profile, salary records, leave balance, and documents* | *Live schema builder for extending data models on the fly* |
 
-### Time-Off, Calendar & Notifications
-| Leave Management & Calendar | Notification Center & Quick Actions |
+### Organisation management, permissions
+| Organization Management | Notification Center & Quick Actions |
 |:---:|:---:|
-| ![Time-off and Calendar](docs/screenshots/calendar-timeoff.png) <br> *(Placeholder: `docs/screenshots/calendar-timeoff.png`)* | ![Notifications](docs/screenshots/notifications.png) <br> *(Placeholder: `docs/screenshots/notifications.png`)* |
-| *Leave requests, PTO balances, and synchronized company event calendar* | *Real-time SSE event alerts and contextual approval requests* |
+| ![Organization Management](docs/screenshots/organization-management.png) <br> *(Placeholder: `docs/screenshots/organization-management.png`)* | ![Notifications](docs/screenshots/notifications.png) <br> *(Placeholder: `docs/screenshots/notifications.png`)* |
+| *Departments, positions, and granular role/permission matrix* | *Real-time SSE event alerts and contextual approval requests* |
 
 </div>
 
