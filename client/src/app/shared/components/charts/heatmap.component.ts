@@ -1,4 +1,4 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TimeOffDay } from '@services';
 
@@ -272,7 +272,7 @@ export class HeatmapComponent {
 
   get uniqueDates(): string[] {
     const dates = Array.from(new Set(this.data.map(d => d.date)));
-    return dates.sort();
+    return dates.sort((a, b) => a.localeCompare(b));
   }
 
   get heatmapRows(): HeatmapRow[] {

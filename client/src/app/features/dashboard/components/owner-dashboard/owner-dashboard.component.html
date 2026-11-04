@@ -1,11 +1,13 @@
 <div class="dashboard-content">
   <!-- Key Metrics Row -->
   <div class="metrics-grid">
-    @for (metric of metrics; track metric.label) {
+    @for (metric of metrics(); track metric.label) {
     <div class="metric-card">
       <div class="metric-label">{{ metric.label }}</div>
       <div class="metric-value">{{ metric.value }}</div>
-      <div class="metric-change" [class.positive]="metric.changeType === 'positive'" [class.negative]="metric.changeType === 'negative'">
+      <div class="metric-change"
+           [class.positive]="metric.changeType === 'positive'"
+           [class.negative]="metric.changeType === 'negative'">
         {{ metric.change }}
       </div>
     </div>
@@ -17,32 +19,32 @@
     <div class="chart-card large">
       <div class="card-header">
         <div class="header-titles">
-          <h3>Headcount Growth & Turnover</h3>
+          <h3>Headcount Growth &amp; Turnover</h3>
           <p class="subtitle">Monthly active headcount, new hires, and departures</p>
         </div>
         <div class="header-controls">
-          <div class="turnover-pill" [class.high-turnover]="currentTurnoverRate > 15">
-            Turnover: <strong>{{ currentTurnoverRate }}%</strong>
+          <div class="turnover-pill" [class.high-turnover]="currentTurnoverRate() > 15">
+            Turnover: <strong>{{ currentTurnoverRate() }}%</strong>
           </div>
           <select
             class="filter-select"
             [ngModel]="selectedDepartmentId"
             (ngModelChange)="onDepartmentChange($event)"
           >
-            @for (dept of departments; track dept.id) {
-              <option [value]="dept.id">{{ dept.name }}</option>
+            @for (dept of departments(); track dept.id) {
+            <option [value]="dept.id">{{ dept.name }}</option>
             }
           </select>
         </div>
       </div>
       <div class="card-body">
-        @if (headcountDatasets.length > 0) {
-          <app-line-chart
-            [labels]="headcountLabels"
-            [datasets]="headcountDatasets"
-            [height]="280"
-            [showLegend]="true"
-          ></app-line-chart>
+        @if (headcountDatasets().length > 0) {
+        <app-line-chart
+          [labels]="headcountLabels()"
+          [datasets]="headcountDatasets()"
+          [height]="280"
+          [showLegend]="true"
+        ></app-line-chart>
         }
       </div>
     </div>
@@ -55,13 +57,13 @@
         </div>
       </div>
       <div class="card-body doughnut-body">
-        @if (deptData.length > 0) {
-          <app-doughnut-chart
-            [labels]="deptLabels"
-            [data]="deptData"
-            [height]="240"
-            cutout="68%"
-          ></app-doughnut-chart>
+        @if (deptData().length > 0) {
+        <app-doughnut-chart
+          [labels]="deptLabels()"
+          [data]="deptData()"
+          [height]="240"
+          cutout="68%"
+        ></app-doughnut-chart>
         }
       </div>
     </div>
@@ -77,13 +79,13 @@
         </div>
       </div>
       <div class="card-body">
-        @if (payrollDatasets.length > 0) {
-          <app-bar-chart
-            [labels]="payrollLabels"
-            [datasets]="payrollDatasets"
-            [height]="260"
-            valuePrefix="$"
-          ></app-bar-chart>
+        @if (payrollDatasets().length > 0) {
+        <app-bar-chart
+          [labels]="payrollLabels()"
+          [datasets]="payrollDatasets()"
+          [height]="260"
+          valuePrefix="$"
+        ></app-bar-chart>
         }
       </div>
     </div>
@@ -131,13 +133,13 @@
         </div>
       </div>
       <div class="card-body">
-        @if (salaryGradeDatasets.length > 0) {
-          <app-bar-chart
-            [labels]="salaryGradeLabels"
-            [datasets]="salaryGradeDatasets"
-            [height]="260"
-            valuePrefix="$"
-          ></app-bar-chart>
+        @if (salaryGradeDatasets().length > 0) {
+        <app-bar-chart
+          [labels]="salaryGradeLabels()"
+          [datasets]="salaryGradeDatasets()"
+          [height]="260"
+          valuePrefix="$"
+        ></app-bar-chart>
         }
       </div>
     </div>
@@ -145,19 +147,19 @@
     <div class="chart-card">
       <div class="card-header">
         <div class="header-titles">
-          <h3>Base Payroll & Bonus Dynamics</h3>
+          <h3>Base Payroll &amp; Bonus Dynamics</h3>
           <p class="subtitle">12-month base spend vs incentive payouts</p>
         </div>
       </div>
       <div class="card-body">
-        @if (bonusDatasets.length > 0) {
-          <app-line-chart
-            [labels]="bonusLabels"
-            [datasets]="bonusDatasets"
-            [height]="260"
-            [showLegend]="true"
-            valuePrefix="$"
-          ></app-line-chart>
+        @if (bonusDatasets().length > 0) {
+        <app-line-chart
+          [labels]="bonusLabels()"
+          [datasets]="bonusDatasets()"
+          [height]="260"
+          [showLegend]="true"
+          valuePrefix="$"
+        ></app-line-chart>
         }
       </div>
     </div>
@@ -187,7 +189,7 @@
           <td>{{ member.position }}</td>
           <td>{{ member.department }}</td>
           <td>
-            <span class="status-badge" [class]="member.status.toLowerCase().replace(' ', '-')">
+            <span class="status-badge" [class]="member.status ? member.status.toLowerCase().replace(' ', '-') : ''">
               {{ member.status }}
             </span>
           </td>
@@ -223,12 +225,12 @@
           <td>{{ project.team }} members</td>
           <td>{{ project.deadline }}</td>
           <td>
-            <span class="status-badge" [class]="project.status.toLowerCase().replace(' ', '-')">
+            <span class="status-badge" [class]="project.status ? project.status.toLowerCase().replace(' ', '-') : ''">
               {{ project.status }}
             </span>
           </td>
           <td>
-            <span class="priority-badge" [class]="project.priority.toLowerCase()">
+            <span class="priority-badge" [class]="project.priority ? project.priority.toLowerCase() : ''">
               {{ project.priority }}
             </span>
           </td>

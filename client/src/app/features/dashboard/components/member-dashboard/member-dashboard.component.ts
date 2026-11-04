@@ -32,15 +32,13 @@ export class MemberDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.analyticsService.getMemberAnalytics().subscribe({
-      next: (data) => {
-        this.analytics.set(data);
-      }
+      next: (data) => this.analytics.set(data),
+      error: (err) => console.error('Member analytics failed', err)
     });
 
     this.analyticsService.getObjectiveProgress().subscribe({
-      next: (objs) => {
-        this.objectives.set(objs);
-      }
+      next: (objs) => this.objectives.set(objs),
+      error: (err) => console.error('Objective progress failed', err)
     });
   }
 

@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import {
   AnalyticsService,
   ExecutiveAnalytics,
-  MonthlyMetric,
   DepartmentPayrollMetric,
   DepartmentHeadcountMetric,
   HeadcountPoint,
@@ -40,38 +39,38 @@ export class OwnerDashboardComponent implements OnInit {
   readonly analytics = signal<ExecutiveAnalytics | null>(null);
   readonly isLoading = signal<boolean>(true);
 
-  // Department filter
+  // Department filter (обычные поля — меняются через ngModel/события)
   selectedDepartmentId = '';
-  departments: { id: string; name: string }[] = [
+  readonly departments = signal<{ id: string; name: string }[]>([
     { id: '', name: 'All Departments' }
-  ];
+  ]);
 
   // Headcount & Turnover Trend
-  headcountLabels: string[] = [];
-  headcountDatasets: LineDataset[] = [];
-  currentTurnoverRate = 3.2;
+  readonly headcountLabels = signal<string[]>([]);
+  readonly headcountDatasets = signal<LineDataset[]>([]);
+  readonly currentTurnoverRate = signal(3.2);
 
   // Department distribution
-  deptLabels: string[] = [];
-  deptData: number[] = [];
+  readonly deptLabels = signal<string[]>([]);
+  readonly deptData = signal<number[]>([]);
 
   // Payroll by Department & Grade distribution
-  payrollLabels: string[] = [];
-  payrollDatasets: BarDataset[] = [];
+  readonly payrollLabels = signal<string[]>([]);
+  readonly payrollDatasets = signal<BarDataset[]>([]);
 
-  salaryGradeLabels: string[] = [];
-  salaryGradeDatasets: BarDataset[] = [];
+  readonly salaryGradeLabels = signal<string[]>([]);
+  readonly salaryGradeDatasets = signal<BarDataset[]>([]);
 
   // Bonus & Base Salary Dynamics
-  bonusLabels: string[] = [];
-  bonusDatasets: LineDataset[] = [];
+  readonly bonusLabels = signal<string[]>([]);
+  readonly bonusDatasets = signal<LineDataset[]>([]);
 
-  metrics = [
+  readonly metrics = signal([
     { label: 'Total Employees', value: '156', change: '+12 this quarter', changeType: 'positive' },
     { label: 'Monthly Payroll', value: '$284,500', change: '+4.2% vs budget', changeType: 'positive' },
     { label: 'Turnover Rate', value: '3.2%', change: '-0.8% YoY (healthy)', changeType: 'positive' },
     { label: 'Company OKR', value: '78%', change: 'On track for Q3', changeType: 'positive' }
-  ];
+  ]);
 
   members = [
     { name: 'John Doe', position: 'CEO', department: 'Executive', status: 'Active', email: 'john.doe@acme.com' },
@@ -100,11 +99,12 @@ export class OwnerDashboardComponent implements OnInit {
     this.analyticsService.getExecutiveAnalytics().subscribe({
       next: (data) => {
         this.analytics.set(data);
-        this.currentTurnoverRate = data.turnoverRate;
+        this.currentTurnoverRate.set(data.turnoverRate);
         this.setupOverviewCharts(data);
         this.isLoading.set(false);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Executive analytics failed', err);
         this.isLoading.set(false);
       }
     });
@@ -112,12 +112,13 @@ export class OwnerDashboardComponent implements OnInit {
     this.analyticsService.getHeadcountByDepartment().subscribe({
       next: (depts) => {
         if (depts && depts.length > 0) {
-          this.departments = [
+          this.departments.set([
             { id: '', name: 'All Departments' },
             ...depts.map(d => ({ id: d.departmentId, name: d.departmentName }))
-          ];
+          ]);
         }
-      }
+      },
+      error: (err) => console.error('Headcount by department failed', err)
     });
   }
 
@@ -130,8 +131,8 @@ export class OwnerDashboardComponent implements OnInit {
   private loadHeadcountTrend(deptId?: string): void {
     this.analyticsService.getHeadcountTrend(12, deptId).subscribe({
       next: (points: HeadcountPoint[]) => {
-        this.headcountLabels = points.map(p => p.period);
-        this.headcountDatasets = [
+        this.headcountLabels.set(points.map(p => p.period));
+        this.headcountDatasets.set([
           {
             label: 'Headcount',
             data: points.map(p => p.headcount),
@@ -156,21 +157,21 @@ export class OwnerDashboardComponent implements OnInit {
             tension: 0.2,
             fill: false
           }
-        ];
+        ]);
 
         if (points.length > 0) {
-          const lastPoint = points[points.length - 1];
-          this.currentTurnoverRate = lastPoint.turnoverRate;
+          this.currentTurnoverRate.set(points[points.length - 1].turnoverRate);
         }
-      }
+      },
+      error: (err) => console.error('Headcount trend failed', err)
     });
   }
 
   private loadSalaryAnalytics(deptId?: string): void {
     this.analyticsService.getSalaryDistribution(deptId).subscribe({
       next: (buckets: SalaryBucket[]) => {
-        this.salaryGradeLabels = buckets.map(b => b.label);
-        this.salaryGradeDatasets = [
+        this.salaryGradeLabels.set(buckets.map(b => b.label));
+        this.salaryGradeDatasets.set([
           {
             label: 'Average Salary ($)',
             data: buckets.map(b => b.avg),
@@ -183,16 +184,17 @@ export class OwnerDashboardComponent implements OnInit {
             backgroundColor: 'rgba(99, 102, 241, 0.65)',
             borderRadius: 6
           }
-        ];
-      }
+        ]);
+      },
+      error: (err) => console.error('Salary distribution failed', err)
     });
   }
 
   private loadBonusDynamics(): void {
     this.analyticsService.getBonusDynamics(12).subscribe({
       next: (points: BonusPoint[]) => {
-        this.bonusLabels = points.map(p => p.period);
-        this.bonusDatasets = [
+        this.bonusLabels.set(points.map(p => p.period));
+        this.bonusDatasets.set([
           {
             label: 'Base Payroll ($)',
             data: points.map(p => p.totalBase),
@@ -208,25 +210,30 @@ export class OwnerDashboardComponent implements OnInit {
             tension: 0.3,
             fill: true
           }
-        ];
-      }
+        ]);
+      },
+      error: (err) => console.error('Bonus dynamics failed', err)
     });
   }
 
   private setupOverviewCharts(data: ExecutiveAnalytics): void {
-    // Payroll by Department
-    this.payrollLabels = data.payrollByDepartment.map((p: DepartmentPayrollMetric) => p.department);
-    this.payrollDatasets = [
+    this.payrollLabels.set(
+      data.payrollByDepartment.map((p: DepartmentPayrollMetric) => p.department)
+    );
+    this.payrollDatasets.set([
       {
         label: 'Total Budget ($)',
         data: data.payrollByDepartment.map((p: DepartmentPayrollMetric) => p.totalPayroll),
         backgroundColor: '#6366f1',
         borderRadius: 6
       }
-    ];
+    ]);
 
-    // Department distribution
-    this.deptLabels = data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.department);
-    this.deptData = data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.headcount);
+    this.deptLabels.set(
+      data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.department)
+    );
+    this.deptData.set(
+      data.departmentDistribution.map((d: DepartmentHeadcountMetric) => d.headcount)
+    );
   }
 }

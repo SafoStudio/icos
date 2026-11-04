@@ -1,36 +1,41 @@
 <div class="dashboard-content">
+
   <!-- Key HR Metrics -->
   <div class="metrics-grid">
-    @for (metric of metrics; track metric.label) {
+    @for (metric of metrics(); track metric.label) {
     <div class="metric-card">
       <div class="metric-label">{{ metric.label }}</div>
       <div class="metric-value">{{ metric.value }}</div>
-      <div class="metric-change" [class.positive]="metric.changeType === 'positive'" [class.negative]="metric.changeType === 'negative'">
+      <div class="metric-change"
+           [class.positive]="metric.changeType === 'positive'"
+           [class.negative]="metric.changeType === 'negative'">
         {{ metric.change }}
       </div>
     </div>
     }
   </div>
 
-  <!-- Analytics Row 1: Hiring Funnel & Candidate Sources -->
+  <!-- Analytics Row 1 -->
   <div class="charts-grid-row">
     <div class="chart-card large">
       <div class="card-header">
         <div class="header-titles">
           <h3>ATS Recruitment Funnel</h3>
-          <p class="subtitle">Candidate volume & stage-by-stage conversion drop-off</p>
+          <p class="subtitle">Candidate volume &amp; stage-by-stage conversion drop-off</p>
         </div>
         <span class="badge-tag live">Pipeline</span>
       </div>
       <div class="card-body">
-        @if (funnelDatasets.length > 0) {
-          <app-bar-chart
-            [labels]="funnelLabels"
-            [datasets]="funnelDatasets"
-            [horizontal]="true"
-            [height]="260"
-            [showLegend]="false"
-          ></app-bar-chart>
+        @if (funnelDatasets().length > 0) {
+        <app-bar-chart
+          [labels]="funnelLabels()"
+          [datasets]="funnelDatasets()"
+          [horizontal]="true"
+          [height]="260"
+          [showLegend]="false"
+        ></app-bar-chart>
+        } @else {
+        <div class="empty-state">No funnel data</div>
         }
       </div>
     </div>
@@ -43,41 +48,35 @@
         </div>
       </div>
       <div class="card-body doughnut-body">
-        @if (sourceData.length > 0) {
-          <app-doughnut-chart
-            [labels]="sourceLabels"
-            [data]="sourceData"
-            [height]="240"
-            cutout="68%"
-          ></app-doughnut-chart>
+        @if (sourceData().length > 0) {
+        <app-doughnut-chart
+          [labels]="sourceLabels()"
+          [data]="sourceData()"
+          [height]="240"
+          cutout="68%"
+        ></app-doughnut-chart>
+        } @else {
+        <div class="empty-state">No source data</div>
         }
       </div>
     </div>
   </div>
 
-  <!-- Analytics Row 2: Team Availability & Time-Off Heatmap (PUNKT 3) -->
+  <!-- Analytics Row 2: Heatmap -->
   <div class="charts-grid-row full-width-row">
     <div class="chart-card full-width">
       <div class="card-header">
         <div class="header-titles">
-          <h3>Team Availability & Time-Off Heatmap</h3>
+          <h3>Team Availability &amp; Time-Off Heatmap</h3>
           <p class="subtitle">Daily absence density across company departments</p>
         </div>
         <div class="header-controls">
-          <select
-            class="filter-select"
-            [(ngModel)]="selectedHeatmapDept"
-            (ngModelChange)="onFilterChange()"
-          >
-            @for (dept of departments; track dept.id) {
-              <option [value]="dept.id">{{ dept.name }}</option>
+          <select class="filter-select" [(ngModel)]="selectedHeatmapDept" (ngModelChange)="onFilterChange()">
+            @for (dept of departments(); track dept.id) {
+            <option [value]="dept.id">{{ dept.name }}</option>
             }
           </select>
-          <select
-            class="filter-select"
-            [(ngModel)]="selectedPeriodDays"
-            (ngModelChange)="onFilterChange()"
-          >
+          <select class="filter-select" [(ngModel)]="selectedPeriodDays" (ngModelChange)="onFilterChange()">
             <option [ngValue]="14">14 Days</option>
             <option [ngValue]="21">21 Days</option>
             <option [ngValue]="30">30 Days</option>
@@ -85,33 +84,35 @@
         </div>
       </div>
       <div class="card-body heatmap-card-body">
-        @if (heatmapData.length > 0) {
-          <app-heatmap [data]="heatmapData"></app-heatmap>
+        @if (heatmapData().length > 0) {
+        <app-heatmap [data]="heatmapData()"></app-heatmap>
         } @else {
-          <div class="empty-state">Loading heatmap data...</div>
+        <div class="empty-state">Loading heatmap data...</div>
         }
       </div>
     </div>
   </div>
 
-  <!-- Analytics Row 3: Leave & Absence Utilization -->
+  <!-- Analytics Row 3: Leave -->
   <div class="charts-grid-row single-chart">
     <div class="chart-card">
       <div class="card-header">
         <div class="header-titles">
-          <h3>Team Leave & PTO Utilization</h3>
+          <h3>Team Leave &amp; PTO Utilization</h3>
           <p class="subtitle">Days taken across leave categories this quarter</p>
         </div>
       </div>
       <div class="card-body doughnut-body">
-        @if (leaveData.length > 0) {
-          <app-doughnut-chart
-            [labels]="leaveLabels"
-            [data]="leaveData"
-            [colors]="leaveColors"
-            [height]="220"
-            cutout="65%"
-          ></app-doughnut-chart>
+        @if (leaveData().length > 0) {
+        <app-doughnut-chart
+          [labels]="leaveLabels()"
+          [data]="leaveData()"
+          [colors]="leaveColors()"
+          [height]="220"
+          cutout="65%"
+        ></app-doughnut-chart>
+        } @else {
+        <div class="empty-state">No leave data</div>
         }
       </div>
     </div>
@@ -139,7 +140,7 @@
           <td>{{ candidate.name }}</td>
           <td>{{ candidate.position }}</td>
           <td>
-            <span class="status-badge" [class]="candidate.status.toLowerCase()">
+            <span class="status-badge" [class]="candidate.status ? candidate.status.toLowerCase() : ''">
               {{ candidate.status }}
             </span>
           </td>
